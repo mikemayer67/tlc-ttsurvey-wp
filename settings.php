@@ -1,5 +1,5 @@
 <?php
-namespace TLC\TTSurvey
+namespace TLC\TTSurvey;
 
 /**
  * Setup and handling of plugin settings

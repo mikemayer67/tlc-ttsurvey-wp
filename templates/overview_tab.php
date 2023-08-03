@@ -1,5 +1,5 @@
 <?php
-namespace TLC\Live;
+namespace TLC\TTSurvey;
 
 require_once tlc_plugin_path('include/logger.php');
 require_once tlc_plugin_path('settings.php');
