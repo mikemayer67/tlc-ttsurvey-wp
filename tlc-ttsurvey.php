@@ -99,7 +99,7 @@ register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
  */
 if( is_admin() )
 {
-  require_once 'admin.php';
+  require_once plugin_path('admin.php');
 }
 
 /**

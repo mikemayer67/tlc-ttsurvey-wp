@@ -16,6 +16,7 @@ if(($_POST['action'] ?? null) == "update") {
   }
 
   $settings = Settings::instance();
+}
 ?>
 
 <h1>

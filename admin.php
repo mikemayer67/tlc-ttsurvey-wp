@@ -16,7 +16,7 @@ const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 
 function handle_init()
 {
-  wp_enqueue_style('tlc-ttsurvey', tlc_plugin_url('css/tlc-ttsurvey.css'));
+  wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
 
   #add_javascript goes here
 }
