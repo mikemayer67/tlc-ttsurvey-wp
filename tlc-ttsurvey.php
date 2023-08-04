@@ -69,6 +69,7 @@ function plugin_url($rel_url)
 
 require_once 'logger.php';
 require_once 'settings.php';
+require_once 'database.php';
 
 /**
  * plugin activation hooks
@@ -77,6 +78,7 @@ require_once 'settings.php';
 function handle_activate()
 {
   log_info('activate: '.__NAMESPACE__);
+  tlc_db_activate();
 }
 
 function handle_deactivate()
