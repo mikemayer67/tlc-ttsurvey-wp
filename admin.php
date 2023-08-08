@@ -56,19 +56,7 @@ add_action('admin_menu',  ns('handle_admin_menu'));
 add_action('init',        ns('handle_init'));
 add_action($action_links, ns('add_settings_link'));
 
-
-/**
- * Populates the contents of the Settings page on the admin dashboard
- */
 function populate_settings_page()
 {
-  if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
-
-  $cur_tab = $_GET["tab"] ?? 'overview';
-
-  echo "<div class=wrap>";
-  require plugin_path('templates/settings_header.php');
-  require plugin_path('templates/'.$cur_tab.'_tab.php');
-  echo "</div>";
+  require 'admin/settings.php';
 }
-

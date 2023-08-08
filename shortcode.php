@@ -8,7 +8,6 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once 'logger.php';
-require_once 'settings.php';
 
 /**
  * handle the plugin shortcode
@@ -30,8 +29,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
   }
 
   wp_enqueue_style('tlc-ttsurvey-shortcode', tlc_plugin_url('css/tlc-ttsurvey-shortcode.css'));
-
-  $settings = Settings::instance();
 
   $html = "<h3>Nothing to See</h3>";
 

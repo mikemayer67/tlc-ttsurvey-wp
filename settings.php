@@ -13,7 +13,12 @@ if( ! defined('WPINC') ) { die; }
 
 const OPTIONS_KEY = 'tlc_ttsurvey_options';
 
+const CAPS_KEY = 'caps';
+
 const OPTION_DEFAULTS = [
+  CAPS_KEY => [
+
+  ],
 ];
 
 class Settings
