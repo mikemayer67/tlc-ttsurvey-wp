@@ -7,7 +7,7 @@ form.tlc {
 form.tlc div.label {
   font-weight: bold;
   font-size: larger;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 form.tlc div.info {
@@ -48,9 +48,16 @@ form.tlc span.input-info {
   font-weight:200;
 }
 
-form.tlc table.settings {
+form.tlc .settings {
   margin-left:3em;
+}
+
+form.tlc table {
   border-collapse:collapse;
+}
+
+form.tlc select {
+  margin-top:10px;
 }
 
 form.tlc table td.name {

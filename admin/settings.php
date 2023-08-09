@@ -12,26 +12,8 @@ $settings = Settings::instance();
 $all_users = get_users();
 
 if(($_POST["action"] ?? null) == "update") {
-  if (!wp_verify_nonce($_POST['_wpnonce'],SETTINGS_NONCE)) {
-    log_error("failed to validate nonce");
-    wp_die("Bad nonce");
-  }
-
-  $settings->set('caps',$_POST['caps']);
-
-  foreach($all_users as $user) {
-    $id = $user->id;
-    foreach(['responses','structure'] as $cap) {
-      $key = "tlc-ttsurvey-$cap";
-      if($_POST['caps'][$cap][$id]) {
-        $user->add_cap($key);
-      } else {
-        $user->remove_cap($key);
-      }
-    }
-  }
-
-  log_info(print_r($settings,true));
+  /* nonce is checked within the update_from_post method */
+  $settings->update_from_post($_POST);
 }
 
 $nonce = wp_nonce_field(SETTINGS_NONCE);
@@ -39,6 +21,8 @@ $nonce = wp_nonce_field(SETTINGS_NONCE);
 $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   'page'=>SETTINGS_PAGE_SLUG,
 ));
+
+$current_year = date('Y');
 
 ?>
 
@@ -77,8 +61,10 @@ foreach($all_users as $user) {
 }
 ?>
   </table>
-  <ul>
-  </ul>
+  <div class=label>Active Year</div>
+  <select name='active_year' class='tlc settings'>
+  <option value='current'><?=$current_year?></option>
+  </select>
   </div>
   <input type="submit" value="Save" class="submit button button-primary button-large">
 </form>
