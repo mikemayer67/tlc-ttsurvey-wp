@@ -154,8 +154,6 @@ class Settings
         }
       }
     }
-
-    log_info(print_r($this,true));
   }
 
 };

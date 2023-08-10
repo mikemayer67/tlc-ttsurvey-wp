@@ -9,17 +9,26 @@ if( ! defined('WPINC') ) { die; }
 
 require_once 'logger.php';
 
+function participant_table()
+{
+  global $wpdb;
+  return $wpdb->prefix . "tlc_ttsurvey_participants";
+}
+
+function structure_table()
+{
+  global $wpdb;
+  return $wpdb->prefix . "tlc_ttsurvey_structure";
+}
+
 function tlc_db_activate()
 {
   global $wpdb;
-
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-	$pre = $wpdb->prefix . "tlc_ttsurvey";
-	
 	$charset_collate = $wpdb->get_charset_collate();
 
-	$sql = "CREATE TABLE ${pre}_participants (
+	$sql = "CREATE TABLE " . participant_table() . " (
     id char(6) NOT NULL,
     name varchar(255) NOT NULL,
     email varchar(255) DEFAULT NULL,
@@ -29,11 +38,20 @@ function tlc_db_activate()
   ) $charset_collate;";
 	dbDelta($sql);
 
-  $sql = "CREATE TABLE ${pre}_structure (
+	$sql = "CREATE TABLE " . structure_table() . " (
     year char(4) NOT NULL,
     data LONGTEXT,
     PRIMARY KEY  (year),
     UNIQUE KEY year_UNIQUE (year)
   ) $charset_collate;";
   dbDelta($sql);
+}
+
+function survey_years()
+{
+  global $wpdb;
+  $sql = "SELECT year from " . structure_table() . ";";
+  $sql = $wpdb->prepare($sql);
+  $years = $wpdb->get_col($sql);
+  return $years ?? array();
 }

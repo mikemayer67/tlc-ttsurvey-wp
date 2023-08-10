@@ -5,6 +5,7 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('settings.php');
 require_once plugin_path('logger.php');
+require_once plugin_path('database.php');
 
 $title = esc_html(get_admin_page_title());
 
@@ -22,8 +23,12 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   'page'=>SETTINGS_PAGE_SLUG,
 ));
 
+$active_year = $settings->get(ACTIVE_YEAR_KEY);
 $current_year = date('Y');
-
+$survey_years = survey_years();
+$survey_years[] = date('Y');
+$survey_years = array_unique($survey_years);
+arsort($survey_years);
 ?>
 
 <div class=wrap>
@@ -41,7 +46,7 @@ $current_year = date('Y');
     <th>Structure</th>
   </tr>
 <?php
-$caps = $settings->get('caps');
+$caps = $settings->get(CAPS_KEY);
 foreach($all_users as $user) {
   $id = $user->id;
   $name = $user->display_name;
@@ -57,13 +62,13 @@ foreach($all_users as $user) {
     <input type=checkbox value=1 name="caps[structure][<?=$id?>]" <?=$structure?>>
     </div></td>
   </tr>
-<?php
-}
-?>
+<?php } ?>
   </table>
   <div class=label>Active Year</div>
   <select name='active_year' class='tlc settings'>
-  <option value='current'><?=$current_year?></option>
+<?php foreach( $survey_years as $year ) { ?>
+  <option value=<?=$year?> <?php echo($year==$active_year ? "selected" : ""); ?>><?=$year?></option>
+<?php } ?>
   </select>
   </div>
   <input type="submit" value="Save" class="submit button button-primary button-large">
