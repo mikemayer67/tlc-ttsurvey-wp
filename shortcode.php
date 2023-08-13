@@ -2,12 +2,13 @@
 namespace TLC\TTSurvey;
 
 /**
- * TLC TTSurvey  plugin shortcode setup
+ * TLC Time and Talent plugin shortcode setup
  */
 
 if( ! defined('WPINC') ) { die; }
 
-require_once 'logger.php';
+require_once plugin_path('logger.php');
+require_once plugin_path('settings.php');
 
 /**
  * handle the plugin shortcode
@@ -21,18 +22,27 @@ require_once 'logger.php';
 
 function handle_shortcode($attr,$content=null,$tag=null)
 {
-  static $first = true;
-  if(!$first) {
-    return;
-  } else {
-    $first = false;
-  }
+  wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
+  wp_enqueue_script('shortcode_scripts');
 
-  wp_enqueue_style('tlc-ttsurvey-shortcode', tlc_plugin_url('css/tlc-ttsurvey-shortcode.css'));
+  $settings = Settings::instance();
 
-  $html = "<h3>Nothing to See</h3>";
+  $html = "";
+  $html .= "<div class=tlc-ttsurvey-container>";
+  $html .= "</div>";
 
   return $html;
 }
 
-add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
+wp_register_script(
+  'shortcode_scripts',
+  plugin_url('js/shortcode.js'),
+  array('jquery'),
+  '1.0.3',
+  true
+);
+wp_localize_script(
+  'shortcode_scripts',
+  'shortcode_vars',
+  array('year'=>Settings::instance()->get(ACTIVE_YEAR_KEY))
+);

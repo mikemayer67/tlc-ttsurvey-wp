@@ -18,7 +18,7 @@ const ACTIVE_YEAR_KEY = 'active_year';
 
 const OPTION_DEFAULTS = array(
   CAPS_KEY => [],
-  ACTIVE_YEAR_KEY => 'current',
+  ACTIVE_YEAR_KEY => '',
 );
 
 class Settings
@@ -117,6 +117,17 @@ class Settings
     }
 
     update_option(OPTIONS_KEY,$this->_values);
+  }
+
+  /**
+   * adds the default settings to the WP database
+   */
+  static function activate()
+  {
+    $settings = Settings::instance();
+    foreach (OPTION_DEFAULTS as $k=>$v) {
+      $settings->set($k,$v);
+    }
   }
 
   /**

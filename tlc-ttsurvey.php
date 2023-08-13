@@ -79,6 +79,7 @@ function handle_activate()
 {
   log_info('activate: '.__NAMESPACE__);
   tlc_db_activate();
+  Settings::activate();
 }
 
 function handle_deactivate()
