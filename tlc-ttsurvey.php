@@ -97,17 +97,22 @@ register_activation_hook(   __FILE__, ns('handle_activate') );
 register_deactivation_hook( __FILE__, ns('handle_deactivate') );
 register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
 
-/**
- * admin setup
- */
-if( is_admin() )
+if( is_admin() ) /* Admin setup */
 {
   require_once plugin_path('admin.php');
 }
+else /* Non-admin setup */
+{
+  add_action('init',ns('handle_init'));
+  /**
+   * shortcode setup (non-admin)
+   */
+  require_once 'shortcode.php';
+  add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
+}
 
-/**
- * shortcode setup (non-admin)
- */
-require_once 'shortcode.php';
-add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
-
+function handle_init()
+{
+  $junk = $_COOKIE['junk'] ?? 'n/a';
+  setcookie('junk','hello',0);
+}

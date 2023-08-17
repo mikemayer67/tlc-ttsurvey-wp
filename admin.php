@@ -13,8 +13,9 @@ require_once 'settings.php';
 
 const SETTINGS_NONCE = 'tlc-ttsurvey-settings';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
+const LOG_PAGE_SLUG = 'tlc-ttsurvey-log';
 
-function handle_init()
+function handle_admin_init()
 {
   wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('css/tlc-ttsurvey-admin.css'));
 
@@ -34,7 +35,6 @@ function handle_admin_menu()
     SETTINGS_PAGE_SLUG, // settings page slug
     ns('populate_settings_page'), // callback to populate settingsn page
   );
-    
 }
 
 function add_settings_link($links)
@@ -42,10 +42,9 @@ function add_settings_link($links)
   $options_url = admin_url('options-general.php');
   $options_url .= "?page=".SETTINGS_PAGE_SLUG;
   $settings_url = $options_url . "&tab=settings";
-  $overview_url = $options_url . "&tab=overview";
-  log_info("Options URL: $options_url");
+  $log_url = $options_url . "&tab=log";
+  array_unshift($links,"<a href='$log_url'>Log</a>");
   array_unshift($links,"<a href='$settings_url'>Settings</a>");
-  array_unshift($links,"<a href='$overview_url'>Overview</a>");
   return $links;
 }
 
@@ -53,10 +52,14 @@ $action_links = 'plugin_action_links_' . plugin_basename(plugin_file());
 
 add_action('admin_menu',  ns('handle_admin_menu'));
 #add_action('admin_init', ns('handle_admin_init'));
-add_action('init',        ns('handle_init'));
+add_action('init',        ns('handle_admin_init'));
 add_action($action_links, ns('add_settings_link'));
 
 function populate_settings_page()
 {
-  require 'admin/settings.php';
+  if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+
+  echo "<div class=wrap>";
+  require 'admin/plugin_page.php';
+  echo "</div>";
 }

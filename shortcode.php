@@ -9,6 +9,9 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('logger.php');
 require_once plugin_path('settings.php');
+require_once plugin_path('participant.php');
+
+const LOGIN_COOKIE = 'tlc-ttsurvey-userid';
 
 /**
  * handle the plugin shortcode
@@ -25,8 +28,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
   wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
   wp_enqueue_script('shortcode_scripts');
 
-  $settings = Settings::instance();
-
   $html = "";
   $html .= "<div class=tlc-ttsurvey-container>";
   $html .= "</div>";
@@ -41,6 +42,7 @@ wp_register_script(
   '1.0.3',
   true
 );
+
 wp_localize_script(
   'shortcode_scripts',
   'shortcode_vars',
