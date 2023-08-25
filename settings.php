@@ -52,11 +52,7 @@ class Settings
   private function __construct() {
     $options = get_option(OPTIONS_KEY,null);
     if( isset($options) ) {
-      try {
         $this->_values = array_replace($this->_values, $options);
-      } catch (TypeError $e) {
-      } catch (Exception $e) {
-      }
     }
   }
 
@@ -117,17 +113,6 @@ class Settings
     }
 
     update_option(OPTIONS_KEY,$this->_values);
-  }
-
-  /**
-   * adds the default settings to the WP database
-   */
-  static function activate()
-  {
-    $settings = Settings::instance();
-    foreach (OPTION_DEFAULTS as $k=>$v) {
-      $settings->set($k,$v);
-    }
   }
 
   /**
