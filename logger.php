@@ -3,6 +3,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+const LOG_FILE = 'tlc-ttsurvey.log';
+
 class Logger
 {
   private static $_instance = null;
@@ -16,12 +18,12 @@ class Logger
 
 
   private function __construct() {
-    $logfile = plugin_path('tlc-ttsurvey.log');
-    if( file_exists($logfile) and filesize($logfile) > 512*1024 ) {
-      $tempfile = $logfile.".tmp";
+    $logger = plugin_path(LOG_FILE);
+    if( file_exists($logger) and filesize($logger) > 512*1024 ) {
+      $tempfile = $logger.".tmp";
       $fp = fopen($tempfile,"w");
       $skip = 1000;
-      foreach(file($logfile) as $line) {
+      foreach(file($logger) as $line) {
         if($skip > 0) {
           $skip--;
         } else {
@@ -29,10 +31,10 @@ class Logger
         }
       }
       fclose($fp);
-      unlink($logfile);
-      rename($tempfile,$logfile);
+      unlink($logger);
+      rename($tempfile,$logger);
     }
-    $this->fp = fopen($logfile,"a");
+    $this->fp = fopen($logger,"a");
   }
 
   function __destruct() {
@@ -45,6 +47,46 @@ class Logger
     $timestamp = $datetime->format("d-M-y H:i:s.v e");
     $prefix = str_pad($prefix,8);
     fwrite($this->fp, "[{$timestamp}] {$prefix} {$msg}\n");
+  }
+
+  function dump_html($level="INFO")
+  {
+    if($level=="ERROR") {
+      $levels = ["ERROR"];
+    } elseif($level=="WARNING") {
+      $levels = ["WARNING","ERROR"];
+    } else {
+      $levels = ["INFO","WARNING","ERROR"];
+    }
+
+    $entries = array();
+    $entry_re = '/^\[(.*?)\]\s*(\w+)\s*(.*?)\s*$/';
+    foreach(file(plugin_path(LOG_FILE)) as $line) {
+      $m = array();
+      if(preg_match($entry_re,$line,$m))
+      {
+        if(in_array($m[2],$levels)) {
+          $entry = "<tr class=" . strtolower($m[2]). ">";
+          $entry .= "<td class=date>" . $m[1] . "</td>";
+          $entry .= "<td class=message>" . $m[3] . "</td>";
+          $entry .= "</tr>";
+          $entries[] = $entry;
+        }
+      }
+    }
+    echo "<table class=log-table>";
+    foreach (array_reverse($entries) as $entry) {
+      echo $entry;
+    }
+    echo "</table>";
+  }
+
+  function clear()
+  {
+    $file = plugin_path(LOG_FILE);
+    fclose($this->fp);
+    unlink($file);
+    $this->fp = fopen($file,"a");
   }
 }
 

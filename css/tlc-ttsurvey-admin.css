@@ -1,0 +1,240 @@
+form.tlc {
+  margin-left: 15px;
+  width: 100%;
+  max-width: 750px;
+}
+
+form.tlc div.label {
+  font-weight: bold;
+  font-size: larger;
+  margin-top: 20px;
+}
+
+form.tlc div.info {
+  font-weight: 200;
+  margin-left: 30px;
+  margin-bottom: 5px;
+}
+
+form.tlc div.info ul {
+  margin-left: 20px;
+  margin-top:5px;
+}
+
+form.tlc div.info ul li {
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+form.tlc div.input {
+  margin-left: 30px;
+}
+
+form.tlc input.submit {
+  margin-top:20px;
+}
+
+form.tlc input.tls-time {
+  max-width: 4em;
+  text-align: center;
+}
+
+form.tlc span.input-label {
+  font-weight:bold;
+}
+
+form.tlc span.input-info {
+  margin-left: 5px;
+  font-weight:200;
+}
+
+form.tlc .settings {
+  margin-left:3em;
+}
+
+form.tlc table {
+  border-collapse:collapse;
+}
+
+form.tlc select {
+  margin-top:10px;
+}
+
+form.tlc table td.name {
+  font-weight:bold;
+  text-align:right;
+}
+
+form.tlc table td.cap {
+  font-weight:bold;
+}
+
+form.tlc table div.cap {
+  text-align:center;
+}
+
+form.tlc table th {
+  border-bottom: 1px solid;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+form.tlc table td {
+  margin:3px;
+  padding-top:10px;
+}
+
+span.tlc-status {
+  margin-left:20px;
+  padding-left:10px;
+  padding-right:10px;
+  font-weight:200;
+  background:yellow;
+  color:black;
+  border:solid;
+  border-width:1px;
+  border-color:lightgray;
+}
+
+div.link {
+  margin-top:30px;
+}
+
+div.link a {
+  font-weight:bold;
+  font-size:larger;
+}
+
+
+input:invalid {
+  background-color:lightpink;
+}
+
+table.tlc-overview {
+  margin-left:15px;
+}
+
+table.tlc-overview td.label {
+  font-weight: bold;
+  vertical-align: top;
+}
+
+table.tlc-overview td.value {
+  padding-left:15px;
+  font-weight:200;
+}
+
+table.tlc-overview tr.heading {
+}
+
+table.tlc-overview tr.heading td {
+  font-weight:500;
+  font-size:large;
+  padding-top:15px;
+  padding-bottom:5px;
+}
+
+table.tlc-overview td.id {
+  padding-left:20px;
+  font-weight:500;
+}
+
+table.tlc-overview table.admins td.username
+{
+  font-weight:bolder;
+  text-align:right;
+}
+
+table.tlc-overview table.admins td.usercaps
+{
+  padding-left:1em;
+}
+
+div.log-table {
+  margin-left:15px;
+  margin-top:15px;
+  border-width:1px;
+  border-color:black;
+  border-style:solid;
+  overflow-y:scroll;
+  width:95%;
+  height:500px;
+}
+
+div.log-table table.log-table {
+  table-layout: auto;
+  width:100%;
+}
+
+div.log-table tr.warning td {
+  color:#e88010;
+}
+
+div.log-table tr.error td {
+  color:#a00000;
+}
+
+div.log-table tr.info td {
+  color:#0000a0;
+}
+
+div.log-table td.date {
+  white-space:nowrap;
+}
+
+div.log-table td.message {
+  padding-left:5px;
+  font-weight:600;
+  width:100%;
+}
+
+div.log-table tr:nth-child(odd) {
+  background: white;
+}
+
+div.log-table tr:nth-child(even) {
+  background: #e0e0e0;
+}
+
+
+.tlc-shortcode-info {
+  margin-top:10px;
+  font-weight:bolder;
+}
+
+.tlc-shortcode-note {
+  margin-left:15px;
+  font-weight:400;
+  font-style:italic;
+}
+
+.tlc-shortcode-args {
+  margin-left:15px;
+}
+
+.tlc-shortcode-arg {
+  font-weight:bolder;
+  margin-top:10px;
+}
+
+.tlc-shortcode-arg-info {
+  margin-left:15px;
+  font-weight:400;
+}
+
+.tlc-shortcode-example {
+  padding-top:8px;
+}
+
+.tlc-shortcode-example span {
+  font-family: monospace;
+  font-weight: bolder;
+  font-size: medium;
+  margin-left: 15px;
+  padding: 4px;
+  color: black;
+  background: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+}

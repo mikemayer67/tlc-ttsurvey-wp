@@ -13,8 +13,13 @@ if( ! defined('WPINC') ) { die; }
 
 const OPTIONS_KEY = 'tlc_ttsurvey_options';
 
-const OPTION_DEFAULTS = [
-];
+const CAPS_KEY = 'caps';
+const ACTIVE_YEAR_KEY = 'active_year';
+
+const OPTION_DEFAULTS = array(
+  CAPS_KEY => [],
+  ACTIVE_YEAR_KEY => '',
+);
 
 class Settings
 {
@@ -47,11 +52,7 @@ class Settings
   private function __construct() {
     $options = get_option(OPTIONS_KEY,null);
     if( isset($options) ) {
-      try {
         $this->_values = array_replace($this->_values, $options);
-      } catch (TypeError $e) {
-      } catch (Exception $e) {
-      }
     }
   }
 
@@ -120,6 +121,35 @@ class Settings
   static function uninstall()
   {
     delete_option(OPTIONS_KEY);
+  }
+
+  /**
+   * updates settings from update post
+   */
+  function update_from_post($post)
+  {
+    if (!wp_verify_nonce($post['_wpnonce'],SETTINGS_NONCE)) {
+      log_error("failed to validate nonce");
+      wp_die("Bad nonce");
+    }
+
+    $this->set(ACTIVE_YEAR_KEY, $post['active_year']);
+
+    $new_caps = $post['caps'];
+    $this->set(CAPS_KEY,$new_caps);
+
+    $all_users = get_users();
+    foreach($all_users as $user) {
+      $id = $user->id;
+      foreach(['responses','structure'] as $cap) {
+        $key = "tlc-ttsurvey-$cap";
+        if($new_caps[$cap][$id]) {
+          $user->add_cap($key);
+        } else {
+          $user->remove_cap($key);
+        }
+      }
+    }
   }
 
 };
