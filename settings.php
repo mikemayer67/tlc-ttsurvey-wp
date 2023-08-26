@@ -15,10 +15,12 @@ const OPTIONS_KEY = 'tlc_ttsurvey_options';
 
 const CAPS_KEY = 'caps';
 const ACTIVE_YEAR_KEY = 'active_year';
+const PDF_URI_KEY = 'pdf_href';
 
 const OPTION_DEFAULTS = array(
   CAPS_KEY => [],
   ACTIVE_YEAR_KEY => '',
+  PDF_URI_KEY => '',
 );
 
 class Settings
@@ -63,6 +65,15 @@ class Settings
   static function active_year() {
     return self::instance()->get(ACTIVE_YEAR_KEY);
   }
+
+  /**
+   * get URI for pdf of the survey
+   * @return uri for link to pdf of the current survey
+   */
+  static function pdf_uri() {
+    return self::instance()->get(PDF_URI_KEY);
+  }
+
 
   /**
    * get option value
@@ -145,6 +156,12 @@ class Settings
 
     $new_caps = $post['caps'];
     $this->set(CAPS_KEY,$new_caps);
+
+    $new_pdf_uri = $post['pdf_uri'];
+    log_info("new_pdf_uri: $new_pdf_uri");
+    $new_pdf_uri = sanitize_url($new_pdf_uri,['http','https','ftp','ftps']);
+    log_info("(sanitized): $new_pdf_uri");
+    $this->set(PDF_URI_KEY,$new_pdf_uri);
 
     $all_users = get_users();
     foreach($all_users as $user) {

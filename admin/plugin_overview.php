@@ -18,6 +18,7 @@ asort($survey_years);
 $survey_years = implode(", ",$survey_years);
 
 $caps = $settings->get(CAPS_KEY);
+$pdf_uri = $settings->get(PDF_URI_KEY);
 
 ?>
 
@@ -59,6 +60,12 @@ foreach($all_users as $user) {
       </table>
     </td>
   </tr>
+
+  <tr>
+    <td class=label>Survey URL</td>
+    <td class=value><?=$pdf_uri?></td>
+  </tr>
+
 </table>
 
 <h2>Usage</h2>

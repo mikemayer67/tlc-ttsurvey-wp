@@ -63,6 +63,14 @@ foreach($all_users as $user) {
 <?php } ?>
   </table>
 
+<?php
+  $pdf_uri = $settings->get(PDF_URI_KEY);
+?>
+  <div class=label>Survey Download URL</div>
+  <div class=info>Location for a downloadable copy of the survey</div>
+  <input type='URL' class='tlc settings' size=50 name='pdf_uri' value='<?=$pdf_uri?>'
+   pattern='^(http|https|ftp|ftps)://[a-zA-Z].*$'>
+
   </div>
 
   <input type="submit" value="Save" class="submit button button-primary button-large">

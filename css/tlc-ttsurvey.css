@@ -1,0 +1,15 @@
+div.tlc-ttsurvey-noscript {
+  font-family: sans-serif;
+  width: 100%;
+  font-size: larger;
+  font-weight: bold;
+  color: white;
+  background-color: brown;
+  padding: 5px 10px;
+}
+
+p.tlc-ttsurvey-noscript {
+  color: brown;
+  margin-top:0;
+  margin-left:1em;
+}

@@ -27,26 +27,39 @@ require_once plugin_path('login.php');
 
 function handle_shortcode($attr,$content=null,$tag=null)
 {
-  wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
-  wp_enqueue_script('shortcode_scripts');
-
   $login_cookie = LoginCookie::instance();
   $userid = $login_cookie->active_userid();
   $anonid = $login_cookie->active_anonid();
 
-  $html = "";
-  $html .= "<div class=tlc-ttsurvey-container>";
+
+  ob_start();
+?>
+<div class=tlc-ttsurvey-container>
+
+<noscript>
+<div class=tlc-ttsurvey-noscript>This survey works best with Javascript enabled</div>
+<p class=tlc-ttsurvey-noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey.
+<?php
+  $pdf_uri = Settings::pdf_uri();
+  if(!empty($pdf_uri)) {
+    echo " You can download a PDF version <a target='_blank' href='$pdf_uri'>here</a>.</p>";
+  }
+?>
+</noscript>
+
+<?php
   if( $userid == null ) {
     require plugin_path('shortcode/login_form.php');
   } elseif( $anonid == null ) {
-    $html .= "Current user has id $userid, but no anonymous id";
+    echo "Current user has id $userid, but no anonymous id";
   } else {
-    $html .= "Current user has id $userid and anonymous id $anonid";
+    echo "Current user has id $userid and anonymous id $anonid";
   }
-
-
-  $html .= "</div>";
-
+?>
+</div>
+<?php
+  $html = ob_get_contents();
+  ob_flush_contents();
   return $html;
 }
 
@@ -63,3 +76,7 @@ wp_localize_script(
   'shortcode_vars',
   array('year'=>Settings::instance()->get(ACTIVE_YEAR_KEY))
 );
+
+wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
+wp_enqueue_script('shortcode_scripts');
+
