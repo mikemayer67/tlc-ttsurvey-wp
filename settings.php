@@ -57,6 +57,14 @@ class Settings
   }
 
   /**
+   * get active survey year
+   * @return active survey year
+   */
+  static function active_year() {
+    return self::instance()->get(ACTIVE_YEAR_KEY);
+  }
+
+  /**
    * get option value
    *
    * Returns null if the option isn't currently set

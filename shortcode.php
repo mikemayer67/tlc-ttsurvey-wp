@@ -37,7 +37,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   $html = "";
   $html .= "<div class=tlc-ttsurvey-container>";
   if( $userid == null ) {
-    $html .= "No current user (add login screen here...)";
+    require plugin_path('shortcode/login_form.php');
   } elseif( $anonid == null ) {
     $html .= "Current user has id $userid, but no anonymous id";
   } else {

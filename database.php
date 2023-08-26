@@ -8,50 +8,62 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once 'logger.php';
+require_once 'settings.php';
 
-function participant_table()
+const USER_TABLE = 'tlc-ttsurvey-users';
+const FORM_TABLE = 'tlc-ttsurvey-forms';
+
+function survey_forms()
 {
-  global $wpdb;
-  return $wpdb->prefix . "tlc_ttsurvey_participants";
+  $forms = get_option(FORM_TABLE,null);
+  if(is_null($forms)) {
+    log_info("Adding forms table as ".FORM_TABLE." option");
+    $forms = array();
+    add_option(FORM_TABLE,$forms);
+  }
+  return $forms;
 }
 
-function structure_table()
+function survey_users()
 {
-  global $wpdb;
-  return $wpdb->prefix . "tlc_ttsurvey_structure";
-}
-
-function tlc_db_activate()
-{
-  global $wpdb;
-	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
-	$charset_collate = $wpdb->get_charset_collate();
-
-	$sql = "CREATE TABLE " . participant_table() . " (
-    id char(6) NOT NULL,
-    name varchar(255) NOT NULL,
-    email varchar(255) DEFAULT NULL,
-    data LONGTEXT,
-    PRIMARY KEY  (id),
-    UNIQUE KEY key_UNIQUE (id)
-  ) $charset_collate;";
-	dbDelta($sql);
-
-	$sql = "CREATE TABLE " . structure_table() . " (
-    year char(4) NOT NULL,
-    data LONGTEXT,
-    PRIMARY KEY  (year),
-    UNIQUE KEY year_UNIQUE (year)
-  ) $charset_collate;";
-  dbDelta($sql);
+  $forms = get_option(USER_TABLE,null);
+  if(is_null($forms)) {
+    log_info("Adding userss table as ".USER_TABLE." option");
+    $forms = array();
+    add_option(USER_TABLE,$forms);
+  }
+  return $forms;
 }
 
 function survey_years()
 {
-  global $wpdb;
-  $sql = "SELECT year from " . structure_table() . ";";
-  $sql = $wpdb->prepare($sql);
-  $years = $wpdb->get_col($sql);
-  return $years ?? array();
+  $forms = survey_forms();
+  $years = array_keys($forms);
+  $year = Settings::active_year();
+  if( ! in_array($year,$years) ) {
+    $years[] = $year;
+  }
+  return $years;
 }
+
+function survey_form($year)
+{
+  $forms = survey_forms();
+  if(! array_key_exists($year,$forms) )
+  {
+    log_info("Adding $year to forms in ".FORM_TABLE." option");
+    $forms[$year] = array();
+  }
+  return $forms[$year];
+}
+
+/*
+ * returns all user ids and anonymous ids ever issued
+ **/
+function all_userids()
+{
+  $users = survey_users();
+  return array_keys($users);
+}
+
+

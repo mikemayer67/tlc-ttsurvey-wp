@@ -8,9 +8,9 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('logger.php');
+require_once plugin_path('database.php');
 
 const LOGIN_COOKIE = 'tlc-ttsurvey-info';
-
 
 class LoginCookie
 {
@@ -26,14 +26,13 @@ class LoginCookie
   }
 
   function unique_ids($prefix) {
-    $new_userid = strtoupper($prefix) . random_int(1000,9999);
-    $new_anonid = 'xx' . random_int(1000,9999);
-    foreach( $this->_userid_history as $userid=>$anonid ) {
-      if( ($new_userid == $userid) || ($new_anoid == $anonid) ) {
-        return $this->unique_ids($prefix);
-      }
+    $userid = strtoupper($prefix) . random_int(1000,9999);
+    $anonid = 'xx' . random_int(1000,9999);
+    $existing = all_userids();
+    if( in_array($userid,$existing) || in_array($anonid,$existing) ) {
+      return $this->unique_ids($prefix);
     }
-    return [$new_userid,$new_anonid];
+    return [$userid,$anonid];
   }
 
   /**
@@ -115,3 +114,5 @@ $login_cookie->reset_timeout();
 
 // TODO: Parse $_REQUEST to see if we're creating a new userid/anonid entry
 
+//[$userid,$anonid] = $login_cookie->unique_ids('kk');
+//$login_cookie->add($userid,$anonid);
