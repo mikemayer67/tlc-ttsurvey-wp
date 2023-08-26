@@ -102,16 +102,11 @@ if( is_admin() ) /* Admin setup */
 }
 else /* Non-admin setup */
 {
-  add_action('init',ns('handle_init'));
+  require_once 'login.php';
+
   /**
    * shortcode setup (non-admin)
    */
   require_once 'shortcode.php';
   add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
-}
-
-function handle_init()
-{
-  $junk = $_COOKIE['junk'] ?? 'n/a';
-  setcookie('junk','hello',0);
 }

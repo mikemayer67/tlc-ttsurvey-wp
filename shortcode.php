@@ -10,8 +10,10 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('logger.php');
 require_once plugin_path('settings.php');
 require_once plugin_path('participant.php');
+require_once plugin_path('login.php');
 
-const LOGIN_COOKIE = 'tlc-ttsurvey-userid';
+/**
+ * handle login 
 
 /**
  * handle the plugin shortcode
@@ -28,8 +30,21 @@ function handle_shortcode($attr,$content=null,$tag=null)
   wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
   wp_enqueue_script('shortcode_scripts');
 
+  $login_cookie = LoginCookie::instance();
+  $userid = $login_cookie->active_userid();
+  $anonid = $login_cookie->active_anonid();
+
   $html = "";
   $html .= "<div class=tlc-ttsurvey-container>";
+  if( $userid == null ) {
+    $html .= "No current user (add login screen here...)";
+  } elseif( $anonid == null ) {
+    $html .= "Current user has id $userid, but no anonymous id";
+  } else {
+    $html .= "Current user has id $userid and anonymous id $anonid";
+  }
+
+
   $html .= "</div>";
 
   return $html;

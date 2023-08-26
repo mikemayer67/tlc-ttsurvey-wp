@@ -19,4 +19,7 @@ $action = $_SERVER['REQUEST_URI'];
   <?=$nonce?>
   <input type='submit' value='Clear Log' class='submit button button-primary button-large'>
 </form>
+<a href='<?=plugin_url("tlc-ttsurvey.log")?>' target='_blank'>
+View Log File
+</a>
 
