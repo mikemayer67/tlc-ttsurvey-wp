@@ -25,6 +25,8 @@ require_once plugin_path('login.php');
  * @param string $tag shortcode tag
  */
 
+const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
+
 function handle_shortcode($attr,$content=null,$tag=null)
 {
   $login_cookie = LoginCookie::instance();
@@ -33,21 +35,9 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
 
   ob_start();
-?>
-<div class=tlc-ttsurvey-container>
+  echo "<div class=tlc-ttsurvey-container>";
+  add_noscript();
 
-<noscript>
-<div class=tlc-ttsurvey-noscript>This survey works best with Javascript enabled</div>
-<p class=tlc-ttsurvey-noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey.
-<?php
-  $pdf_uri = Settings::pdf_uri();
-  if(!empty($pdf_uri)) {
-    echo " You can download a PDF version <a target='_blank' href='$pdf_uri'>here</a>.</p>";
-  }
-?>
-</noscript>
-
-<?php
   if( $userid == null ) {
     require plugin_path('shortcode/login_form.php');
   } elseif( $anonid == null ) {
@@ -55,13 +45,32 @@ function handle_shortcode($attr,$content=null,$tag=null)
   } else {
     echo "Current user has id $userid and anonymous id $anonid";
   }
-?>
-</div>
-<?php
+
+  echo "</div>";
   $html = ob_get_contents();
-  ob_flush_contents();
+  ob_end_clean();
   return $html;
 }
+
+function add_noscript()
+{
+  $pdf_uri = Settings::pdf_uri();
+  if($pdf_uri) {
+    $download = "You can download a PDF version <a target='_blank' href='$pdf_uri'>here</a>.</p>";
+  } else {
+    $download = "";
+  }
+?>
+  <noscript>
+  <div class=tlc-ttsurvey-noscript>This survey works best with Javascript enabled</div>
+  <p class=tlc-ttsurvey-noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey. <?=$download?></p>
+  </noscript>
+<?php
+}
+
+/**
+ * Add the script and style enqueing
+ */
 
 wp_register_script(
   'shortcode_scripts',

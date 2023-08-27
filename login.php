@@ -10,29 +10,23 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('logger.php');
 require_once plugin_path('database.php');
 
-const LOGIN_COOKIE = 'tlc-ttsurvey-info';
+const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
+const USERIDS_COOKIE = 'tlc-ttsurvey-userids';
 
 class LoginCookie
 {
   /**
-   * resets the timeout on the current cookie value to 1 year from now
+   * instance setup
    **/
-  static function reset_timeout() {
-    setcookie(
-      LOGIN_COOKIE,
-      $_COOKIE[LOGIN_COOKIE],
-      time() + 86400*365,
-    );
-  }
+  private $_active_userid = null;
+  private $_userids = array();
 
-  function unique_ids($prefix) {
-    $userid = strtoupper($prefix) . random_int(1000,9999);
-    $anonid = 'xx' . random_int(1000,9999);
-    $existing = all_userids();
-    if( in_array($userid,$existing) || in_array($anonid,$existing) ) {
-      return $this->unique_ids($prefix);
-    }
-    return [$userid,$anonid];
+  private function __construct() {
+    $this->_active_userid = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
+
+    $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
+    $userids = json_decode($userids,true);
+    $this->_userids = $userids;
   }
 
   /**
@@ -48,18 +42,14 @@ class LoginCookie
   }
 
   /**
-   * instance setup
+   * resets the timeout on the current cookie value to 1 year from now
    **/
-  private $_active_userid = null;
-  private $_userid_history = array();
-
-  private function __construct() {
-    if(array_key_exists(LOGIN_COOKIE,$_COOKIE)) {
-      $userid_cookie = $_COOKIE[LOGIN_COOKIE];
-      $ids = json_decode($userid_cookie,true);
-      $this->_active_userid = $ids[0];
-      $this->_userid_history = $ids[1];
-    }
+  static function reset_timeout() {
+    setcookie(
+      USERIDS_COOKIE,
+      $_COOKIE[USERIDS_COOKIE],
+      time() + 86400*365,
+    );
   }
 
   function active_userid()
@@ -67,11 +57,19 @@ class LoginCookie
     return $this->_active_userid;
   }
 
+  function all_userids()
+  {
+    return array_keys($this->_userids);
+  }
+
   function active_anonid()
   {
-    $userid = $this->_active_userid;
-    $anonid = $this->_userid_history[$userid] ?? null;
-    return $anonid;
+    return $this->anonid($this->_active_userid);
+  }
+
+  function anonid($userid)
+  {
+    return $this->_userids[$userid] ?? null;
   }
 
   function add($userid,$anonid,$active=true)
@@ -80,7 +78,7 @@ class LoginCookie
     {
       $this->_active_userid = $userid;
     }
-    $this->_userid_history[$userid] = $anonid;
+    $this->_userids[$userid] = $anonid;
     $this->_save();
   }
 
@@ -89,24 +87,28 @@ class LoginCookie
     if($this->_active_user == $userid) {
       $this->_active_user = null;
     }
-    unset($this->_userid_history[$userid]);
+    unset($this->_userids[$userid]);
     $this->_save();
   }
 
   private function _save()
   {
-    $new_cookie = [
-      $this->_active_userid,
-      $this->_userid_history,
-    ];
-    $new_cookie = json_encode($new_cookie);
-
-    setcookie(
-      LOGIN_COOKIE,
-      $new_cookie,
-      time() + 86400*365,
-    );
+    $userids = json_encode($this->_userids);
+    log_info("save cookie for userids: $userids");
+    setcookie( USERIDS_COOKIE, $userids, time() + 86400*365 );
+    setcookie( ACTIVE_USER_COOKIE, $this->_active_userid, 0 );
   }
+
+  function unique_ids($prefix) {
+    $userid = strtoupper($prefix) . random_int(1000,9999);
+    $anonid = 'xx' . random_int(1000,9999);
+    $existing = all_userids();
+    if( in_array($userid,$existing) || in_array($anonid,$existing) ) {
+      return $this->unique_ids($prefix);
+    }
+    return [$userid,$anonid];
+  }
+
 }
 
 $login_cookie = LoginCookie::instance();

@@ -13,3 +13,97 @@ p.tlc-ttsurvey-noscript {
   margin-top:0;
   margin-left:1em;
 }
+
+div.tlc-ttsurvey-login-form form
+{
+  margin-left:3em;
+}
+
+div.tlc-ttsurvey-login-form form.tlc-known-users input[type=submit]
+{
+  border-radius:12px;
+  margin-top:5px;
+  /*
+  font-weight:100;
+  font-size:larger;
+  */
+}
+
+div.tlc-ttsurvey-login-form form.tlc-known-users input[type=submit]:hover
+{
+  /*
+  font-weight:900;
+  */
+  margin-left:-1em;
+}
+
+div.tlc-ttsurvey-login-form form.tlc-resume-as input:invalid
+{
+  background:lightpink;
+}
+
+div.tlc-ttsurvey-login-form form table
+{
+  width:auto;
+  border-style:none;
+}
+
+div.tlc-ttsurvey-login-form form tr
+{
+  border-style:none;
+}
+
+div.tlc-ttsurvey-login-form form td
+{
+  width:auto;
+  border-style:none;
+  padding-left:5px;
+  padding-right:5px;
+  padding-top:0;
+  padding-bottom:0;
+}
+
+div.tlc-ttsurvey-login-form form span.tlc-prefix
+{
+  display:inline-block;
+  font-size:larger;
+  width:1em;
+}
+
+div.tlc-ttsurvey-login-form form td.tlc-label
+{
+  font-weight:bold;
+  text-align:right;
+  font-size:larger;
+}
+
+div.tlc-ttsurvey-login-form form p.tlc-info
+{
+  margin-top:0;
+  margin-bottom:0;
+}
+
+div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=text]
+{
+  font-weight:bold;
+  font-size:large;
+  width:6em;
+}
+
+div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=submit],
+div.tlc-ttsurvey-login-form form.tlc-new-user input[type=submit]
+{
+  border-radius:12px;
+  margin-top:5px;
+  /*
+  font-weight:100;
+  */
+  padding-left:3em;
+  padding-right:3em;
+}
+
+div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=submit]:hover,
+div.tlc-ttsurvey-login-form form.tlc-new-user input[type=submit]:hover
+{
+  margin-left:-1em;
+}
