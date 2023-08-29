@@ -16,6 +16,18 @@ const USERIDS_COOKIE = 'tlc-ttsurvey-userids';
 class LoginCookie
 {
   /**
+   * singleton setup
+   **/
+  private static $_instance = null;
+
+  static function instance() {
+    if( is_null(self::$_instance) ) {
+      self::$_instance = new self;
+    }
+    return self::$_instance;
+  }
+
+  /**
    * instance setup
    **/
   private $_active_userid = null;
@@ -25,20 +37,7 @@ class LoginCookie
     $this->_active_userid = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
 
     $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
-    $userids = json_decode($userids,true);
-    $this->_userids = $userids;
-  }
-
-  /**
-   * singleton setup
-   **/
-  private static $_instance = null;
-
-  static function instance() {
-    if( self::$_instance == null ) {
-      self::$_instance = new self;
-    }
-    return self::$_instance;
+    $this->_userids = json_decode($userids,true);
   }
 
   /**
@@ -82,6 +81,16 @@ class LoginCookie
     $this->_save();
   }
 
+  function resume($userid,$anonid,$case)
+  {
+    /*
+    TODO: Verify userid
+    TODO: Verify anonid if specified
+    TODO: if anonid was blank, create one now and notify user of new anonid
+     */
+    $this->add($userid,$anonid,true);
+  }
+
   function remove($userid)
   {
     if($this->_active_user == $userid) {
@@ -94,27 +103,50 @@ class LoginCookie
   private function _save()
   {
     $userids = json_encode($this->_userids);
-    log_info("save cookie for userids: $userids");
-    setcookie( USERIDS_COOKIE, $userids, time() + 86400*365 );
+    log_info("save cookie for userids: '$userids'");
     setcookie( ACTIVE_USER_COOKIE, $this->_active_userid, 0 );
+    setcookie( USERIDS_COOKIE, $userids,time() + 86400*365);
   }
-
-  function unique_ids($prefix) {
-    $userid = strtoupper($prefix) . random_int(1000,9999);
-    $anonid = 'xx' . random_int(1000,9999);
-    $existing = all_userids();
-    if( in_array($userid,$existing) || in_array($anonid,$existing) ) {
-      return $this->unique_ids($prefix);
-    }
-    return [$userid,$anonid];
-  }
-
 }
 
 $login_cookie = LoginCookie::instance();
 $login_cookie->reset_timeout();
 
-// TODO: Parse $_REQUEST to see if we're creating a new userid/anonid entry
+function login_init()
+{
+  $nonce = $_POST['_wpnonce'] ?? '';
 
-//[$userid,$anonid] = $login_cookie->unique_ids('kk');
-//$login_cookie->add($userid,$anonid);
+  if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
+  {
+    require_once plugin_path('users.php');
+    $users = Users::instance();
+
+
+    $action = $_POST['action'] ?? null;
+    log_dev("action=$action");
+    if( $action == 'resume' ) {
+      LoginCookie::instance()->resume(
+        $_POST['userid'],
+        $_POST['anonid']??"",
+        $_POST['case']
+      );
+    }
+    elseif( $action == 'new_user' ) {
+      $first = $_POST['firstname'] ?? null;
+      $last = $_POST['lastname'] ?? null;
+      $email = $_POST['email'] ?? null;
+      // @@@ TODO: handle empty names
+      log_dev("Registering new user: $first, $last, $email");
+      [$userid,$anonid] = $users->add_user($first,$last,$email);
+      log_dev("New user assigned ids: $userid, $anonid");
+      LoginCookie::instance()->add($userid,$anonid,true);
+    }
+    elseif( $action == 'resend_userid') {
+    }
+  }
+}
+
+add_action('init',ns('login_init'));
+
+//[$userid,$anonid] = create_unique_ids('QQ');
+//$login_cookie->add($userid,$anonid,false);

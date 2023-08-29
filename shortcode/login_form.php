@@ -12,7 +12,7 @@ $login = LoginCookie::instance();
 $userids = $login->all_userids();
 $nonce = wp_nonce_field(LOGIN_FORM_NONCE);
 
-log_info(print_r($_REQUEST,true));
+log_dev(print_r($_REQUEST,true));
 ?>
 
 <div class=tlc-ttsurvey-login-form>
@@ -53,13 +53,11 @@ if($userids) {
     <tr>
       <td class=tlc-label>User Code:</td>
       <td class=tlc-input>
-        <span class=tlc-prefix></span>
         <input type=text name=userid placeholder='XX####' pattern='^[A-Z]{2}\d{4}$' maxlength=6></td>
     </tr><tr>
       <td class=tlc-label>Anonymity Code:</td>
       <td class=tlc-input>
-        <span class=tlc-prefix>x_</span>
-        <input type=text name=anonid placeholder="####" pattern='^\d{4}$' maxlength=4></td>
+        <input type=text name=anonid placeholder="xx####" pattern='^[a-z]_\d{4}$' maxlength=6></td>
       <td class=tlc-info>optional</td>
     </tr>
   </table>

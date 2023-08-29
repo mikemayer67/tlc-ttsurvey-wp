@@ -7,6 +7,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
+
 require_once plugin_path('logger.php');
 require_once plugin_path('settings.php');
 require_once plugin_path('participant.php');
@@ -24,8 +26,6 @@ require_once plugin_path('login.php');
  * @param string $content shortcode content
  * @param string $tag shortcode tag
  */
-
-const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
 function handle_shortcode($attr,$content=null,$tag=null)
 {

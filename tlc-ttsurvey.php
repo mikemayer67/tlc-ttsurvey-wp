@@ -78,7 +78,6 @@ require_once 'database.php';
 function handle_activate()
 {
   log_info('activate: '.__NAMESPACE__);
-  tlc_db_activate();
 }
 
 function handle_deactivate()

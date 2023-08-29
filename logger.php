@@ -90,6 +90,10 @@ class Logger
   }
 }
 
+function log_dev($msg) {
+  Logger::instance()->add("DEV",$msg);
+}
+
 function log_info($msg) {
   Logger::instance()->add("INFO",$msg);
 }

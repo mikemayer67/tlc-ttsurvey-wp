@@ -17,40 +17,32 @@ const CAPS_KEY = 'caps';
 const ACTIVE_YEAR_KEY = 'active_year';
 const PDF_URI_KEY = 'pdf_href';
 
-const OPTION_DEFAULTS = array(
-  CAPS_KEY => [],
-  ACTIVE_YEAR_KEY => '',
-  PDF_URI_KEY => '',
-);
-
 class Settings
 {
+  private $_defaults = array(
+    CAPS_KEY => [],
+    ACTIVE_YEAR_KEY => '',
+    PDF_URI_KEY => '',
+  );
+
   /**
-   * singleton instance
+   * singleton setup
    */
   private static $_instance = null;
 
-  /**
-   * values dictionary
-   */
-
-  private $_values = array();
-
-  /**
-   * return singleton instanceo
-   */
   static function instance() {
-    if( self::$_instance == null ) {
+    if( is_null(self::$_instance) ) {
       self::$_instance = new self;
     }
     return self::$_instance;
   }
 
   /**
-   * (private) constructor
-   *
-   * Instantiates values from the WP database
+   * instance setup
    */
+
+  private $_values = array();
+
   private function __construct() {
     $options = get_option(OPTIONS_KEY,null);
     if( isset($options) ) {
@@ -84,7 +76,7 @@ class Settings
    * @return string or null
    */
   public function get($key) {
-    return $this->_values[$key] ?? (OPTION_DEFAULTS[$key] ?? null);
+    return $this->_values[$key] ?? ($this->_defaults[$key] ?? null);
   }
 
   /**

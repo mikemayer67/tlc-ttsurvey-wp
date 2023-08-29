@@ -10,7 +10,6 @@ if( ! defined('WPINC') ) { die; }
 require_once 'logger.php';
 require_once 'settings.php';
 
-const USER_TABLE = 'tlc-ttsurvey-users';
 const FORM_TABLE = 'tlc-ttsurvey-forms';
 
 function survey_forms()
@@ -20,17 +19,6 @@ function survey_forms()
     log_info("Adding forms table as ".FORM_TABLE." option");
     $forms = array();
     add_option(FORM_TABLE,$forms);
-  }
-  return $forms;
-}
-
-function survey_users()
-{
-  $forms = get_option(USER_TABLE,null);
-  if(is_null($forms)) {
-    log_info("Adding userss table as ".USER_TABLE." option");
-    $forms = array();
-    add_option(USER_TABLE,$forms);
   }
   return $forms;
 }
@@ -55,15 +43,6 @@ function survey_form($year)
     $forms[$year] = array();
   }
   return $forms[$year];
-}
-
-/*
- * returns all user ids and anonymous ids ever issued
- **/
-function all_userids()
-{
-  $users = survey_users();
-  return array_keys($users);
 }
 
 
