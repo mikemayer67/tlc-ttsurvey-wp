@@ -96,14 +96,14 @@ if($userids) {
     </tr>
   </table>
   <p class=info>
-      The email address is optional. It will only be used in conjunction with this survey. If provided, it will be used to send you:
-      <ul>
-        <li>confirmation of your registration
-        <li>comfirmation of your survey submission
-        <li>status updates for an incomplete survey
-        <li>user code reminders (if requested)
-      </ul>
-    </p>
+    The email address is optional. It will only be used in conjunction with this survey. If provided, it will be used to send you:
+    <ul>
+      <li>confirmation of your registration
+      <li>comfirmation of your survey submission
+      <li>status updates for an incomplete survey
+      <li>user code reminders (if requested)
+    </ul>
+  </p>
   <div>
     <input type='submit' value="Register for Survey">
   </div>

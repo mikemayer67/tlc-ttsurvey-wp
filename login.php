@@ -86,7 +86,10 @@ class LoginCookie
     {
       $this->_active_userid = $userid;
     }
-    $this->_userids[$userid] = $anonid;
+    if($anonid || !array_key_exists($userid,$this->_userids))
+    {
+      $this->_userids[$userid] = $anonid;
+    }
     $this->_save();
   }
 
@@ -117,8 +120,6 @@ class LoginCookie
 
   private function _save()
   {
-    $this->_userids['XX1234'] = 'xx4321';
-    $this->_userids['XX6789'] = 'xx9876';
     $userids = json_encode($this->_userids);
     log_info("save cookie for userids: '$userids'");
     setcookie( ACTIVE_USER_COOKIE, $this->_active_userid, 0 );
@@ -159,6 +160,8 @@ function login_init()
       LoginCookie::instance()->add($userid,$anonid,true);
     }
     elseif( $action == 'resend_userid') {
+      require_once plugin_path('sendmail.php');
+      sendmail_userid_reminder($_POST['email']);
     }
     elseif( $action == 'logout') {
       LoginCookie::instance()->logout();
