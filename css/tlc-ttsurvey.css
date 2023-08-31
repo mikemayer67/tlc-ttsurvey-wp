@@ -1,4 +1,4 @@
-div.tlc-ttsurvey-noscript {
+div.tlc-ttsurvey div.noscript {
   font-family: sans-serif;
   width: 100%;
   font-size: larger;
@@ -8,52 +8,48 @@ div.tlc-ttsurvey-noscript {
   padding: 5px 10px;
 }
 
-p.tlc-ttsurvey-noscript {
+div.tlc-ttsurvey p.noscript {
   color: brown;
   margin-top:0;
   margin-left:1em;
 }
 
-div.tlc-ttsurvey-login-form form
+div.tlc-ttsurvey form
 {
   margin-left:3em;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-known-users input[type=submit]
+div.tlc-ttsurvey form input[type=submit]
 {
   border-radius:12px;
   margin-top:5px;
-  /*
-  font-weight:100;
-  font-size:larger;
-  */
+
+  padding-left:3em;
+  padding-right:3em;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-known-users input[type=submit]:hover
+div.tlc-ttsurvey form input[type=submit]:hover
 {
-  /*
-  font-weight:900;
-  */
   margin-left:-1em;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-resume-as input:invalid
+div.tlc-ttsurvey form input:invalid
 {
   background:lightpink;
 }
 
-div.tlc-ttsurvey-login-form form table
+div.tlc-ttsurvey form table
 {
   width:auto;
   border-style:none;
 }
 
-div.tlc-ttsurvey-login-form form tr
+div.tlc-ttsurvey form tr
 {
   border-style:none;
 }
 
-div.tlc-ttsurvey-login-form form td
+div.tlc-ttsurvey form td
 {
   width:auto;
   border-style:none;
@@ -63,47 +59,34 @@ div.tlc-ttsurvey-login-form form td
   padding-bottom:0;
 }
 
-div.tlc-ttsurvey-login-form form span.tlc-prefix
-{
-  display:inline-block;
-  font-size:larger;
-  width:1em;
-}
-
-div.tlc-ttsurvey-login-form form td.tlc-label
+div.tlc-ttsurvey form td.label
 {
   font-weight:bold;
   text-align:right;
   font-size:larger;
 }
 
-div.tlc-ttsurvey-login-form form p.tlc-info
+div.tlc-ttsurvey form p.info
 {
   margin-top:0;
   margin-bottom:0;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=text]
+div.tlc-ttsurvey form input[type=text]
 {
   font-weight:bold;
   font-size:large;
   width:6em;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=submit],
-div.tlc-ttsurvey-login-form form.tlc-new-user input[type=submit]
+div.tlc-ttsurvey form input[type=email]
 {
-  border-radius:12px;
-  margin-top:5px;
-  /*
-  font-weight:100;
-  */
-  padding-left:3em;
-  padding-right:3em;
+  font-weight:bold;
+  font-size:large;
+  width:18em;
 }
 
-div.tlc-ttsurvey-login-form form.tlc-resume-as input[type=submit]:hover,
-div.tlc-ttsurvey-login-form form.tlc-new-user input[type=submit]:hover
+div.tlc-ttsurvey form input.name
 {
-  margin-left:-1em;
+  width:18em;
 }

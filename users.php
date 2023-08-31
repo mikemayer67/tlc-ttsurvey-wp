@@ -53,14 +53,11 @@ class Users
 
   private function __construct() {
     $users = get_option(USER_TABLE,"{}");
-    log_dev("Construct users from: $users");
     $users = json_decode($users,true);
-    log_dev("decoded: " . print_r($users,true));
 
     foreach($users as $userid=>$data) {
-      $_users[$userid] = $data;
+      $this->_users[$userid] = $data;
     }
-    log_dev("constructed: " . print_r($_users,true));
   }
 
   /**
@@ -71,20 +68,24 @@ class Users
     return array_keys($this->_users);
   }
 
+  function is_valid_userid($userid) {
+    return !is_null($this->_bio($userid));
+  }
+
   function first_name($userid) {
-    $bio = $this->_bio();
+    $bio = $this->_bio($userid);
     if( is_null($bio) ) { return null; }
     return $bio['first_name'] ?? "";
   }
 
   function last_name($userid) {
-    $bio = $this->_bio();
+    $bio = $this->_bio($userid);
     if( is_null($bio) ) { return null; }
     return $bio['last_name'] ?? "";
   }
 
   function full_name($userid) {
-    $bio = $this->_bio();
+    $bio = $this->_bio($userid);
     if( is_null($bio) ) { return null; }
 
     $first_name = $bio['first_name'] ?? "";
@@ -93,13 +94,13 @@ class Users
   }
 
   function email($userid) {
-    $bio = $this->_bio();
+    $bio = $this->_bio($userid);
     if( is_null($bio) ) { return null; }
     return $bio['email'] ?? null;
   }
 
   function created($userid) {
-    $bio = $this->_bio();
+    $bio = $this->_bio($userid);
     if( is_null($bio) ) { return null; }
     return $bio['created'] ?? null;
   }
@@ -146,21 +147,19 @@ class Users
 
   private function _save()
   {
-    log_dev("save users: ".print_r($this->_users,true));
     $new_value = json_encode($this->_users);
-    log_dev("encoded: $new_value");
     update_option(USER_TABLE,$new_value);
   }
 
   private function _bio($userid)
   {
-    return $_users[$userid] ?? null;
+    return $this->_users[$userid]['bio'] ?? null;
   }
 
   private function _create_userid($prefix) {
     do {
       $userid = strtoupper($prefix) . random_int(1000,9999);
-    } while( array_key_exists($userid) );
+    } while( array_key_exists($userid,$this->_users) );
     return $userid;
   }
 
@@ -171,7 +170,7 @@ class Users
         chr(97 + random_int(0,25)) .
         random_int(1000,9999)
       );
-    } while( array_key_exists($anonid) );
+    } while( array_key_exists($anonid,$this->_users) );
     return $anonid;
   }
 }

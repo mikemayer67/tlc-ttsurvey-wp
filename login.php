@@ -8,6 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('logger.php');
+require_once plugin_path('users.php');
 require_once plugin_path('database.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
@@ -37,7 +38,15 @@ class LoginCookie
     $this->_active_userid = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
 
     $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
-    $this->_userids = json_decode($userids,true);
+    $userids = json_decode($userids,true);
+    $userids = array_filter(
+      $userids,
+      function ($key) {
+        return Users::instance()->is_valid_userid($key);
+      },
+      ARRAY_FILTER_USE_KEY
+    );
+    $this->_userids = $userids;
   }
 
   /**
@@ -81,6 +90,12 @@ class LoginCookie
     $this->_save();
   }
 
+  function logout()
+  {
+    setcookie(ACTIVE_USER_COOKIE, "", 0);
+    $this->_active_userid = null;
+  }
+
   function resume($userid,$anonid,$case)
   {
     /*
@@ -102,6 +117,8 @@ class LoginCookie
 
   private function _save()
   {
+    $this->_userids['XX1234'] = 'xx4321';
+    $this->_userids['XX6789'] = 'xx9876';
     $userids = json_encode($this->_userids);
     log_info("save cookie for userids: '$userids'");
     setcookie( ACTIVE_USER_COOKIE, $this->_active_userid, 0 );
@@ -142,6 +159,9 @@ function login_init()
       LoginCookie::instance()->add($userid,$anonid,true);
     }
     elseif( $action == 'resend_userid') {
+    }
+    elseif( $action == 'logout') {
+      LoginCookie::instance()->logout();
     }
   }
 }

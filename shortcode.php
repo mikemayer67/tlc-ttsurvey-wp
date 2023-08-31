@@ -35,15 +35,13 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
 
   ob_start();
-  echo "<div class=tlc-ttsurvey-container>";
+  echo "<div class=tlc-ttsurvey>";
   add_noscript();
 
   if( $userid == null ) {
     require plugin_path('shortcode/login_form.php');
-  } elseif( $anonid == null ) {
-    echo "Current user has id $userid, but no anonymous id";
   } else {
-    echo "Current user has id $userid and anonymous id $anonid";
+    require plugin_path('shortcode/survey.php');
   }
 
   echo "</div>";
@@ -62,8 +60,8 @@ function add_noscript()
   }
 ?>
   <noscript>
-  <div class=tlc-ttsurvey-noscript>This survey works best with Javascript enabled</div>
-  <p class=tlc-ttsurvey-noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey. <?=$download?></p>
+  <div class=noscript>This survey works best with Javascript enabled</div>
+  <p class=noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
 }
