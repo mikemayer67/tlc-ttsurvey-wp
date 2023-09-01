@@ -29,6 +29,9 @@ require_once plugin_path('login.php');
 
 function handle_shortcode($attr,$content=null,$tag=null)
 {
+  log_info("enqueue script when shortcode is rendered");
+  wp_enqueue_script('shortcode_scripts');
+
   $login_cookie = LoginCookie::instance();
   $userid = $login_cookie->active_userid();
   $anonid = $login_cookie->active_anonid();
@@ -85,5 +88,5 @@ wp_localize_script(
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
-wp_enqueue_script('shortcode_scripts');
+#wp_enqueue_script('shortcode_scripts');
 

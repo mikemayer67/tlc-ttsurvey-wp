@@ -91,4 +91,12 @@ div.tlc-ttsurvey form input.name
   width:18em;
 }
 
+div.tlc-ttsurvey form div.email-info {
+  border:solid;
+  border-width: 1px;
+  padding:10px 10px 0 10px;
+  margin-bottom:10px;
+  margin-left:3em;
+  margin-right:3em;
+}
 

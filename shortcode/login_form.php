@@ -18,6 +18,8 @@ $users = Users::instance();
 $form_uri=$_SERVER['REQUEST_URI'];
 $nonce = wp_nonce_field(LOGIN_FORM_NONCE);
 
+$info_icon = plugin_url('img/icons8-info.png');
+
 log_dev(print_r($_REQUEST,true));
 ?>
 
@@ -93,17 +95,20 @@ if($userids) {
     <tr>
       <td class=label>Email:</td>
       <td class=input><input type=email name=email placeholder=optional></td>
+      <td class=info><a class=email-info-trigger><img src='<?=$info_icon?>' alt="email usage info" width=32 height=32></a>
     </tr>
   </table>
-  <p class=info>
-    The email address is optional. It will only be used in conjunction with this survey. If provided, it will be used to send you:
-    <ul>
-      <li>confirmation of your registration
-      <li>comfirmation of your survey submission
-      <li>status updates for an incomplete survey
-      <li>user code reminders (if requested)
-    </ul>
-  </p>
+  <div class=email-info>
+    <p class=info>
+      The email address is optional. It will only be used in conjunction with this survey. If provided, it will be used to send you:
+      <ul>
+        <li>confirmation of your registration
+        <li>comfirmation of your survey submission
+        <li>status updates for an incomplete survey
+        <li>user code reminders (if requested)
+      </ul>
+    </p>
+  </div>
   <div>
     <input type='submit' value="Register for Survey">
   </div>
