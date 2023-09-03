@@ -88,5 +88,6 @@ wp_localize_script(
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
+wp_enqueue_style('w3-css','https://www.w3schools.com/w3css/4/w3.css');
 #wp_enqueue_script('shortcode_scripts');
 

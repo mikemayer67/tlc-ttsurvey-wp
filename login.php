@@ -55,7 +55,7 @@ class LoginCookie
   static function reset_timeout() {
     setcookie(
       USERIDS_COOKIE,
-      $_COOKIE[USERIDS_COOKIE],
+      $_COOKIE[USERIDS_COOKIE] ?? "",
       time() + 86400*365,
     );
   }
