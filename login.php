@@ -14,156 +14,137 @@ require_once plugin_path('database.php');
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
 const USERIDS_COOKIE = 'tlc-ttsurvey-userids';
 
-class LoginCookie
+function active_userid()
 {
-  /**
-   * singleton setup
-   **/
-  private static $_instance = null;
-
-  static function instance() {
-    if( is_null(self::$_instance) ) {
-      self::$_instance = new self;
-    }
-    return self::$_instance;
-  }
-
-  /**
-   * instance setup
-   **/
-  private $_active_userid = null;
-  private $_userids = array();
-
-  private function __construct() {
-    $this->_active_userid = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
-
-    $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
-    $userids = json_decode($userids,true);
-    $userids = array_filter(
-      $userids,
-      function ($key) {
-        return Users::instance()->is_valid_userid($key);
-      },
-    );
-    $this->_userids = $userids;
-  }
-
-  /**
-   * resets the timeout on the current cookie value to 1 year from now
-   **/
-  static function reset_timeout() {
-    setcookie(
-      USERIDS_COOKIE,
-      $_COOKIE[USERIDS_COOKIE] ?? "",
-      time() + 86400*365,
-    );
-  }
-
-  function active_userid()
-  {
-    return $this->_active_userid;
-  }
-
-  function all_userids()
-  {
-    return array_keys($this->_userids);
-  }
-
-  function active_anonid()
-  {
-    return $this->anonid($this->_active_userid);
-  }
-
-  function anonid($userid)
-  {
-    return $this->_userids[$userid] ?? null;
-  }
-
-  function add($userid,$anonid,$active=true)
-  {
-    if($active)
-    {
-      $this->_active_userid = $userid;
-    }
-    if($anonid || !array_key_exists($userid,$this->_userids))
-    {
-      $this->_userids[$userid] = $anonid;
-    }
-    $this->_save();
-  }
-
-  function logout()
-  {
-    setcookie(ACTIVE_USER_COOKIE, "", 0);
-    $this->_active_userid = null;
-  }
-
-  function resume($userid,$anonid,$case)
-  {
-    /*
-    TODO: Verify userid
-    TODO: Verify anonid if specified
-    TODO: if anonid was blank, create one now and notify user of new anonid
-     */
-    $this->add($userid,$anonid,true);
-  }
-
-  function remove($userid)
-  {
-    if($this->_active_user == $userid) {
-      $this->_active_user = null;
-    }
-    unset($this->_userids[$userid]);
-    $this->_save();
-  }
-
-  private function _save()
-  {
-    $userids = json_encode($this->_userids);
-    log_info("save cookie for userids: '$userids'");
-    setcookie( ACTIVE_USER_COOKIE, $this->_active_userid, 0 );
-    setcookie( USERIDS_COOKIE, $userids,time() + 86400*365);
-  }
+  log_dev("active_userid()");
+  return $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
 }
 
-$login_cookie = LoginCookie::instance();
-$login_cookie->reset_timeout();
+function cookie_userids()
+{
+  log_dev("cookie_userids()");
+  $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
+  $userids = json_decode($userids,true);
+  return array_filter(
+    $userids,
+    function ($key) { get_user_post_id($key); }
+  );
+}
+
+function reset_cookie_timeout() {
+  log_dev("reset_cookie_timeout()");
+  setcookie(
+    USERIDS_COOKIE,
+    $_COOKIE[USERIDS_COOKIE] ?? "",
+    time() + 86400*365,
+  );
+}
+
+function add_userid_to_cookie($userid,$active=true)
+{
+  log_dev("add_userid_to_cookie($userid,$active)");
+  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
+  $userids = cookie_userids();
+  if(!in_array($userid,$userids)) {
+    $userids[] = $userid;
+    $_COOKIE[USERIDS_COOKIE] = json_encode($userids);
+  }
+  save_survey_cookies();
+}
+
+function logout_active_user()
+{
+  log_dev("logout_active_user()");
+  unset($_COOKIE[ACTIVE_USER_COOKIE]);
+  save_survey_cookies();
+}
+
+function resume_survey_as($userid,$case)
+{
+  log_dev("resume_survey_as($userid,$case)");
+  /*
+  TODO: Verify userid
+  TODO: Verify anonid if specified
+  TODO: if anonid was blank, create one now and notify user of new anonid
+   */
+  add_userid_to_cookie($userid,true);
+}
+
+function remove_userid_from_cookie($userid)
+{
+  log_dev("remove_userid_from_cookie($userid)");
+  if( active_userid() == $userid ) {
+    unset($_COOKIE[ACTIVE_USER_COOKIE]);
+  }
+  $userids = cookie_userids();
+  unset($userids[$userid]);
+  if($userids) {
+    $_COOKIE[USERIDS_COOKIE] = json_encode($userids);
+  } else {
+    unset($_COOKIE[USERIDS_COOKIE]);
+  }
+  save_survey_cookies();
+}
+
+function save_survey_cookies()
+{
+  log_dev("save_survey_cookies()");
+  setcookie( ACTIVE_USER_COOKIE, $_COOKIE[ACTIVE_USER_COOKIE], 0 );
+  setcookie( USERIDS_COOKIE, $_COOKIE[USERIDS_COOKIE], time() + 86400*365);
+}
+
+reset_cookie_timeout();
 
 function login_init()
 {
+  log_dev("login_init()");
   $nonce = $_POST['_wpnonce'] ?? '';
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
     require_once plugin_path('users.php');
-    $users = Users::instance();
-
 
     $action = $_POST['action'] ?? null;
     log_dev("action=$action");
     if( $action == 'resume' ) {
-      LoginCookie::instance()->resume(
-        $_POST['userid'],
-        $_POST['anonid']??"",
-        $_POST['case']
-      );
+      resume_survey_as($_POST['userid'],$_POST['case']);
     }
     elseif( $action == 'new_user' ) {
-      $first = $_POST['firstname'] ?? null;
-      $last = $_POST['lastname'] ?? null;
+      $userid = $_POST['userid'] ?? null;
+      $name = $_POST['name'] ?? null;
       $email = $_POST['email'] ?? null;
-      // @@@ TODO: handle empty names
-      log_dev("Registering new user: $first, $last, $email");
-      [$userid,$anonid] = $users->add_user($first,$last,$email);
-      log_dev("New user assigned ids: $userid, $anonid");
-      LoginCookie::instance()->add($userid,$anonid,true);
+      $password = $_POST['password'] ?? null;
+
+      if(!is_valid_userid($userid)) {
+        // @@@ TODO: Handle bad user userid
+        log_warning("Need to add logic for bad new user userid");
+      }
+      
+      if(!is_valid_name($name)) {
+        // @@@ TODO: Handle bad user name
+        log_warning("Need to add logic for bad new user name");
+      }
+      
+      if(!is_valid_email($email)) {
+        // @@@ TODO: Handle bad user email
+        log_warning("Need to add logic for bad new user email");
+      }
+      
+      if(!is_valid_password($password)) {
+        // @@@ TODO: Handle bad user password
+        log_warning("Need to add logic for bad new user password");
+      }
+      
+      log_dev("Registering new user: $name, $email");
+      add_new_user($userid,$password,$name,$email);
+      add_userid_to_cookie($userid,true);
     }
     elseif( $action == 'resend_userid') {
       require_once plugin_path('sendmail.php');
       sendmail_userid_reminder($_POST['email']);
     }
     elseif( $action == 'logout') {
-      LoginCookie::instance()->logout();
+      logout_active_user();
     }
   }
 }

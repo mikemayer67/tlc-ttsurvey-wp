@@ -11,7 +11,7 @@ $action = $_SERVER['REQUEST_URI'];
 ?>
 
 <div class='log-table'>
-<?php Logger::instance()->dump_html(); ?>
+<?php dumnp_log_to_html(); ?>
 </div>
 
 <form id='tlc-clear-log' class='tlc' action='<?=$action?>' method="POST">

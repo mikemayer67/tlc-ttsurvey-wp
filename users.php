@@ -294,7 +294,7 @@ function gen_access_token()
   return $access_token;
 }
 
-function add_user($userid, $password, $name, $email=null)
+function add_new_user($userid, $password, $name, $email=null)
 {
   log_dev("add_user($userid, $password, $name, $email)");
   $userid = trim($userid);
@@ -352,8 +352,6 @@ function add_user($userid, $password, $name, $email=null)
 
   $anon_post_id = wp_insert_post($anonid_args,true);
   log_dev("Anonymous id added for $userid");
-
-  return $user_post_id;
 }
 
 /**

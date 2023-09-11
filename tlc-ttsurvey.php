@@ -105,10 +105,5 @@ if( is_admin() ) /* Admin setup */
 else /* Non-admin setup */
 {
   require_once 'login.php';
-
-  /**
-   * shortcode setup (non-admin)
-   */
   require_once 'shortcode.php';
-  add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
 }

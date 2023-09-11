@@ -11,7 +11,6 @@ const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
 require_once plugin_path('logger.php');
 require_once plugin_path('options.php');
-require_once plugin_path('participant.php');
 require_once plugin_path('login.php');
 
 /**
@@ -32,10 +31,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   log_info("enqueue script when shortcode is rendered");
   wp_enqueue_script('shortcode_scripts');
 
-  $login_cookie = LoginCookie::instance();
-  $userid = $login_cookie->active_userid();
-  $anonid = $login_cookie->active_anonid();
-
+  $userid = active_userid();
 
   ob_start();
   echo "<div class=tlc-ttsurvey>";
@@ -91,3 +87,4 @@ wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
 wp_enqueue_style('w3-css','https://www.w3schools.com/w3css/4/w3.css');
 #wp_enqueue_script('shortcode_scripts');
 
+add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
