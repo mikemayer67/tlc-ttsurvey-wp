@@ -44,7 +44,6 @@ class LoginCookie
       function ($key) {
         return Users::instance()->is_valid_userid($key);
       },
-      ARRAY_FILTER_USE_KEY
     );
     $this->_userids = $userids;
   }

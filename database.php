@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once 'logger.php';
-require_once 'settings.php';
+require_once 'options.php';
 
 const FORM_TABLE = 'tlc-ttsurvey-forms';
 
@@ -27,7 +27,7 @@ function survey_years()
 {
   $forms = survey_forms();
   $years = array_keys($forms);
-  $year = Settings::active_year();
+  $year = active_survey_year()
   if( ! in_array($year,$years) ) {
     $years[] = $year;
   }

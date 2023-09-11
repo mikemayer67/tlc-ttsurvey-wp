@@ -68,8 +68,9 @@ function plugin_url($rel_url)
 }
 
 require_once 'logger.php';
-require_once 'settings.php';
+require_once 'options.php';
 require_once 'database.php';
+require_once 'users.php';
 
 /**
  * plugin activation hooks
@@ -78,17 +79,19 @@ require_once 'database.php';
 function handle_activate()
 {
   log_info('activate: '.__NAMESPACE__);
+  users_activate();
 }
 
 function handle_deactivate()
 {
   log_info('deactivate: '.__NAMESPACE__);
+  users_deactivate();
 }
 
 function handle_uninstall()
 {
   log_info('uninstall: '.__NAMESPACE__);
-  Settings::uninstall();
+  uninstall_options();
 }
 
 register_activation_hook(   __FILE__, ns('handle_activate') );

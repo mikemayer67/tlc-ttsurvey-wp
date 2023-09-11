@@ -3,18 +3,16 @@ namespace TLC\TTSurvey;
 
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
-require_once plugin_path('settings.php');
+require_once plugin_path('options.php');
 
-$settings = Settings::instance();
-
-$active_year = $settings->get(ACTIVE_YEAR_KEY);
+$active_year = active_survey_year();
 $current_year = date('Y');
 $survey_years = survey_years();
 $survey_years[] = date('Y');
 $survey_years = array_unique($survey_years);
 arsort($survey_years);
 
-$nonce = wp_nonce_field(SETTINGS_NONCE);
+$nonce = wp_nonce_field(OPTIONS_NONCE);
 
 $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   'page'=>SETTINGS_PAGE_SLUG,
@@ -43,9 +41,8 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
     <th>Structure</th>
   </tr>
 <?php
-$caps = $settings->get(CAPS_KEY);
-$all_users = get_users();
-foreach($all_users as $user) {
+$caps = survey_capabilites();
+foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
   $response = $caps['responses'][$id] ? "checked" : "";
@@ -64,7 +61,7 @@ foreach($all_users as $user) {
   </table>
 
 <?php
-  $pdf_uri = $settings->get(PDF_URI_KEY);
+  $pdf_uri = survey_pdf_uri();
 ?>
   <div class=label>Survey Download URL</div>
   <div class=info>Location for a downloadable copy of the survey</div>

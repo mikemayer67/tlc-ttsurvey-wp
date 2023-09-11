@@ -10,7 +10,7 @@ if( ! defined('WPINC') ) { die; }
 const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
 require_once plugin_path('logger.php');
-require_once plugin_path('settings.php');
+require_once plugin_path('options.php');
 require_once plugin_path('participant.php');
 require_once plugin_path('login.php');
 
@@ -55,7 +55,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
 function add_noscript()
 {
-  $pdf_uri = Settings::pdf_uri();
+  $pdf_uri = survey_pdf_uri();
   if($pdf_uri) {
     $download = "You can download a PDF version <a target='_blank' href='$pdf_uri'>here</a>.</p>";
   } else {
@@ -84,7 +84,7 @@ wp_register_script(
 wp_localize_script(
   'shortcode_scripts',
   'shortcode_vars',
-  array('year'=>Settings::instance()->get(ACTIVE_YEAR_KEY))
+  array('year'=>active_surey_year()
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));

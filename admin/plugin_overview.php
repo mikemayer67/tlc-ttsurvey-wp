@@ -3,13 +3,11 @@ namespace TLC\TTSurvey;
 
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
-require_once plugin_path('settings.php');
-
-$settings = Settings::instance();
+require_once plugin_path('options.php');
 
 $current_year = date('Y');
 
-$active_year = $settings->get(ACTIVE_YEAR_KEY);
+$active_year = active_survey_year();
 
 $survey_years = survey_years();
 $survey_years[] = date('Y');
@@ -17,8 +15,8 @@ $survey_years = array_unique($survey_years);
 asort($survey_years);
 $survey_years = implode(", ",$survey_years);
 
-$caps = $settings->get(CAPS_KEY);
-$pdf_uri = $settings->get(PDF_URI_KEY);
+$caps = survey_capabilities();
+$pdf_uri = survey_pdf_uri();
 
 ?>
 
@@ -38,8 +36,7 @@ $pdf_uri = $settings->get(PDF_URI_KEY);
       <table class=admins>
 
 <?php
-$all_users = get_users();
-foreach($all_users as $user) {
+foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
   $responses = $caps['responses'][$id];

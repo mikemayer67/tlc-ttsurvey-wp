@@ -6,21 +6,19 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 $title = esc_html(get_admin_page_title());
 $status = "";
 
-require_once plugin_path('settings.php');
+require_once plugin_path('options.php');
 require_once plugin_path('logger.php');
-
-$settings = Settings::instance();
 
 $action = $_POST['action'] ?? null;
 if($action == "update") 
 {
   /* nonce is checked within the update_from_post method */
-  $settings->update_from_post($_POST);
+  update_options_from_post();
   $status = "<span class='tlc-status'>udpated</span>";
 }
 elseif($action == "clear-log") 
 {
-  if (!wp_verify_nonce($_POST['_wpnonce'],SETTINGS_NONCE)) 
+  if (!wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) 
   {
     log_error("failed to validate nonce");
     wp_die("Bad nonce");
