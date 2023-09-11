@@ -4,14 +4,14 @@ namespace TLC\TTSurvey;
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('logger.php');
-require_once plugin_path('options.php');
+require_once plugin_path('settings.php');
 
 $nonce = wp_nonce_field(OPTIONS_NONCE);
 $action = $_SERVER['REQUEST_URI'];
 ?>
 
 <div class='log-table'>
-<?php dumnp_log_to_html(); ?>
+<?php dump_log_to_html("DEV"); ?>
 </div>
 
 <form id='tlc-clear-log' class='tlc' action='<?=$action?>' method="POST">

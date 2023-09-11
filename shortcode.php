@@ -10,7 +10,7 @@ if( ! defined('WPINC') ) { die; }
 const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
 require_once plugin_path('logger.php');
-require_once plugin_path('options.php');
+require_once plugin_path('settings.php');
 require_once plugin_path('login.php');
 
 /**
@@ -80,7 +80,7 @@ wp_register_script(
 wp_localize_script(
   'shortcode_scripts',
   'shortcode_vars',
-  array('year'=>active_surey_year()
+  array('year'=>active_survey_year()),
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));

@@ -16,11 +16,13 @@ const OPTIONS_KEY = 'tlc_ttsurvey_options';
 const CAPS_KEY = 'caps';
 const ACTIVE_YEAR_KEY = 'active_year';
 const PDF_URI_KEY = 'pdf_href';
+const LOG_LEVEL_KEY = 'log_level';
 
 $option_defaults = array(
   CAPS_KEY => [],
   ACTIVE_YEAR_KEY => '',
   PDF_URI_KEY => '',
+  LOG_LEVEL_KEY => 'INFO',
 );
 
 /**
@@ -58,7 +60,7 @@ function set_survey_option($key,$value)
  * get active survey year
  * @return active survey year
  */
-function active_year() {
+function active_survey_year() {
   return get_survey_option(ACTIVE_YEAR_KEY);
 }
 
@@ -66,8 +68,24 @@ function active_year() {
  * get URI for pdf of the survey
  * @return uri for link to pdf of the current survey
  */
-function pdf_uri() {
+function survey_pdf_uri() {
   return get_survey_option(PDF_URI_KEY);
+}
+
+/**
+ * get (wordpress) user capabilities
+ * @return list of capabilities
+ */
+function survey_capabilities() {
+  return get_survey_option(CAPS_KEY);
+}
+
+/**
+ * get survey log level
+ * @return DEV, INFO, WARNING, or ERROR
+ */
+function survey_log_level() {
+  return get_survey_option(LOG_LEVEL_KEY);
 }
 
 /**
@@ -122,13 +140,15 @@ function update_options_from_post()
   $new_caps = $_POST['caps'];
   $options[CAPS_KEY] = $new_caps;
 
+  $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
+
   $new_pdf_uri = $_POST['pdf_uri'];
   log_info("new_pdf_uri: $new_pdf_uri");
   $new_pdf_uri = sanitize_url($new_pdf_uri,['http','https','ftp','ftps']);
   log_info("(sanitized): $new_pdf_uri");
-  $otions[PDF_URI_KEY] = $new_pdf_uri;
+  $options[PDF_URI_KEY] = $new_pdf_uri;
 
-  foreach(get_users as $user) {
+  foreach(get_users() as $user) {
     $id = $user->id;
     foreach(['responses','structure'] as $cap) {
       $key = "tlc-ttsurvey-$cap";
@@ -139,4 +159,7 @@ function update_options_from_post()
       }
     }
   }
+  update_option(OPTIONS_KEY,$options);
 }
+
+

@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('login.php');
-require_once plugin_path('users.php');
+require_once plugin_path('user_database.php');
 
 $userids = cookie_userids();
 

@@ -68,9 +68,9 @@ function plugin_url($rel_url)
 }
 
 require_once 'logger.php';
-require_once 'options.php';
+require_once 'settings.php';
 require_once 'database.php';
-require_once 'users.php';
+require_once 'user_database.php';
 
 /**
  * plugin activation hooks

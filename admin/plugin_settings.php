@@ -3,7 +3,7 @@ namespace TLC\TTSurvey;
 
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
-require_once plugin_path('options.php');
+require_once plugin_path('settings.php');
 
 $active_year = active_survey_year();
 $current_year = date('Y');
@@ -41,7 +41,7 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
     <th>Structure</th>
   </tr>
 <?php
-$caps = survey_capabilites();
+$caps = survey_capabilities();
 foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
@@ -68,6 +68,17 @@ foreach(get_users() as $user) {
   <input type='URL' class='tlc settings' size=50 name='pdf_uri' value='<?=$pdf_uri?>'
    pattern='^(http|https|ftp|ftps)://[a-zA-Z].*$'>
 
+<?php
+  $log_level = survey_log_level();
+?>
+  <div class=label>Log Level</div>
+  <select name='log_level' class='tlc settings'>
+<?php foreach(array("DEV","INFO","WARNING","ERROR") as $log_level) {
+  $selected = ($log_level == survey_log_level()) ? "selected" : "";
+  echo "<option value=$log_level $selected>$log_level</option>";
+  }
+?>
+  </select>
   </div>
 
   <input type="submit" value="Save" class="submit button button-primary button-large">

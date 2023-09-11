@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('logger.php');
-require_once plugin_path('users.php');
+require_once plugin_path('user_database.php');
 require_once plugin_path('database.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';

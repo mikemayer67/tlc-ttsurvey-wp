@@ -1,6 +1,7 @@
 <?php
 namespace TLC\TTSurvey;
 
+
 /**
  * TLC Time and Talent participant info and login
  */
@@ -105,6 +106,7 @@ function register_userid_post_type()
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
+      'show_in_menu' => false,
     ),
   );
 }
@@ -174,7 +176,7 @@ function validate_password($userid,$password)
     return false;
   }
   $pw_hash = $post->content;
-  if(!password_verify($userid,$pw_hash) {
+  if(!password_verify($userid,$pw_hash)) {
     log_info("Failed to validate password:: Incorrect password for $userid");
     return false;
   }
@@ -204,7 +206,7 @@ function get_user_post($userid)
   }
   if(!$posts) { 
     log_info("No post found for userid $userid");
-    return null
+    return null;
   }
   return $posts[0];
 }
@@ -228,7 +230,7 @@ function get_user_name($userid)
 
   $name = get_post_meta($post_id,'name');
   log_dev(" => $name");
-  return $name);
+  return $name;
 }
 
 function get_user_email($userid)
@@ -239,7 +241,7 @@ function get_user_email($userid)
 
   $email = get_post_meta($post_id,'email');
   log_dev(" => $email");
-  return $email);
+  return $email;
 }
 
 function get_user_anonid($userid)

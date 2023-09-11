@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('users.php');
+require_once plugin_path('user_database.php');
 
 $user_name = get_user_name();
 echo "Logged in as $user_name ($userid)";

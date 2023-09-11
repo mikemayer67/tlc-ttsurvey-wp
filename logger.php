@@ -5,65 +5,69 @@ if( ! defined('WPINC') ) { die; }
 
 const LOG_FILE = 'tlc-ttsurvey.log';
 
-$logger_fp = null;
+$_logger_fp = null;
 
-function init_logger()
+function logger($create=true)
 {
-  if(is_null($logger_fp))
+  global $_logger_fp;
+
+  if(is_null($_logger_fp) && $create)
   {
     $logfile = plugin_path(LOG_FILE);
     if( file_exists($logfile) and filesize($logfile) > 512*1024 ) {
       $tempfile = $logfile.".tmp";
-      $fp = fopen($tempfile,"w");
+      $_logger_fp = fopen($tempfile,"w");
       $skip = 1000;
       foreach(file($logfile) as $line) {
         if($skip > 0) {
           $skip--;
         } else {
-          fwrite($fp,$line);
+          fwrite($_logger_fp,$line);
         }
       }
-      fclose($fp);
+      fclose($_logger_fp);
       unlink($logfile);
       rename($tempfile,$logfile);
     }
-    $logger_fp = fopen($logfile,"a");
+    $_logger_fp = fopen($logfile,"a");
   }
+  return $_logger_fp;
 }
+
+function clear_logger()
+{
+  global $_logger_fp;
+
+  $file = plugin_path(LOG_FILE);
+  if($_logger_fp) { 
+    fclose($_logger_fp); 
+    unlink($file);
+  }
+  $_logger_fp = fopen($file,"a");
+}
+
 
 function write_to_logger($prefix,$msg)
 {
-  init_logger();
   $datetime = new \DateTime;
   $timestamp = $datetime->format("d-M-y H:i:s.v e");
   $prefix = str_pad($prefix,8);
-  fwrite($logger_fp, "[{$timestamp}] {$prefix} {$msg}\n");
+  fwrite(logger(), "[{$timestamp}] {$prefix} {$msg}\n");
 }
 
-function dump_log_to_html($level="INFO")
+function dump_log_to_html()
 {
-  init_logger();
-  if($level=="ERROR") {
-    $levels = ["ERROR"];
-  } elseif($level=="WARNING") {
-    $levels = ["WARNING","ERROR"];
-  } else {
-    $levels = ["INFO","WARNING","ERROR"];
-  }
-
   $entries = array();
   $entry_re = '/^\[(.*?)\]\s*(\w+)\s*(.*?)\s*$/';
   foreach(file(plugin_path(LOG_FILE)) as $line) {
     $m = array();
     if(preg_match($entry_re,$line,$m))
     {
-      if(in_array($m[2],$levels)) {
-        $entry = "<tr class=" . strtolower($m[2]). ">";
-        $entry .= "<td class=date>" . $m[1] . "</td>";
-        $entry .= "<td class=message>" . $m[3] . "</td>";
-        $entry .= "</tr>";
-        $entries[] = $entry;
-      }
+      $entry = "<tr class=" . strtolower($m[2]). ">";
+      $entry .= "<td class=date>" . $m[1] . "</td>";
+      $entry .= "<td class=message>" . $m[3] . "</td>";
+      $entry .= "</tr>";
+      $entries[] = $entry;
     }
   }
   echo "<table class=log-table>";
@@ -73,26 +77,22 @@ function dump_log_to_html($level="INFO")
   echo "</table>";
 }
 
-function clear_logger()
-{
-  init_logger();
-  $file = plugin_path(LOG_FILE);
-  fclose($logger_fp);
-  unlink($file);
-  $logger_fp = fopen($file,"a");
-}
-}
-
 function log_dev($msg) {
-  write_to_logger("DEV",$msg);
+  if(survey_log_level() == "DEV") {
+    write_to_logger("DEV",$msg);
+  }
 }
 
 function log_info($msg) {
-  write_to_logger("INFO",$msg);
+  if(in_array(survey_log_level(),array("DEV","INFO"))) {
+    write_to_logger("INFO",$msg);
+  }
 }
 
 function log_warning($msg) {
-  write_to_logger("WARNING",$msg);
+  if(in_array(survey_log_level(),array("DEV","INFO","WARNING"))) {
+    write_to_logger("WARNING",$msg);
+  }
 }
 
 function log_error($msg) {

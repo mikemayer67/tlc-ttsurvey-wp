@@ -6,7 +6,7 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 $title = esc_html(get_admin_page_title());
 $status = "";
 
-require_once plugin_path('options.php');
+require_once plugin_path('settings.php');
 require_once plugin_path('logger.php');
 
 $action = $_POST['action'] ?? null;
@@ -23,7 +23,7 @@ elseif($action == "clear-log")
     log_error("failed to validate nonce");
     wp_die("Bad nonce");
   }
-  Logger::instance()->clear();
+  clear_logger();
 }
 
 echo "<h1>$title$status</h1>";
