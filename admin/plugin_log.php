@@ -4,7 +4,7 @@ namespace TLC\TTSurvey;
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('settings.php');
+require_once plugin_path('include/settings.php');
 
 $nonce = wp_nonce_field(OPTIONS_NONCE);
 $action = $_SERVER['REQUEST_URI'];

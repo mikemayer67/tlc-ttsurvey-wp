@@ -3,7 +3,7 @@ namespace TLC\TTSurvey;
 
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
-require_once plugin_path('settings.php');
+require_once plugin_path('include/settings.php');
 
 $current_year = date('Y');
 

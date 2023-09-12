@@ -68,7 +68,7 @@ function plugin_url($rel_url)
 }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('settings.php');
+require_once plugin_path('include/settings.php');
 require_once plugin_path('database.php');
 require_once plugin_path('user_database.php');
 
@@ -104,6 +104,6 @@ if( is_admin() ) /* Admin setup */
 }
 else /* Non-admin setup */
 {
-  require_once plugin_path('login.php');
+  require_once plugin_path('public/login.php');
   require_once plugin_path('shortcode.php');
 }

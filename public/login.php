@@ -140,7 +140,7 @@ function login_init()
       add_userid_to_cookie($userid,true);
     }
     elseif( $action == 'resend_userid') {
-      require_once plugin_path('sendmail.php');
+      require_once plugin_path('include/sendmail.php');
       sendmail_userid_reminder($_POST['email']);
     }
     elseif( $action == 'logout') {

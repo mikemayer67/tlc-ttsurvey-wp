@@ -6,7 +6,7 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 $title = esc_html(get_admin_page_title());
 $status = "";
 
-require_once plugin_path('settings.php');
+require_once plugin_path('include/settings.php');
 require_once plugin_path('include/logger.php');
 
 $action = $_POST['action'] ?? null;

@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once 'include/logger.php';
-require_once 'settings.php';
+require_once 'include/settings.php';
 
 const FORM_TABLE = 'tlc-ttsurvey-forms';
 
