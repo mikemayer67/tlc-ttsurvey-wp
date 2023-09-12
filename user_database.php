@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once 'logger.php';
+require_once plugin_path('include/logger.php');
 
 /**
  * The survey participant information is stored as a wordpress post 

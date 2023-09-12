@@ -7,7 +7,7 @@ $title = esc_html(get_admin_page_title());
 $status = "";
 
 require_once plugin_path('settings.php');
-require_once plugin_path('logger.php');
+require_once plugin_path('include/logger.php');
 
 $action = $_POST['action'] ?? null;
 if($action == "update") 

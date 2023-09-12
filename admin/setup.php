@@ -12,7 +12,7 @@ const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 const LOG_PAGE_SLUG = 'tlc-ttsurvey-log';
 
-require_once plugin_path('logger.php');
+require_once plugin_path('include/logger.php');
 require_once plugin_path('settings.php');
 
 function handle_admin_init()

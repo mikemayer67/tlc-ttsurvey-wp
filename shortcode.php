@@ -9,7 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
-require_once plugin_path('logger.php');
+require_once plugin_path('include/logger.php');
 require_once plugin_path('settings.php');
 require_once plugin_path('login.php');
 

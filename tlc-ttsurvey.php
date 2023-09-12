@@ -67,7 +67,7 @@ function plugin_url($rel_url)
   return plugin_dir_url(__FILE__).'/'.$rel_url;
 }
 
-require_once plugin_path('logger.php');
+require_once plugin_path('include/logger.php');
 require_once plugin_path('settings.php');
 require_once plugin_path('database.php');
 require_once plugin_path('user_database.php');

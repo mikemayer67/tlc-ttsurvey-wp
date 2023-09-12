@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('logger.php');
+require_once plugin_path('include/logger.php');
 
 function sendmail_userid_reminder($email)
 {
