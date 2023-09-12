@@ -67,10 +67,10 @@ function plugin_url($rel_url)
   return plugin_dir_url(__FILE__).'/'.$rel_url;
 }
 
-require_once 'logger.php';
-require_once 'settings.php';
-require_once 'database.php';
-require_once 'user_database.php';
+require_once plugin_path('logger.php');
+require_once plugin_path('settings.php');
+require_once plugin_path('database.php');
+require_once plugin_path('user_database.php');
 
 /**
  * plugin activation hooks
@@ -100,10 +100,10 @@ register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
 
 if( is_admin() ) /* Admin setup */
 {
-  require_once plugin_path('admin.php');
+  require_once plugin_path('admin/setup.php');
 }
 else /* Non-admin setup */
 {
-  require_once 'login.php';
-  require_once 'shortcode.php';
+  require_once plugin_path('login.php');
+  require_once plugin_path('shortcode.php');
 }

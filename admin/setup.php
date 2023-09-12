@@ -12,8 +12,8 @@ const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 const LOG_PAGE_SLUG = 'tlc-ttsurvey-log';
 
-require_once 'logger.php';
-require_once 'settings.php';
+require_once plugin_path('logger.php');
+require_once plugin_path('settings.php');
 
 function handle_admin_init()
 {
@@ -21,10 +21,6 @@ function handle_admin_init()
 
   #add_javascript goes here
 }
-
-#function handle_admin_init()
-#{
-#}
 
 function handle_admin_menu()
 {
@@ -60,6 +56,6 @@ function populate_settings_page()
   if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
   echo "<div class=wrap>";
-  require 'admin/plugin_page.php';
+  require plugin_path('admin/plugin_page.php');
   echo "</div>";
 }
