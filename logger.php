@@ -37,6 +37,7 @@ function logger($create=true)
 function clear_logger()
 {
   global $_logger_fp;
+  log_dev("clear_logger: $_logger_fp");
 
   $file = plugin_path(LOG_FILE);
   if($_logger_fp) { 
@@ -44,13 +45,14 @@ function clear_logger()
     unlink($file);
   }
   $_logger_fp = fopen($file,"a");
+  log_info("log cleared");
 }
 
 
 function write_to_logger($prefix,$msg)
 {
-  $datetime = new \DateTime;
-  $timestamp = $datetime->format("d-M-y H:i:s.v e");
+  $datetime = current_datetime();
+  $timestamp = $datetime->format("d-M-y H:i:s.v T");
   $prefix = str_pad($prefix,8);
   fwrite(logger(), "[{$timestamp}] {$prefix} {$msg}\n");
 }

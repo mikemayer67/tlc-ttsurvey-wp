@@ -86,8 +86,6 @@ const USERID_POST_TYPE = 'tlc-ttsurvey-id';
 
 function register_userid_post_type()
 {
-  log_dev("register_userid_post_type");
-
   register_post_type( USERID_POST_TYPE,
     array(
       'labels' => array(
@@ -118,14 +116,14 @@ function users_init()
 
 function users_activate()
 {
-  log_info("User Activate");
+  log_info("Users Activate");
   register_userid_post_type();
   flush_rewrite_rules();
 }
 
 function users_deactivate()
 {
-  log_info("User Deactivate");
+  log_info("Users Deactivate");
   unregister_post_type(USERID_POST_TYPE);
 }
 

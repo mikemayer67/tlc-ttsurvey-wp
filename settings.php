@@ -142,11 +142,10 @@ function update_options_from_post()
 
   $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
 
-  $new_pdf_uri = $_POST['pdf_uri'];
-  log_info("new_pdf_uri: $new_pdf_uri");
-  $new_pdf_uri = sanitize_url($new_pdf_uri,['http','https','ftp','ftps']);
-  log_info("(sanitized): $new_pdf_uri");
-  $options[PDF_URI_KEY] = $new_pdf_uri;
+  $options[PDF_URI_KEY] = sanitize_url(
+    $_POST['pdf_uri'],
+    ['http','https','ftp','ftps'],
+  );
 
   foreach(get_users() as $user) {
     $id = $user->id;
