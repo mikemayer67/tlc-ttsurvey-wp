@@ -8,7 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('user_database.php');
+require_once plugin_path('include/users.php');
 require_once plugin_path('database.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
@@ -24,7 +24,9 @@ function cookie_userids()
 {
   log_dev("cookie_userids()");
   $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
+  log_dev(print_r($userids,true));
   $userids = json_decode($userids,true);
+  log_dev(print_r($userids,true));
   return array_filter(
     $userids,
     function ($key) { get_user_post_id($key); }
@@ -93,8 +95,6 @@ function save_survey_cookies()
   setcookie( USERIDS_COOKIE, $_COOKIE[USERIDS_COOKIE], time() + 86400*365);
 }
 
-reset_cookie_timeout();
-
 function login_init()
 {
   log_dev("login_init()");
@@ -102,6 +102,8 @@ function login_init()
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
+    reset_cookie_timeout();
+
     require_once plugin_path('users.php');
 
     $action = $_POST['action'] ?? null;

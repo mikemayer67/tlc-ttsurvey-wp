@@ -3,7 +3,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const LOG_FILE = 'tlc-ttsurvey.log';
+const PLUGIN_LOG_FILE = 'plugin.log';
 
 $_logger_fp = null;
 
@@ -13,7 +13,7 @@ function logger($create=true)
 
   if(is_null($_logger_fp) && $create)
   {
-    $logfile = plugin_path(LOG_FILE);
+    $logfile = plugin_path(PLUGIN_LOG_FILE);
     if( file_exists($logfile) and filesize($logfile) > 512*1024 ) {
       $tempfile = $logfile.".tmp";
       $_logger_fp = fopen($tempfile,"w");
@@ -39,7 +39,7 @@ function clear_logger()
   global $_logger_fp;
   log_dev("clear_logger: $_logger_fp");
 
-  $file = plugin_path(LOG_FILE);
+  $file = plugin_path(PLUGIN_LOG_FILE);
   if($_logger_fp) { 
     fclose($_logger_fp); 
     unlink($file);
@@ -61,7 +61,7 @@ function dump_log_to_html()
 {
   $entries = array();
   $entry_re = '/^\[(.*?)\]\s*(\w+)\s*(.*?)\s*$/';
-  foreach(file(plugin_path(LOG_FILE)) as $line) {
+  foreach(file(plugin_path(PLUGIN_LOG_FILE)) as $line) {
     $m = array();
     if(preg_match($entry_re,$line,$m))
     {

@@ -11,7 +11,7 @@ const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
-require_once plugin_path('public/login.php');
+require_once plugin_path('include/login.php');
 
 /**
  * handle login 
