@@ -69,7 +69,7 @@ function plugin_url($rel_url)
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
-require_once plugin_path('database.php');
+require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/users.php');
 
 /**
@@ -80,12 +80,14 @@ function handle_activate()
 {
   log_info('activate: '.__NAMESPACE__);
   users_activate();
+  surveys_activate();
 }
 
 function handle_deactivate()
 {
   log_info('deactivate: '.__NAMESPACE__);
   users_deactivate();
+  surveys_deactivate();
 }
 
 function handle_uninstall()
@@ -105,5 +107,5 @@ if( is_admin() ) /* Admin setup */
 else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
-  require_once plugin_path('shortcode/setup.php');
+  require_once plugin_path('shortcode.php');
 }

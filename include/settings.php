@@ -14,13 +14,11 @@ if( ! defined('WPINC') ) { die; }
 const OPTIONS_KEY = 'tlc_ttsurvey_options';
 
 const CAPS_KEY = 'caps';
-const ACTIVE_YEAR_KEY = 'active_year';
 const PDF_URI_KEY = 'pdf_href';
 const LOG_LEVEL_KEY = 'log_level';
 
 $option_defaults = array(
   CAPS_KEY => [],
-  ACTIVE_YEAR_KEY => '',
   PDF_URI_KEY => '',
   LOG_LEVEL_KEY => 'INFO',
 );
@@ -54,14 +52,6 @@ function set_survey_option($key,$value)
     $options[$key] = $value;
     update_option(OPTIONS_KEY,$options);
   }
-}
-
-/**
- * get active survey year
- * @return active survey year
- */
-function active_survey_year() {
-  return get_survey_option(ACTIVE_YEAR_KEY);
 }
 
 /**
@@ -135,7 +125,6 @@ function update_options_from_post()
   }
 
   $options = get_option(OPTIONS_KEY,array());
-  $options[ACTIVE_YEAR_KEY] = $_POST['active_year'];
 
   $new_caps = $_POST['caps'];
   $options[CAPS_KEY] = $new_caps;

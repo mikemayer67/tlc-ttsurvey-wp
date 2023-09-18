@@ -9,49 +9,41 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/users.php');
-require_once plugin_path('database.php');
+require_once plugin_path('include/surveys.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
-const USERIDS_COOKIE = 'tlc-ttsurvey-userids';
+const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
 
 function active_userid()
 {
-  log_dev("active_userid()");
-  return $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
+  $rval = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
+  log_dev("active_userid() => $rval");
+  return $rval;
 }
 
-function cookie_userids()
+function cookie_tokens()
 {
-  log_dev("cookie_userids()");
-  $userids = $_COOKIE[USERIDS_COOKIE] ?? "{}";
-  log_dev(print_r($userids,true));
-  $userids = json_decode($userids,true);
-  log_dev(print_r($userids,true));
-  return array_filter(
-    $userids,
-    function ($key) { get_user_post_id($key); }
-  );
+  $userids = $_COOKIE[ACCESS_TOKEN_COOKIE] ?? "";
+  $userids = json_decode($userids,true) ?? array();
+  $rval = array();
+  foreach($userids as $userid=>$access_token)
+  {
+    if(validate_access_token($userid,$access_token))
+    {
+      $rval[$userid] = $access_token;
+    }
+  }
+  log_dev("cookie_tokens() => ".print_r($rval,true));
+  return $rval;
 }
 
 function reset_cookie_timeout() {
   log_dev("reset_cookie_timeout()");
   setcookie(
-    USERIDS_COOKIE,
-    $_COOKIE[USERIDS_COOKIE] ?? "",
+    ACCESS_TOKEN_COOKIE,
+    $_COOKIE[ACCESS_TOKEN_COOKIE] ?? "",
     time() + 86400*365,
   );
-}
-
-function add_userid_to_cookie($userid,$active=true)
-{
-  log_dev("add_userid_to_cookie($userid,$active)");
-  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
-  $userids = cookie_userids();
-  if(!in_array($userid,$userids)) {
-    $userids[] = $userid;
-    $_COOKIE[USERIDS_COOKIE] = json_encode($userids);
-  }
-  save_survey_cookies();
 }
 
 function logout_active_user()
@@ -61,15 +53,20 @@ function logout_active_user()
   save_survey_cookies();
 }
 
-function resume_survey_as($userid,$case)
+function resume_survey_as($userid,$token)
 {
-  log_dev("resume_survey_as($userid,$case)");
-  /*
-  TODO: Verify userid
-  TODO: Verify anonid if specified
-  TODO: if anonid was blank, create one now and notify user of new anonid
-   */
-  add_userid_to_cookie($userid,true);
+  log_dev("resume_survey_as($userid,$token)");
+  if( !validate_access_token($userid,$token) ) { return false; }
+
+  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
+
+  $tokens = cookie_tokens();
+  $tokens[$userid] = $token;
+  $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
+
+  save_survey_cookies();
+
+  return true;
 }
 
 function remove_userid_from_cookie($userid)
@@ -78,13 +75,11 @@ function remove_userid_from_cookie($userid)
   if( active_userid() == $userid ) {
     unset($_COOKIE[ACTIVE_USER_COOKIE]);
   }
-  $userids = cookie_userids();
-  unset($userids[$userid]);
-  if($userids) {
-    $_COOKIE[USERIDS_COOKIE] = json_encode($userids);
-  } else {
-    unset($_COOKIE[USERIDS_COOKIE]);
-  }
+
+  $tokens = cookie_tokens();
+  unset($tokens[$userid]);
+  $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
+
   save_survey_cookies();
 }
 
@@ -92,60 +87,33 @@ function save_survey_cookies()
 {
   log_dev("save_survey_cookies()");
   setcookie( ACTIVE_USER_COOKIE, $_COOKIE[ACTIVE_USER_COOKIE], 0 );
-  setcookie( USERIDS_COOKIE, $_COOKIE[USERIDS_COOKIE], time() + 86400*365);
+  setcookie( ACCESS_TOKEN_COOKIE, $_COOKIE[ACCESS_TOKEN_COOKIE], time() + 86400*365);
 }
 
 function login_init()
 {
-  log_dev("login_init()");
   $nonce = $_POST['_wpnonce'] ?? '';
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
-    reset_cookie_timeout();
+    require_once plugin_path('include/users.php');
 
-    require_once plugin_path('users.php');
+    reset_cookie_timeout();
 
     $action = $_POST['action'] ?? null;
     log_dev("action=$action");
     if( $action == 'resume' ) {
-      resume_survey_as($_POST['userid'],$_POST['case']);
+      $userid = $_POST['userid'];
+      $token = $_POST['access_token'];
+      if( resume_survey_as($userid,$token) ) {
+        log_dev("resuming survey as $userid");
+      } else {
+        log_dev("invalid access token, removing $userid from cookie");
+        remove_userid_from_cookie($userid);
+      }
     }
-    elseif( $action == 'new_user' ) {
-      $userid = $_POST['userid'] ?? null;
-      $name = $_POST['name'] ?? null;
-      $email = $_POST['email'] ?? null;
-      $password = $_POST['password'] ?? null;
-
-      if(!is_valid_userid($userid)) {
-        // @@@ TODO: Handle bad user userid
-        log_warning("Need to add logic for bad new user userid");
-      }
-      
-      if(!is_valid_name($name)) {
-        // @@@ TODO: Handle bad user name
-        log_warning("Need to add logic for bad new user name");
-      }
-      
-      if(!is_valid_email($email)) {
-        // @@@ TODO: Handle bad user email
-        log_warning("Need to add logic for bad new user email");
-      }
-      
-      if(!is_valid_password($password)) {
-        // @@@ TODO: Handle bad user password
-        log_warning("Need to add logic for bad new user password");
-      }
-      
-      log_dev("Registering new user: $name, $email");
-      add_new_user($userid,$password,$name,$email);
-      add_userid_to_cookie($userid,true);
-    }
-    elseif( $action == 'resend_userid') {
-      require_once plugin_path('include/sendmail.php');
-      sendmail_userid_reminder($_POST['email']);
-    }
-    elseif( $action == 'logout') {
+    elseif( $action == 'logout') 
+    {
       logout_active_user();
     }
   }

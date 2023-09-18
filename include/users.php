@@ -11,8 +11,8 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/logger.php');
 
 /**
- * The survey participant information is stored as a wordpress post 
- * using the custome post type of tlc-ttsurvey-id.  Each post corresponds
+ * The survey participant information is stored as wordpress posts 
+ * using the custom post type of tlc-ttsurvey-id.  Each post corresponds
  * to a single participant userid or anonymous id (anonid)
  *
  * The post title contains the userid or anonid
@@ -94,8 +94,8 @@ function register_userid_post_type()
         'add_new' => 'New Participant',
         'add_new_item' => 'Add New Participant',
         'edit_item' => 'Edit Participant',
-        'new_item' => 'New Participanty',
-        'view_item' => 'View Participanties',
+        'new_item' => 'New Participant',
+        'view_item' => 'View Participants',
         'search_items' => 'Search Participants',
         'not_found' =>  'No Participants Found',
         'not_found_in_trash' => 'No Participants found in Trash',
@@ -180,6 +180,18 @@ function validate_password($userid,$password)
   }
   log_dev(" => password validated for $userid");
   return true;
+}
+
+function validate_access_token($userid,$token)
+{
+  log_dev("valiate_access_token($userid,$token)");
+  $post_id = get_user_post_id($userid);
+  log_dev("  post_id: $post_id");
+  if(!$post_id) { return false; }
+
+  $expected_token = get_post_meta($post_id,'access_token');
+  log_dev("  expected token: $expected_token");
+  return $token == $expected_token;
 }
 
 /**

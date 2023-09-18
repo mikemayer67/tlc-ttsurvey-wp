@@ -5,13 +5,6 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('include/settings.php');
 
-$active_year = active_survey_year();
-$current_year = date('Y');
-$survey_years = survey_years();
-$survey_years[] = date('Y');
-$survey_years = array_unique($survey_years);
-arsort($survey_years);
-
 $nonce = wp_nonce_field(OPTIONS_NONCE);
 
 $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
@@ -25,13 +18,6 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   <input type="hidden" name="action" value="update">
   <?=$nonce?>
   <div class=tlc>
-
-  <div class=label>Active Year</div>
-  <select name='active_year' class='tlc settings'>
-<?php foreach( $survey_years as $year ) { ?>
-  <option value=<?=$year?> <?php echo($year==$active_year ? "selected" : ""); ?>><?=$year?></option>
-<?php } ?>
-  </select>
 
   <div class=label>Survey Admins</div>
   <table id='tlc-ttsurvey-admin-caps' class='tlc settings'>

@@ -7,13 +7,11 @@ require_once plugin_path('include/settings.php');
 
 $current_year = date('Y');
 
-$active_year = active_survey_year();
-
 $survey_years = survey_years();
-$survey_years[] = date('Y');
-$survey_years = array_unique($survey_years);
-asort($survey_years);
-$survey_years = implode(", ",$survey_years);
+$current_status = $survey_years[$current_year] ?? 'not started';
+unset($survey_years[$current_year]);
+$years = array_keys($survey_years);
+arsort($years);
 
 $log_level = survey_log_level();
 
@@ -25,12 +23,31 @@ $pdf_uri = survey_pdf_uri();
 <h2>Survey Settings</h2>
 <table class='tlc-overview'>
   <tr>
-    <td class=label>Active Year</td>
-    <td class=value><?=$active_year?>
+    <td class=label>Current Year</td>
+    <td class=value>
+      <table class=years>
+        <tr>
+          <td class=year><?=$current_year?></td>
+          <td class=status><?=$current_status?></td>
+        </tr> 
+      </table>
+    </td>
   </tr>
   <tr>
-    <td class=label>All Years</td>
-    <td class=value><?=$survey_years?>
+    <td class=label>Past Years</td>
+    <td class=value>
+      <table class=years>
+<?php
+if(!$survey_years) {
+  echo "<tr><td class=year>n/a</td></tr>";
+}
+foreach($years as $year) {
+  $status = $survey_years[$year];
+  echo "<tr><td class=year>$year</td><td class=status>$status</td></tr>";
+}
+?>
+      </table>
+    </td>
   </tr>
   <tr>
     <td class=label>Admins</td>

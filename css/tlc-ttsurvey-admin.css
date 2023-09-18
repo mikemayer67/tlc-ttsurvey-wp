@@ -145,7 +145,15 @@ table.tlc-overview table.admins td.username
   text-align:right;
 }
 
+table.tlc-overview table.years td.year
+{
+  width:3em;
+  font-weight:bolder;
+  text-align:left;
+}
+
 table.tlc-overview table.admins td.usercaps
+table.tlc-overview table.years td.status
 {
   padding-left:1em;
 }
