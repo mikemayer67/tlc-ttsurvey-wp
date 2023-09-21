@@ -4,6 +4,8 @@ namespace TLC\TTSurvey;
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/logger.php');
 
 $current_year = date('Y');
 
@@ -59,13 +61,13 @@ foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
   $responses = $caps['responses'][$id];
-  $structure = $caps['structure'][$id];
+  $content = $caps['content'][$id];
   $user_caps = array();
   if( $caps['responses'][$id] ) {
     $user_caps[] = "Responses";
   }
-  if( $caps['structure'][$id] ) {
-    $user_caps[] = " Structure";
+  if( $caps['content'][$id] ) {
+    $user_caps[] = " Content";
   }
   if( !empty($user_caps) ) {
     $user_caps = implode(", ",$user_caps);

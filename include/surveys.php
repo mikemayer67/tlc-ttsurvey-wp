@@ -147,7 +147,6 @@ function active_survey_year()
 
 function survey_years()
 {
-  log_dev("get_survey_post_id($year)");
   $posts = get_posts(
     array(
       'post_type' => SURVEY_POST_TYPE,
@@ -156,15 +155,24 @@ function survey_years()
   );
   $rval = array();
   foreach( $posts as $post ) {
-    $year = $post->title;
-    $status = get_post_meta($post->ID,'status') ?? null;
+    $year = $post->post_title;
     if( array_key_exists($year,$rval) ) {
       # log error both to the plugin log and to the php error log
       log_error("Multiple posts associated with year $year");
       error_log("Multiple posts associated with year $year");
       die;
     }
-    $rval[$post->title] = $status;
+
+    $status = get_post_meta($post->ID,'status') ?? null;
+    if($status) {
+      if(count($status) > 1) {
+        log_error("Multiple status associated $year with survey");
+        error_log("Multiple status associated $year with survey");
+        die;
+      }
+      $status = $status[0];
+    }
+    $rval[$year] = $status;
   }
 
   $current_year = date('Y');

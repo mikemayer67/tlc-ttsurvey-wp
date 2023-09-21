@@ -138,7 +138,7 @@ function update_options_from_post()
 
   foreach(get_users() as $user) {
     $id = $user->id;
-    foreach(['responses','structure'] as $cap) {
+    foreach(['responses','content'] as $cap) {
       $key = "tlc-ttsurvey-$cap";
       if($new_caps[$cap][$id]) {
         $user->add_cap($key);

@@ -1,23 +1,57 @@
 
 jQuery(document).ready(
   function($) {
-    email_info = $("div.tlc-ttsurvey form .email-info");
-    email_info_trigger = $("div.tlc-ttsurvey form .email-info-trigger");
-    email_info.hide();
-    email_info_trigger.hover(
-      function(e) {email_info.slideDown(100)},
+    $('div.tlc-ttsurvey form .info-trigger').show();
+    $('div.tlc-ttsurvey form .info').hide();
+
+    rml_info = $("div.tlc-ttsurvey form.login .info.remember-me");
+    rml_trigger = $("div.tlc-ttsurvey form.login .info-trigger.remember-me");
+    rml_trigger.hover(
+      function(e) {rml_info.slideDown(100)},
       function(e) {
-        if(!email_info.hasClass('locked')) {
-          email_info.slideUp(100);
+        if(!rml_info.hasClass('locked')) {
+          rml_info.slideUp(100);
         }
-      }
-    );
-    email_info_trigger.on('click',function() {
-      email_info.addClass('locked').slideDown(100)
-    });
-    email_info.on('click',function() {
-      email_info.removeClass("locked").slideUp(100);
-    });
+      });
+      rml_trigger.on('click',function() {
+        rml_info.addClass('locked').slideDown(100)
+      });
+      rml_info.on('click',function() {
+        rml_info.removeClass('locked').slideUp(100);
+      });
+            
+    rmr_info = $("div.tlc-ttsurvey form.register .info.remember-me");
+    rmr_trigger = $("div.tlc-ttsurvey form.register .info-trigger.remember-me");
+    rmr_trigger.hover(
+      function(e) {rmr_info.slideDown(100)},
+      function(e) {
+        if(!rmr_info.hasClass('locked')) {
+          rmr_info.slideUp(100);
+        }
+      });
+      rmr_trigger.on('click',function() {
+        rmr_info.addClass('locked').slideDown(100)
+      });
+      rmr_info.on('click',function() {
+        rmr_info.removeClass('locked').slideUp(100);
+      });
+            
+    emailinfo = $("div.tlc-ttsurvey form .info.email");
+    emailtrigger = $("div.tlc-ttsurvey form .info-trigger.email");
+    emailtrigger.hover(
+      function(e) {emailinfo.slideDown(100)},
+      function(e) {
+        if(!emailinfo.hasClass('locked')) {
+          emailinfo.slideUp(100);
+        }
+      });
+      emailtrigger.on('click',function() {
+        emailinfo.addClass('locked').slideDown(100)
+      });
+      emailinfo.on('click',function() {
+        emailinfo.removeClass('locked').slideUp(100);
+      });
+            
   }
 );
 

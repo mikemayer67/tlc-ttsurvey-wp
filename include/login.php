@@ -102,6 +102,7 @@ function login_init()
 
     $action = $_POST['action'] ?? null;
     log_dev("action=$action");
+    log_dev(print_r($_POST,true));
     if( $action == 'resume' ) {
       $userid = $_POST['userid'];
       $token = $_POST['access_token'];

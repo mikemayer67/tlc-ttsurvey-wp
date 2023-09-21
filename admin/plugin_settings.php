@@ -24,7 +24,7 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   <tr>
     <th></th>
     <th>Responses</th>
-    <th>Structure</th>
+    <th>Content</th>
   </tr>
 <?php
 $caps = survey_capabilities();
@@ -32,7 +32,7 @@ foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
   $response = $caps['responses'][$id] ? "checked" : "";
-  $structure = $caps['structure'][$id] ? "checked" : "";
+  $content = $caps['content'][$id] ? "checked" : "";
 ?>
   <tr>
     <td class=name><?=$name?></td>
@@ -40,7 +40,7 @@ foreach(get_users() as $user) {
     <input type=checkbox value=1 name="caps[responses][<?=$id?>]" <?=$response?>>
     </div></td>
     <td><div class=cap>
-    <input type=checkbox value=1 name="caps[structure][<?=$id?>]" <?=$structure?>>
+    <input type=checkbox value=1 name="caps[content][<?=$id?>]" <?=$content?>>
     </div></td>
   </tr>
 <?php } ?>

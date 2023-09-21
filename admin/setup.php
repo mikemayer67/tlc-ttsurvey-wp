@@ -59,3 +59,13 @@ function populate_settings_page()
   require plugin_path('admin/plugin_page.php');
   echo "</div>";
 }
+
+wp_register_script(
+  'tlc_admin_scripts',
+  plugin_url('js/admin.js'),
+  array('jquery'),
+  '1.0.3',
+  true
+);
+
+wp_enqueue_script('tlc_admin_scripts');

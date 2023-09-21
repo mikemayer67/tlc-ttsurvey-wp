@@ -34,8 +34,8 @@ $tabs = [
   ['settings','Settings'],
 ];
 
-if(current_user_can('tlc-ttsurvey-structure')) {
-  $tabs[] = ['structure','Structure'];
+if(current_user_can('tlc-ttsurvey-content')) {
+  $tabs[] = ['content','Content'];
 }
 if(current_user_can('tlc-ttsurvey-responses')) {
   $tabs[] = ['responses','Responses'];

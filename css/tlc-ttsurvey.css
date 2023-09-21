@@ -48,90 +48,61 @@ div.tlc-ttsurvey form.resume li button:active {
   transform:translate(2px,2px)
 }
 
-/**
-div.tlc-ttsurvey form
+div.tlc-ttsurvey form.login input.w3-input,
+div.tlc-ttsurvey form.register input.w3-input,
+div.tlc-ttsurvey form.senduserid input.w3-input
 {
-  margin-left:3em;
+  width:90%;
+  border-left:none;
+  border-right:none;
+  border-top:none;
+}
+div.tlc-ttsurvey form.senduserid input.w3-input
+{
+  width:100%;
 }
 
-div.tlc-ttsurvey form input[type=submit]
-{
-  border-radius:12px;
-  margin-top:5px;
-
-  padding-left:3em;
-  padding-right:3em;
+div.tlc-ttsurvey form .info-trigger {
+  display:none;
+  margin-left:10px;
 }
 
-div.tlc-ttsurvey form input[type=submit]:hover
-{
-  margin-left:-1em;
+div.tlc-ttsurvey form .info-test {
+  display:none;
+  margin-left:10px;
 }
 
-div.tlc-ttsurvey form input:invalid
-{
-  background:lightpink;
+div.tlc-ttsurvey form .input{
+  margin-top:16px;
 }
 
-div.tlc-ttsurvey form table
+div.tlc-ttsurvey form .instruction
 {
-  width:auto;
-  border-style:none;
+  padding:8px;
 }
 
-div.tlc-ttsurvey form tr
+div.tlc-ttsurvey form .info
 {
-  border-style:none;
-}
-
-div.tlc-ttsurvey form td
-{
-  width:auto;
-  border-style:none;
-  padding-left:5px;
-  padding-right:5px;
-  padding-top:0;
-  padding-bottom:0;
-}
-
-div.tlc-ttsurvey form td.label
-{
-  font-weight:bold;
-  text-align:right;
-  font-size:larger;
+  margin-top:16px;
+  margin-left:2em;
+  margin-right:1em;
+  padding:8px;
+  font-size:small;
+  width:80%;
 }
 
 div.tlc-ttsurvey form p.info
 {
-  margin-top:0;
+  margin-top: 5px;
+  font-size:small;
+}
+
+div.tlc-ttsurvey form .info ul 
+{
+  margin:0;
+}
+
+div.tlc-ttsurvey form .info li 
+{
   margin-bottom:0;
 }
-
-div.tlc-ttsurvey form input[type=text]
-{
-  font-weight:bold;
-  font-size:large;
-  width:6em;
-}
-
-div.tlc-ttsurvey form input[type=email]
-{
-  font-weight:bold;
-  font-size:large;
-  width:18em;
-}
-
-div.tlc-ttsurvey form input.name
-{
-  width:18em;
-}
-
-div.tlc-ttsurvey form div.email-info {
-  border:solid;
-  border-width: 1px;
-  padding:10px 10px 0 10px;
-  margin-bottom:10px;
-  margin-left:3em;
-  margin-right:3em;
-}
-**/
