@@ -7,15 +7,6 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('users.php');
-
-$user_name = Users::instance()->full_name($userid);
-
-if( $anonid == null ) {
-  echo "Logged in as $user_name ($userid) with no anonymous id";
-} else {
-  echo "Logged in as $user_name ($userid) and anonymous id $anonid";
-}
 
 $form_uri=$_SERVER['REQUEST_URI'];
 $nonce = wp_nonce_field(LOGIN_FORM_NONCE);

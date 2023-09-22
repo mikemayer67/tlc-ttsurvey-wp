@@ -1,3 +1,8 @@
+div.tlc-ttsurvey {
+  background-color:white;
+  color:black;
+}
+
 div.tlc-ttsurvey div.noscript {
   font-family: sans-serif;
   width: 100%;
@@ -14,89 +19,99 @@ div.tlc-ttsurvey p.noscript {
   margin-left:1em;
 }
 
-div.tlc-ttsurvey form
-{
-  margin-left:3em;
+div.tlc-ttsurvey form.resume li {
+  list-style-type: none;
+  border-bottom: 1px solid #d5d5d5;
+  border-radius: 10px;
+  box-shadow: 0 2px 2px rgba(0,0,0,.3);
+  width: 300px;
+  height:60px;
+  margin-top:3px;
 }
 
-div.tlc-ttsurvey form input[type=submit]
-{
-  border-radius:12px;
-  margin-top:5px;
-
-  padding-left:3em;
-  padding-right:3em;
-}
-
-div.tlc-ttsurvey form input[type=submit]:hover
-{
-  margin-left:-1em;
-}
-
-div.tlc-ttsurvey form input:invalid
-{
-  background:lightpink;
-}
-
-div.tlc-ttsurvey form table
-{
-  width:auto;
-  border-style:none;
-}
-
-div.tlc-ttsurvey form tr
-{
-  border-style:none;
-}
-
-div.tlc-ttsurvey form td
-{
-  width:auto;
-  border-style:none;
-  padding-left:5px;
-  padding-right:5px;
-  padding-top:0;
-  padding-bottom:0;
-}
-
-div.tlc-ttsurvey form td.label
-{
+div.tlc-ttsurvey form.resume li button {
+  background:#f8f8f8;
+  color:black;
+  width:100%;
+  height:100%;
   font-weight:bold;
-  text-align:right;
-  font-size:larger;
+  margin:0;
+  padding:0;
 }
 
-div.tlc-ttsurvey form p.info
+div.tlc-ttsurvey form.resume li button:hover {
+  background:#e0ffe0;
+}
+
+div.tlc-ttsurvey form.resume li button:active {
+  background:#a0ffa0;
+  transform:translate(2px,2px)
+}
+
+div.tlc-ttsurvey form.login input.w3-input
 {
+  width:90%;
+  border-left:none;
+  border-right:none;
+  border-top:none;
+}
+div.tlc-ttsurvey form.senduserid input.w3-input
+{
+  width:100%;
+}
+
+div.tlc-ttsurvey form .info-trigger {
+  display:none;
+  margin-left:10px;
+}
+
+div.tlc-ttsurvey form .info-test {
+  display:none;
+  margin-left:10px;
+}
+
+div.tlc-ttsurvey form .input{
+  margin-top:16px;
+}
+
+div.tlc-ttsurvey form .input{
+  margin-top:16px;
+}
+
+div.tlc-ttsurvey .login_form.senduserid .input {
   margin-top:0;
-  margin-bottom:0;
+}
+div.tlc-ttsurvey .login_form.senduserid .w3-input {
+  width:100%;
 }
 
-div.tlc-ttsurvey form input[type=text]
+
+div.tlc-ttsurvey .instruction
 {
-  font-weight:bold;
-  font-size:large;
-  width:6em;
+  padding:8px 0 0 0;
+  color:gray;
 }
 
-div.tlc-ttsurvey form input[type=email]
+div.tlc-ttsurvey form .info
 {
-  font-weight:bold;
-  font-size:large;
-  width:18em;
+  margin:0 0 0 25px;
+  padding:8px;
+  width:80%;
 }
 
-div.tlc-ttsurvey form input.name
+div.tlc-ttsurvey form .info p
 {
-  width:18em;
+  margin:0;
+  font-size:small;
 }
 
-div.tlc-ttsurvey form div.email-info {
-  border:solid;
-  border-width: 1px;
-  padding:10px 10px 0 10px;
-  margin-bottom:10px;
-  margin-left:3em;
-  margin-right:3em;
+div .tlc-ttsurvey form .info .info-list
+{
+  margin-left:10px;
 }
 
+div .tlc-ttsurvey form .info .info-list::before
+{
+  content:"> ";
+  color:gray;
+}

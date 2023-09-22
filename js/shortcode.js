@@ -1,23 +1,23 @@
 
 jQuery(document).ready(
   function($) {
-    email_info = $("div.tlc-ttsurvey form .email-info");
-    email_info_trigger = $("div.tlc-ttsurvey form .email-info-trigger");
-    email_info.hide();
-    email_info_trigger.hover(
-      function(e) {email_info.slideDown(100)},
-      function(e) {
-        if(!email_info.hasClass('locked')) {
-          email_info.slideUp(100);
-        }
+    $('div.tlc-ttsurvey form .info-trigger').show();
+    $('div.tlc-ttsurvey form .info').hide();
+
+    $('div.tlc-ttsurvey form .info-trigger').each(
+      function() {
+        var trigger = $(this)
+        var tgt_id = trigger.data('target');
+        var tgt = $('#'+tgt_id);
+        trigger.hover(
+          function(e) { tgt.slideDown(100) },
+          function(e) { if(!tgt.hasClass('locked')) { tgt.slideUp(100) } },
+        );
+        trigger.on( 'click', function() { tgt.addClass('locked').slideDown(100) });
+        tgt.on( 'click', function() { tgt.removeClass('locked').slideUp(100) });
       }
     );
-    email_info_trigger.on('click',function() {
-      email_info.addClass('locked').slideDown(100)
-    });
-    email_info.on('click',function() {
-      email_info.removeClass("locked").slideUp(100);
-    });
+            
   }
 );
 

@@ -3,34 +3,53 @@ namespace TLC\TTSurvey;
 
 if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
-require_once plugin_path('settings.php');
-
-$settings = Settings::instance();
+require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/logger.php');
 
 $current_year = date('Y');
 
-$active_year = $settings->get(ACTIVE_YEAR_KEY);
-
 $survey_years = survey_years();
-$survey_years[] = date('Y');
-$survey_years = array_unique($survey_years);
-asort($survey_years);
-$survey_years = implode(", ",$survey_years);
+$current_status = $survey_years[$current_year] ?? 'not started';
+unset($survey_years[$current_year]);
+$years = array_keys($survey_years);
+arsort($years);
 
-$caps = $settings->get(CAPS_KEY);
-$pdf_uri = $settings->get(PDF_URI_KEY);
+$log_level = survey_log_level();
+
+$caps = survey_capabilities();
+$pdf_uri = survey_pdf_uri();
 
 ?>
 
 <h2>Survey Settings</h2>
 <table class='tlc-overview'>
   <tr>
-    <td class=label>Active Year</td>
-    <td class=value><?=$active_year?>
+    <td class=label>Current Year</td>
+    <td class=value>
+      <table class=years>
+        <tr>
+          <td class=year><?=$current_year?></td>
+          <td class=status><?=$current_status?></td>
+        </tr> 
+      </table>
+    </td>
   </tr>
   <tr>
-    <td class=label>All Years</td>
-    <td class=value><?=$survey_years?>
+    <td class=label>Past Years</td>
+    <td class=value>
+      <table class=years>
+<?php
+if(!$survey_years) {
+  echo "<tr><td class=year>n/a</td></tr>";
+}
+foreach($years as $year) {
+  $status = $survey_years[$year];
+  echo "<tr><td class=year>$year</td><td class=status>$status</td></tr>";
+}
+?>
+      </table>
+    </td>
   </tr>
   <tr>
     <td class=label>Admins</td>
@@ -38,18 +57,17 @@ $pdf_uri = $settings->get(PDF_URI_KEY);
       <table class=admins>
 
 <?php
-$all_users = get_users();
-foreach($all_users as $user) {
+foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
   $responses = $caps['responses'][$id];
-  $structure = $caps['structure'][$id];
+  $content = $caps['content'][$id];
   $user_caps = array();
   if( $caps['responses'][$id] ) {
     $user_caps[] = "Responses";
   }
-  if( $caps['structure'][$id] ) {
-    $user_caps[] = " Structure";
+  if( $caps['content'][$id] ) {
+    $user_caps[] = " Content";
   }
   if( !empty($user_caps) ) {
     $user_caps = implode(", ",$user_caps);
@@ -64,6 +82,11 @@ foreach($all_users as $user) {
   <tr>
     <td class=label>Survey URL</td>
     <td class=value><?=$pdf_uri?></td>
+  </tr>
+
+  <tr>
+    <td class=label>Log Level</td>
+    <td class=value><?=$log_level?></td>
   </tr>
 
 </table>
