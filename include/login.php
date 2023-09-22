@@ -117,6 +117,17 @@ function login_init()
     {
       logout_active_user();
     }
+    elseif( $action == 'senduserid') 
+    {
+      require_once plugin_path('include/sendmail.php');
+      $email = $_POST['email'];
+      if(sendmail_userid($email)) {
+        set_survey_info("Sent userid/password to $email");
+      } else {
+        set_survey_warning("Unrecognized email address");
+        set_shortcode_page("senduserid");
+      }
+    }
   }
 }
 

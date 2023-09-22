@@ -10,7 +10,7 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/login.php');
 require_once plugin_path('include/users.php');
 
-$form_uri=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+$form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 $nonce = wp_nonce_field(LOGIN_FORM_NONCE);
 
 $info_icon = plugin_url('img/icons8-info.png');
