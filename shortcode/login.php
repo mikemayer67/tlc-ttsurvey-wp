@@ -22,23 +22,27 @@ $info_icon = plugin_url('img/icons8-info.png');
     <form class='login w3-container w3-card-4' method=post action='<?=$form_uri?>'>
       <?=$nonce?>
       <input type=hidden name=action value=login>
+      <!-- Userid -->
       <div class=input>
         <input class="w3-input" type="text" name=userid required>
         <label>Userid</label>
       </div>
+      <!-- Password -->
       <div class=input>
         <input class="w3-input" type="password" name=password required>
         <label>Password</label>
       </div>
+      <!-- Remember me -->
       <div class=input>
         <input class="w3-check remember-me" type="checkbox" name=remember_me checked="checked">
         <label>Remember me</label>
         <a class="remember-me info-trigger"><img src='<?=$info_icon?>' width=18 height=18></a>
-        <p class='remember-me info w3-panel w3-pale-yellow w3-border'>
-          <i>Remember me</i> will set a cookie on your browswer
-          so that you need not enter your password on future logins
-        </p>
+        <div class='remember-me info w3-panel w3-pale-yellow w3-border'>
+          <p><i>Remember me</i> will set a cookie on your browswer
+          so that you need not enter your password on future logins</p>
+        </div>
       </div>
+      <!-- Button bar-->
       <div>
         <button class='w3-button w3-section w3-blue-gray w3-ripple w3-block'>Log in</button>
       </div>

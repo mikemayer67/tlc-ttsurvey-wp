@@ -100,6 +100,27 @@ register_activation_hook(   __FILE__, ns('handle_activate') );
 register_deactivation_hook( __FILE__, ns('handle_deactivate') );
 register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
 
+const SURVEY_STATUS_INFO = 0;
+const SURVEY_STATUS_WARNING = 1;
+const SURVEY_STATUS_ERROR = 2;
+$survey_status = null;
+function set_survey_status($msg,$level)
+{
+  global $survey_status;
+  $survey_status = [$level,$msg];
+}
+function set_survey_info($msg) { set_survey_status($msg,SURVEY_STATUS_INFO); }
+function set_survey_warning($msg) { set_survey_status($msg,SURVEY_STATUS_WARNING); }
+function set_survey_error($msg) { set_survey_status($msg,SURVEY_STATUS_ERROR); }
+
+$shortcode_page = null;
+function set_shortcode_page($page)
+{
+  global $shortcode_page;
+  $shortcode_page=$page;
+}
+
+
 if( is_admin() ) /* Admin setup */
 {
   require_once plugin_path('admin/setup.php');

@@ -35,6 +35,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
   echo "<div class='tlc-ttsurvey w3-css'>";
   add_noscript();
+  add_status();
   add_shortcode_content();
   echo "</div>";
 
@@ -57,6 +58,29 @@ function add_noscript()
   <p class=noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
+}
+
+function add_status()
+{
+  global $survey_status;
+  if(is_null($survey_status)) { return ; }
+  switch($survey_status[0]) 
+  {
+    case SURVEY_STATUS_INFO:
+      $w3_status = "w3-pale-green w3-border-green";
+      break;
+    case SURVEY_STATUS_WARNING;
+      $w3_status = "w3-pale-yellow w3-border-orange";
+      break;
+    case SURVEY_STATUS_ERROR:
+      $w3_status = "w3-pale-red w3-border-red";
+      break;
+    default:
+      log_error("Unexpected survey status level encountered: $survey_status[0]");
+      return;
+  }
+
+  echo("<div class='w3-panel w3-card $w3_status w3-border w3-leftbar'>$survey_status[1]</div>");
 }
 
 function add_shortcode_content()
