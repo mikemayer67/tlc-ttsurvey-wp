@@ -65,8 +65,9 @@ function add_login_input($type,$name,$label,$kwargs=array())
   if($info)
   {
     $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
-    echo("<a class='info-trigger'>$info_icon</a>");
-    echo("<div class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
+    $link = "tlc-ttsurvey-$name-info";
+    echo("<a class='info-trigger' data-target=$link>$info_icon</a>");
+    echo("<div id=$link class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
   }
 
   echo("</div>");
