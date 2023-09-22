@@ -48,9 +48,7 @@ div.tlc-ttsurvey form.resume li button:active {
   transform:translate(2px,2px)
 }
 
-div.tlc-ttsurvey form.login input.w3-input,
-div.tlc-ttsurvey form.register input.w3-input,
-div.tlc-ttsurvey form.senduserid input.w3-input
+div.tlc-ttsurvey form.login input.w3-input
 {
   width:90%;
   border-left:none;
@@ -76,33 +74,44 @@ div.tlc-ttsurvey form .input{
   margin-top:16px;
 }
 
-div.tlc-ttsurvey form .instruction
+div.tlc-ttsurvey form .input{
+  margin-top:16px;
+}
+
+div.tlc-ttsurvey .login_form.senduserid .input {
+  margin-top:0;
+}
+div.tlc-ttsurvey .login_form.senduserid .w3-input {
+  width:100%;
+}
+
+
+div.tlc-ttsurvey .instruction
 {
-  padding:8px;
+  padding:8px 0 0 0;
+  color:gray;
 }
 
 div.tlc-ttsurvey form .info
 {
-  margin-top:16px;
-  margin-left:2em;
-  margin-right:1em;
+  margin:0 0 0 25px;
   padding:8px;
-  font-size:small;
   width:80%;
 }
 
-div.tlc-ttsurvey form p.info
+div.tlc-ttsurvey form .info p
 {
-  margin-top: 5px;
+  margin:0;
   font-size:small;
 }
 
-div.tlc-ttsurvey form .info ul 
+div .tlc-ttsurvey form .info .info-list
 {
-  margin:0;
+  margin-left:10px;
 }
 
-div.tlc-ttsurvey form .info li 
+div .tlc-ttsurvey form .info .info-list::before
 {
-  margin-bottom:0;
+  content:"> ";
+  color:gray;
 }

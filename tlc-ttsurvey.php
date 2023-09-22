@@ -5,9 +5,9 @@ namespace TLC\TTSurvey;
  * Plugin Name: TLC Time and Talent Survey
  * Plugin URI: https://github.com/mikemayer67/tlc-ttsurvey
  * Description: Time and Talent Survey WP Plugin
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: Michael A. Mayer
- * Requires PHP: 5.3.0
+ * Requires PHP: 7.3.0
  * License: GPLv3
  * License URL: https://www.gnu.org/licenses/gpl-3.0.html
  */

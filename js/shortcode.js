@@ -4,8 +4,8 @@ jQuery(document).ready(
     $('div.tlc-ttsurvey form .info-trigger').show();
     $('div.tlc-ttsurvey form .info').hide();
 
-    rml_info = $("div.tlc-ttsurvey form.login .info.remember-me");
-    rml_trigger = $("div.tlc-ttsurvey form.login .info-trigger.remember-me");
+    rml_info = $("div.tlc-ttsurvey .remember-me .info");
+    rml_trigger = $("div.tlc-ttsurvey .remember-me .info-trigger");
     rml_trigger.hover(
       function(e) {rml_info.slideDown(100)},
       function(e) {
