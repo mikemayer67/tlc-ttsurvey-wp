@@ -1,8 +1,6 @@
 <?php
 namespace TLC\TTSurvey;
 
-// TODO: Update this to actually send an email and report success/failure
-
 /**
  * Handle sending of email
  */

@@ -1,10 +1,10 @@
 
 jQuery(document).ready(
   function($) {
-    $('div.tlc-ttsurvey form .info-trigger').show();
-    $('div.tlc-ttsurvey form .info').hide();
+    $('div#tlc-ttsurvey form .info-trigger').show();
+    $('div#tlc-ttsurvey form .info').hide();
 
-    $('div.tlc-ttsurvey form .info-trigger').each(
+    $('div#tlc-ttsurvey form .info-trigger').each(
       function() {
         var trigger = $(this)
         var tgt_id = trigger.data('target');

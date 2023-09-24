@@ -1,9 +1,6 @@
 <?php
 namespace TLC\TTSurvey;
 
-// TODO: Replace dev buttons with actual loop over cookie_tokens
-// TODO: Refine Continue/Reopen based on submission status
-
 /**
  * Handle the user resume form
  */

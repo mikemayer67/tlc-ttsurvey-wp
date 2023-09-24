@@ -132,7 +132,6 @@ add_action('init',ns('users_init'));
 
 /**
  * Input validation
- * @@@ TODO: Flesh these all out
  **/
 
 function is_valid_name($name)

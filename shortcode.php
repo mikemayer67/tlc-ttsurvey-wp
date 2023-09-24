@@ -26,14 +26,27 @@ require_once plugin_path('include/login.php');
  * @param string $tag shortcode tag
  */
 
+$page_has_shortcode = False;
+
 function handle_shortcode($attr,$content=null,$tag=null)
 {
+  global $page_has_shortcode;
+  if($page_has_shortcode) {
+    log_error("Cannot include multiple tlc-ttsurvey shortcodes on a given page");
+    if(current_user_can('edit_pages')) {
+      set_survey_error("Can only include one tlc-ttsurvey shortcode per page");
+      add_status();
+    }
+    return;
+  }
+  $page_has_shortcode = True;
+
   log_info("enqueue script when shortcode is rendered");
   wp_enqueue_script('tlc_shortcode_scripts');
 
   ob_start();
 
-  echo "<div class='tlc-ttsurvey w3-css'>";
+  echo "<div id=tlc-ttsurvey class='w3-css'>";
   add_noscript();
   add_status();
   add_shortcode_content();

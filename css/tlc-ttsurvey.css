@@ -1,9 +1,9 @@
-div.tlc-ttsurvey {
+div#tlc-ttsurvey {
   background-color:white;
   color:black;
 }
 
-div.tlc-ttsurvey div.noscript {
+div#tlc-ttsurvey div.noscript {
   font-family: sans-serif;
   width: 100%;
   font-size: larger;
@@ -13,13 +13,13 @@ div.tlc-ttsurvey div.noscript {
   padding: 5px 10px;
 }
 
-div.tlc-ttsurvey p.noscript {
+div#tlc-ttsurvey p.noscript {
   color: brown;
   margin-top:0;
   margin-left:1em;
 }
 
-div.tlc-ttsurvey form.resume li {
+div#tlc-ttsurvey form.resume li {
   list-style-type: none;
   border-bottom: 1px solid #d5d5d5;
   border-radius: 10px;
@@ -29,7 +29,7 @@ div.tlc-ttsurvey form.resume li {
   margin-top:3px;
 }
 
-div.tlc-ttsurvey form.resume li button {
+div#tlc-ttsurvey form.resume li button {
   background:#f8f8f8;
   color:black;
   width:100%;
@@ -39,78 +39,78 @@ div.tlc-ttsurvey form.resume li button {
   padding:0;
 }
 
-div.tlc-ttsurvey form.resume li button:hover {
+div#tlc-ttsurvey form.resume li button:hover {
   background:#e0ffe0;
 }
 
-div.tlc-ttsurvey form.resume li button:active {
+div#tlc-ttsurvey form.resume li button:active {
   background:#a0ffa0;
   transform:translate(2px,2px)
 }
 
-div.tlc-ttsurvey form.login input.w3-input
+div#tlc-ttsurvey form.login input.w3-input
 {
   width:90%;
   border-left:none;
   border-right:none;
   border-top:none;
 }
-div.tlc-ttsurvey form.senduserid input.w3-input
+div#tlc-ttsurvey form.senduserid input.w3-input
 {
   width:100%;
 }
 
-div.tlc-ttsurvey form .info-trigger {
+div#tlc-ttsurvey form .info-trigger {
   display:none;
   margin-left:10px;
 }
 
-div.tlc-ttsurvey form .info-test {
+div#tlc-ttsurvey form .info-test {
   display:none;
   margin-left:10px;
 }
 
-div.tlc-ttsurvey form .input{
+div#tlc-ttsurvey form .input{
   margin-top:16px;
 }
 
-div.tlc-ttsurvey form .input{
+div#tlc-ttsurvey form .input{
   margin-top:16px;
 }
 
-div.tlc-ttsurvey .login_form.senduserid .input {
+div#tlc-ttsurvey .login_form.senduserid .input {
   margin-top:0;
 }
-div.tlc-ttsurvey .login_form.senduserid .w3-input {
+div#tlc-ttsurvey .login_form.senduserid .w3-input {
   width:100%;
 }
 
 
-div.tlc-ttsurvey .instruction
+div#tlc-ttsurvey .instruction
 {
   padding:8px 0 0 0;
   color:gray;
 }
 
-div.tlc-ttsurvey form .info
+div#tlc-ttsurvey form .info
 {
   margin:0 0 0 25px;
   padding:8px;
   width:80%;
 }
 
-div.tlc-ttsurvey form .info p
+div#tlc-ttsurvey form .info p
 {
   margin:0;
   font-size:small;
 }
 
-div .tlc-ttsurvey form .info .info-list
+div#tlc-ttsurvey form .info .info-list
 {
   margin-left:10px;
 }
 
-div .tlc-ttsurvey form .info .info-list::before
+div#tlc-ttsurvey form .info .info-list::before
 {
   content:"> ";
   color:gray;
