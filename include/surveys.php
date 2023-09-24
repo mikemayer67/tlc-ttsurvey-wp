@@ -71,7 +71,7 @@ function surveys_activate()
   flush_rewrite_rules();
 }
 
-function survey_deactivate()
+function surveys_deactivate()
 {
   log_info("Surveys Deactivate");
   unregister_post_type(SURVEY_POST_TYPE);
