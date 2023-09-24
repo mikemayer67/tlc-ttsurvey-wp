@@ -46,12 +46,12 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
   if(in_array('survey-css',$attr))
   {
-    wp_enqueue_style('tlc-overrides', plugin_url('css/tlc-theme-overrides.css'));
+    wp_enqueue_style('tlc-overrides', plugin_url('css/tlc-w3-theme-overrides.css'));
   }
 
   ob_start();
 
-  echo "<div id=tlc-ttsurvey class='w3-css'>";
+  echo "<div id=tlc-ttsurvey>";
   add_noscript();
   add_status();
   add_shortcode_content();
@@ -163,6 +163,6 @@ wp_localize_script(
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
-wp_enqueue_style('wp-w3-css',plugin_url('css/wp-w3.css'));
+wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
