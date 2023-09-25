@@ -104,7 +104,7 @@ Only the first occurance of this shortcode on any given page will be rendered.  
 </div>
 
 <div class=tlc-shortcode-info>
-The following <b>optional</b> arguments are currently recognized:
+The following <b>optional</b> arguments are currently recognized (<i>yes, there's only one right now</i>):
 </div>
 <div class=tlc-shortcode-note>
 Any unspecified argument defaults to the value defined in the plugin settings
@@ -113,14 +113,10 @@ Any unspecified argument defaults to the value defined in the plugin settings
 <div class=tlc-shortcode-args>
 <div class=tlc-shortcode-arg>year</div>
 <div class=tlc-shortcode-arg-info>Must match one of the survey years.</div>
-<div class=tlc-shortcode-arg>survey-css</div>
-<div class=tlc-shortcode-arg-info>Overrides the current theme's css when rendering
-the survey.  This should <b>not</b> affect styling outside the survey.
-</div>
 
 <div class=tlc-shortcode-info>Example</div>
 <div class=tlc-shortcode-example><span>
-[tlc-ttsurvey year=2023 survey-css]
+[tlc-ttsurvey year=2023]
 </span></div>
 
 <h2>Theme Compatibility</h2>
@@ -130,11 +126,6 @@ the survey.  This should <b>not</b> affect styling outside the survey.
   provides wide page templates, you may want to make sure the page that contains 
   the survey uses that template.  Similarly, you probably do not want to use 
   multi-column templates or templates with side bars for the survey page.</li>
-  <li>If the does survey does not render well for your theme, try adding
-  <code>survey-css</code> to the survey shortcode (<i>see above</i>).  
-  This corrected the formatting issues for all of the tested themes. But note this 
-  means that the look and feel of the survey will probably not match that of the 
-  theme.</li>
 </ul>
 </div>
 
