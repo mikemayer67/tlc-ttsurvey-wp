@@ -13,7 +13,7 @@ function start_login_form($header,$name)
 
   $nonce = wp_nonce_field(LOGIN_FORM_NONCE);
   echo("<div class='login_form $name'>");
-  echo("<div class='w3-container w3-half w3-margin-top'>");
+  echo("<div class='w3-container w3-margin-top'>");
   echo("<header class='w3-container w3-blue-gray'><h3>$header</h3></header>");
   echo("<form class='login w3-container w3-card-4' method=post action='$form_uri'>");
   echo("$nonce");

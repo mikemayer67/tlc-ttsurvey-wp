@@ -78,6 +78,14 @@
   margin-top:16px;
 }
 
+#tlc-ttsurvey .login_form {
+  width:min(100%,400px);
+}
+
+#tlc-ttsurvey .login_form button {
+  box-sizing: border-box;
+}
+
 #tlc-ttsurvey .login_form.senduserid .input {
   margin-top:0;
 }
