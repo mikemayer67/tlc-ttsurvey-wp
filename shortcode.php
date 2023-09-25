@@ -26,14 +26,32 @@ require_once plugin_path('include/login.php');
  * @param string $tag shortcode tag
  */
 
+$page_has_shortcode = False;
+
 function handle_shortcode($attr,$content=null,$tag=null)
 {
+  global $page_has_shortcode;
+  if($page_has_shortcode) {
+    log_error("Cannot include multiple tlc-ttsurvey shortcodes on a given page");
+    if(current_user_can('edit_pages')) {
+      set_survey_error("Can only include one tlc-ttsurvey shortcode per page");
+      add_status();
+    }
+    return;
+  }
+  $page_has_shortcode = True;
+
   log_info("enqueue script when shortcode is rendered");
   wp_enqueue_script('tlc_shortcode_scripts');
 
+  if(is_array($attr) && in_array('survey-css',$attr))
+  {
+    wp_enqueue_style('tlc-overrides', plugin_url('css/tlc-w3-theme-overrides.css'));
+  }
+
   ob_start();
 
-  echo "<div class='tlc-ttsurvey w3-css'>";
+  echo "<div id=tlc-ttsurvey>";
   add_noscript();
   add_status();
   add_shortcode_content();
@@ -145,6 +163,6 @@ wp_localize_script(
 );
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
-wp_enqueue_style('wp-w3-css',plugin_url('css/wp-w3.css'));
+wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));

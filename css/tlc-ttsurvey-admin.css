@@ -110,50 +110,70 @@ input:invalid {
   background-color:lightpink;
 }
 
-table.tlc-overview {
+div.tlc-overview div,
+div.tlc-overview table
+{
   margin-left:15px;
 }
 
-table.tlc-overview td.label {
+div.tlc-overview h1,
+div.tlc-overview h2,
+div.tlc-overview h3
+{
+  margin-left:0px;
+  margin-top:25px;
+  margin-bottom:8px;
+}
+
+div.tlc-overview li
+{
+  list-style-type: initial;
+}
+
+div.tlc-overview table {
+  margin-left:15px;
+}
+
+div.tlc-overview table td.label {
   font-weight: bold;
   vertical-align: top;
 }
 
-table.tlc-overview td.value {
+div.tlc-overview table td.value {
   padding-left:15px;
   font-weight:200;
 }
 
-table.tlc-overview tr.heading {
+div.tlc-overview table tr.heading {
 }
 
-table.tlc-overview tr.heading td {
+div.tlc-overview table tr.heading td {
   font-weight:500;
   font-size:large;
   padding-top:15px;
   padding-bottom:5px;
 }
 
-table.tlc-overview td.id {
+div.tlc-overview table td.id {
   padding-left:20px;
   font-weight:500;
 }
 
-table.tlc-overview table.admins td.username
+div.tlc-overview table table.admins td.username
 {
   font-weight:bolder;
   text-align:right;
 }
 
-table.tlc-overview table.years td.year
+div.tlc-overview table table.years td.year
 {
   width:3em;
   font-weight:bolder;
   text-align:left;
 }
 
-table.tlc-overview table.admins td.usercaps
-table.tlc-overview table.years td.status
+div.tlc-overview table table.admins td.usercaps
+div.tlc-overview table table.years td.status
 {
   padding-left:1em;
 }

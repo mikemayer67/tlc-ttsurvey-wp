@@ -22,6 +22,7 @@ $pdf_uri = survey_pdf_uri();
 
 ?>
 
+<div class=tlc-overview>
 <h2>Survey Settings</h2>
 <table class='tlc-overview'>
   <tr>
@@ -97,12 +98,13 @@ foreach(get_users() as $user) {
 Simply add the shortcode <code>[tlc-ttsurvey]</code> to your pages or posts to embed
 the Time & Talent survey
 </div>
+
 <div class=tlc-shortcode-note>
 Only the first occurance of this shortcode on any given page will be rendered.  All others will be quietly ignored.
 </div>
 
 <div class=tlc-shortcode-info>
-Only one <b>optional</b> argument is currently recognized:
+The following <b>optional</b> arguments are currently recognized:
 </div>
 <div class=tlc-shortcode-note>
 Any unspecified argument defaults to the value defined in the plugin settings
@@ -110,10 +112,30 @@ Any unspecified argument defaults to the value defined in the plugin settings
 
 <div class=tlc-shortcode-args>
 <div class=tlc-shortcode-arg>year</div>
-<div class=tlc-shortcode-arg-info> Must match one of the survey years.</div>
+<div class=tlc-shortcode-arg-info>Must match one of the survey years.</div>
+<div class=tlc-shortcode-arg>survey-css</div>
+<div class=tlc-shortcode-arg-info>Overrides the current theme's css when rendering
+the survey.  This should <b>not</b> affect styling outside the survey.
 </div>
 
 <div class=tlc-shortcode-info>Example</div>
 <div class=tlc-shortcode-example><span>
-[tlc-ttsurvey year=2023]
+[tlc-ttsurvey year=2023 survey-css]
 </span></div>
+
+<h2>Theme Compatibility</h2>
+<div>
+<ul>
+  <li>The survey does not render well when its width is too narrow.  If your theme 
+  provides wide page templates, you may want to make sure the page that contains 
+  the survey uses that template.  Similarly, you probably do not want to use 
+  multi-column templates or templates with side bars for the survey page.</li>
+  <li>If the does survey does not render well for your theme, try adding
+  <code>survey-css</code> to the survey shortcode (<i>see above</i>).  
+  This corrected the formatting issues for all of the tested themes. But note this 
+  means that the look and feel of the survey will probably not match that of the 
+  theme.</li>
+</ul>
+</div>
+
+</div>
