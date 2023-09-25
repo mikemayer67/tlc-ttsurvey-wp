@@ -9,15 +9,14 @@
  * To ensure that this stylesheet does not conflict with the theme, the seletors have been modified to
  *   only apply DOM elements within the container (probably a div) with the #tlc-ttsurvey id.
  *
- *
  * In addtion, it "resets" the Wordpress theme styles by setting most of the content of the tlc-ttsurvey container.
  **/
 
 #tlc-ttsurvey * {
   margin:initial;
   padding:initial;
-  font:initial;
-  color:initial;
+  font:inherit;
+  color:inherit;
 }
 
 #tlc-ttsurvey html
