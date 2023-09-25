@@ -44,7 +44,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   log_info("enqueue script when shortcode is rendered");
   wp_enqueue_script('tlc_shortcode_scripts');
 
-  if(in_array('survey-css',$attr))
+  if(is_array($attr) && in_array('survey-css',$attr))
   {
     wp_enqueue_style('tlc-overrides', plugin_url('css/tlc-w3-theme-overrides.css'));
   }

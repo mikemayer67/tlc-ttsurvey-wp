@@ -113,7 +113,7 @@ Any unspecified argument defaults to the value defined in the plugin settings
 <div class=tlc-shortcode-args>
 <div class=tlc-shortcode-arg>year</div>
 <div class=tlc-shortcode-arg-info>Must match one of the survey years.</div>
-<div class=tlc-shortcode-arg>plugin-css</div>
+<div class=tlc-shortcode-arg>survey-css</div>
 <div class=tlc-shortcode-arg-info>Overrides the current theme's css when rendering
 the survey.  This should <b>not</b> affect styling outside the survey.
 </div>
