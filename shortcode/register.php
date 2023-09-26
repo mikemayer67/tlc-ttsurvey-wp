@@ -13,7 +13,9 @@ start_login_form("Register for the Survey","register");
 
 $name_info = <<<INFO
 How your name will appear on the survey summary report
-<p class=info-list><b>must</b>contain a valid name</p>
+<p class=info-list><b>must</b> contain a valid name</p>
+<p class=info-list><b>may</b> contain apostrophes</p>
+<p class=info-list><b>may></b> contain hyphens</p>
 <p class=info-list>Extra whitespace will be removed</p>
 INFO;
 
@@ -21,9 +23,9 @@ add_login_input("text","name","Name",["info"=>$name_info]);
 
 $userid_info = <<<INFO
 Used to log into the survey
-<p class=info-list>It <b>must</b> be between 8 and 16 characters</p>
-<p class=info-list>It <b>must</b> start with a letter</p>
-<p class=info-list>It <b>must</b> contain only letters and numbers</p>
+<p class=info-list><b>must</b> be between 8 and 16 characters</p>
+<p class=info-list><b>must</b> start with a letter</p>
+<p class=info-list><b>must</b> contain only letters and numbers</p>
 INFO;
 
 add_login_input("text","userid","Userid",['info'=>$userid_info]);
