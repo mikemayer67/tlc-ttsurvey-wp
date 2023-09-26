@@ -5,8 +5,6 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('include/settings.php');
 
-$nonce = wp_nonce_field(OPTIONS_NONCE);
-
 $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   'page'=>SETTINGS_PAGE_SLUG,
   'tab'=>'overview',
@@ -16,7 +14,7 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
 
 <form id='tlc-ttsurvey-settings' class='tlc' action='<?=$action?>' method="POST">
   <input type="hidden" name="action" value="update">
-  <?=$nonce?>
+  <?php wp_nonce_field(OPTIONS_NONCE); ?>
   <div class=tlc>
 
   <div class=label>Survey Admins</div>

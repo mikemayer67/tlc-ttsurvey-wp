@@ -11,18 +11,16 @@ function start_login_form($header,$name)
 {
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-  $nonce = wp_nonce_field(LOGIN_FORM_NONCE);
-  echo("<div class='login_form $name'>");
-  echo("<div class='w3-container w3-margin-top'>");
+  echo("<div class='login_form $name w3-container w3-margin-top'>");
   echo("<header class='w3-container w3-blue-gray'><h3>$header</h3></header>");
   echo("<form class='login w3-container w3-card-4' method=post action='$form_uri'>");
-  echo("$nonce");
+  wp_nonce_field(LOGIN_FORM_NONCE);
 }
 
 function close_login_form()
 {
   // must close all DOM elements opened in start_login_form
-  echo("</form></div></div>");
+  echo("</form></div>");
 }
 
 function add_login_instructions($instructions)
