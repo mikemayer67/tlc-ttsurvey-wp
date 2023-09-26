@@ -138,18 +138,33 @@ function login_init()
 
 function register_new_user()
 {
-  $name = $_POST['name'];
-  $v = new NameValidator($name);
-  if(!$v->is_valid())
+  $name = new UserName($_POST['name']);
+  if($name->is_valid())
+  { 
+    $name = $name->value();
+  }
+  else
   {
-    $error = $v->error();
-    log_info("Registration error: invalid name $name ($error)");
+    $error = $name->error();
+    log_info("Registration error: invalid name ".$_POST['name']." ($error)");
     set_survey_error($error);
     return null;
   }
-  $name = $v->sanitized();
 
-  log_info("Registered new user $name");
+  $userid = new UserID($_POST['userid']);
+  if($userid->is_valid())
+  {
+    $userid = $userid->value();
+  }
+  else
+  {
+    $error = $userid->error();
+    log_info("Registration error: invalid userid ".$_POST['userid']." ($error)");
+    set_survey_error($error);
+    return null;
+  }
+
+  log_info("Registered new user $name with userid $userid");
 }
 
 add_action('init',ns('login_init'));

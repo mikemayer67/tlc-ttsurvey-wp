@@ -134,14 +134,12 @@ add_action('init',ns('users_init'));
  * Input validation
  **/
 
-class NameValidator
+class UserName
 {
-  private $input = null;
-  private $sanitized = null;
+  private $value = null;
   private $error = null;
 
   public function __construct($name) {
-    $this->input = $name;
     $name = stripslashes($name);
     $name = trim($name);                      // trim leading/trailing whitespace
     $name = preg_replace('/\s+/',' ',$name);  // condense multiple whitespace
@@ -152,7 +150,7 @@ class NameValidator
 
     $names = explode(' ',$name);
     if(count($names)<2) {
-      $this->error = "Name must contain both first and last names";
+      $this->error = "Names must contain both first and last names";
       return;
     }
 
@@ -163,23 +161,58 @@ class NameValidator
       $m = array();
       if(preg_match("/([^$valid])/",$n,$m))
       {
-        $this->error = "Name cannot contain '$m[1]'";
+        $this->error = "Names cannot contain '$m[1]'";
         return;
       }
       if(preg_match("/^([$invalid_first])/",$n,$m))
       {
-        $this->error = "Name cannot start with '$m[1]'";
+        $this->error = "Namse cannot start with '$m[1]'";
         return;
       }
     }
 
-    $this->sanitized = $name;
+    $this->value = $name;
   }
 
-  public function is_valid()  { return is_null($this->error); }
-  public function error()     { return $this->error; }
-  public function input()     { return $this->input; }
-  public function sanitized() { return $this->sanitized; }
+  public function is_valid() { return is_null($this->error); }
+  public function error()    { return $this->error; }
+  public function value()    { return $this->value; }
+}
+
+class UserID
+{
+  private $value = null;
+  private $error = null;
+
+  public function __construct($userid)
+  {
+    $userid = trim($userid);
+    $userid = stripslashes($userid);
+
+    if(strlen($userid)<8 || strlen($userid)>16) 
+    {
+      $this->error = "Userids must be between 8 and 16 characters";
+    } 
+    elseif(preg_match("/\s/",$userid))
+    {
+      $this->error = "Userids cannot contain spaces";
+    }
+    elseif(!preg_match("/^[a-zA-Z]/",$userid)) 
+    {
+      $this->error = "Userids must be begin with a lettter";
+    }
+    elseif(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$userid)) {
+      $this->error = "Userids may only contain letters and numbers";
+    }
+    else
+    {
+      $this->value = $userid;
+    }
+  }
+
+  public function is_valid() { return is_null($this->error); }
+  public function error()    { return $this->error; }
+  public function value()    { return $this->value; }
 }
 
 function is_valid_userid($userid)
