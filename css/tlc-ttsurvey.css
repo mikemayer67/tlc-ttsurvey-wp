@@ -54,16 +54,6 @@
  * Form elements
  **/
 
-#tlc-ttsurvey div.login_form form .info-trigger {
-  display:none;
-  margin-left:10px;
-}
-
-#tlc-ttsurvey div.login_form form .info-test {
-  display:none;
-  margin-left:10px;
-}
-
 #tlc-ttsurvey div.login_form form div.input {
   margin-top:16px;
 }
@@ -96,7 +86,7 @@
 
 #tlc-ttsurvey form .info
 {
-  margin:0;
+  margin:5px 0 0 0;
   padding:8px;
   width:100%;
 }
@@ -104,7 +94,7 @@
 {
   #tlc-ttsurvey form .info
   {
-    margin:0 0 0 25px;
+    margin:5px 0 0 25px;
     padding:8px;
     width:80%;
   }
@@ -127,6 +117,16 @@
 {
   content:"> ";
   color:gray;
+}
+
+#tlc-ttsurvey div.login_form form .info-trigger {
+  display:none;
+  margin-left:10px;
+}
+
+#tlc-ttsurvey div.login_form form .info-test {
+  display:none;
+  margin-left:10px;
 }
 
 
