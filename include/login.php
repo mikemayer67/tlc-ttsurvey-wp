@@ -92,6 +92,7 @@ function save_survey_cookies()
 
 function login_init()
 {
+  log_dev(print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
@@ -113,6 +114,10 @@ function login_init()
         remove_userid_from_cookie($userid);
       }
     }
+    elseif( $action == 'register')
+    {
+      register_new_user();
+    }
     elseif( $action == 'logout') 
     {
       logout_active_user();
@@ -129,6 +134,22 @@ function login_init()
       }
     }
   }
+}
+
+function register_new_user()
+{
+  $name = $_POST['name'];
+  $v = new NameValidator($name);
+  if(!$v->is_valid())
+  {
+    $error = $v->error();
+    log_info("Registration error: invalid name $name ($error)");
+    set_survey_error($error);
+    return null;
+  }
+  $name = $v->sanitized();
+
+  log_info("Registered new user $name");
 }
 
 add_action('init',ns('login_init'));

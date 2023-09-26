@@ -134,11 +134,56 @@ add_action('init',ns('users_init'));
  * Input validation
  **/
 
-function is_valid_name($name)
+class NameValidator
 {
-  $name = trim($name);
-  log_dev("is_valid_name($name)");
-  return true;
+  private $input = null;
+  private $sanitized = null;
+  private $error = null;
+
+  public function __construct($name) {
+    $this->input = $name;
+    $name = stripslashes($name);
+    $name = trim($name);                      // trim leading/trailing whitespace
+    $name = preg_replace('/\s+/',' ',$name);  // condense multiple whitespace
+    $name = preg_replace('/\s/',' ',$name);   // only use ' ' for whitespace
+    $name = preg_replace('/\'+/',"'",$name);  // condense multiple apostrophes
+    $name = preg_replace('/-+/',"-",$name);   // condense multiple hyphens
+    $name = preg_replace('/~+/',"~",$name);   // consense multiple tildes
+
+    $valid_first = 'A-Za-z\x{00C0}-\x{00FF}';
+    $valid = $valid_first . "'~\\-'";
+    $pattern = "/^[$valid_first][$valid]+(\\s[$valid_first][$valid]+)*$/u";
+
+    if(preg_match($pattern,$name)) 
+    {
+      $this->sanitized = $name;
+    } 
+    else 
+    {
+      $m = array();
+      if(preg_match("/([^\\s$valid])/",$name,$m)) 
+      {
+        $this->error = "Name cannot contain '".$m[1]."'";
+      }
+      elseif(preg_match("/^([^$valid_first])/",$name,$m))
+      {
+        $this->error = "Names cannot start with '".$m[1]."'";
+      }
+      elseif(preg_match("/\s([^$valid_first])/",$name,$m))
+      {
+        $this->error = "Names cannot start with '".$m[1]."'";
+      }
+      else
+      {
+        $this->error = "Name is invalid";
+      }
+    }
+  }
+
+  public function is_valid()  { return is_null($this->error); }
+  public function error()     { return $this->error; }
+  public function input()     { return $this->input; }
+  public function sanitized() { return $this->sanitized; }
 }
 
 function is_valid_userid($userid)

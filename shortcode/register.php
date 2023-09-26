@@ -13,6 +13,8 @@ start_login_form("Register for the Survey","register");
 
 $name_info = <<<INFO
 How your name will appear on the survey summary report
+<p class=info-list><b>must</b>contain a valid name</p>
+<p class=info-list>Extra whitespace will be removed</p>
 INFO;
 
 add_login_input("text","name","Name",["info"=>$name_info]);
