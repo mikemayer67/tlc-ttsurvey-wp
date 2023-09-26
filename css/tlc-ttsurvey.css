@@ -19,6 +19,148 @@
   margin-left:1em;
 }
 
+/*******************************************************************************
+ *******************************************************************************
+ **
+ ** Login Forms
+ **
+ *******************************************************************************
+ *******************************************************************************/
+
+/**
+ * div containing a login form (class = login_form)
+ **/
+
+#tlc-ttsurvey div.login_form {
+  width:min(100%,400px);
+}
+
+#tlc-ttsurvey div.login_form
+{
+  margin:0;
+  padding:0;
+}
+@media (min-width:480px)
+{
+  #tlc-ttsurvey div.login_form
+  { 
+    padding:0 16px; 
+    margin:0 auto;
+  }
+}
+
+
+/**
+ * Form elements
+ **/
+
+#tlc-ttsurvey div.login_form form .info-trigger {
+  display:none;
+  margin-left:10px;
+}
+
+#tlc-ttsurvey div.login_form form .info-test {
+  display:none;
+  margin-left:10px;
+}
+
+#tlc-ttsurvey div.login_form form div.input {
+  margin-top:16px;
+}
+
+#tlc-ttsurvey div.login_form form input.w3-input 
+{ 
+  width:100%; 
+}
+@media (min-width:480px)
+{
+  #tlc-ttsurvey div.login_form form input.w3-input 
+  { 
+    width:90%; 
+  }
+}
+
+#tlc-ttsurvey .login_form button {
+  box-sizing: border-box;
+}
+
+/**
+ * Form Instructions/Info
+ **/
+
+#tlc-ttsurvey .instruction
+{
+  padding:8px 0 0 0;
+  color:gray;
+}
+
+#tlc-ttsurvey form .info
+{
+  margin:0;
+  padding:8px;
+  width:100%;
+}
+@media (min-width:480px)
+{
+  #tlc-ttsurvey form .info
+  {
+    margin:0 0 0 25px;
+    padding:8px;
+    width:80%;
+  }
+}
+
+#tlc-ttsurvey form .info p
+{
+  margin:0;
+  font-size:small;
+}
+
+#tlc-ttsurvey form .info .info-list
+{
+  margin-left:10px;
+}
+
+#tlc-ttsurvey form .info .info-list::before
+{
+  content:"> ";
+  color:gray;
+}
+
+
+/**
+ * Login Form
+ **/
+
+#tlc-ttsurvey form.login input.w3-input
+{
+  width:90%;
+  border-left:none;
+  border-right:none;
+  border-top:none;
+}
+
+/**
+ * Register Form
+ **/
+
+/**
+ * Senduserid Form
+ **/
+
+#tlc-ttsurvey .login_form.senduserid div.input {
+  margin-top:0;
+}
+
+#tlc-ttsurvey .login_form.senduserid input.w3-input
+{
+  width:100%;
+}
+
+/**
+ * Resume Form
+ **/
+
 #tlc-ttsurvey form.resume li {
   list-style-type: none;
   border-bottom: 1px solid #d5d5d5;
@@ -46,115 +188,4 @@
 #tlc-ttsurvey form.resume li button:active {
   background:#a0ffa0;
   transform:translate(2px,2px)
-}
-
-#tlc-ttsurvey form.login input.w3-input
-{
-  width:90%;
-  border-left:none;
-  border-right:none;
-  border-top:none;
-}
-#tlc-ttsurvey form.senduserid input.w3-input
-{
-  width:100%;
-}
-
-#tlc-ttsurvey form .info-trigger {
-  display:none;
-  margin-left:10px;
-}
-
-#tlc-ttsurvey form .info-test {
-  display:none;
-  margin-left:10px;
-}
-
-#tlc-ttsurvey form .input{
-  margin-top:16px;
-}
-
-#tlc-ttsurvey form .input{
-  margin-top:16px;
-}
-
-#tlc-ttsurvey .login_form {
-  width:min(100%,400px);
-}
-
-#tlc-ttsurvey .login_form
-{
-  padding:0px;
-}
-
-#tlc-ttsurvey div.login_form 
-{ 
-  padding:0;
-  margin:0;
-}
-
-@media (min-width:480px)
-{
-  #tlc-ttsurvey div.login_form
-  { 
-    padding:0 16px; 
-    margin:0 auto;
-  }
-}
-
-#tlc-ttsurvey div.login_form input.w3-input { width:100%; }
-@media (min-width:480px)
-{
-  #tlc-ttsurvey div.login_form input.w3-input { width:90%; }
-}
-
-#tlc-ttsurvey .login_form button {
-  box-sizing: border-box;
-}
-
-#tlc-ttsurvey .login_form.senduserid .input {
-  margin-top:0;
-}
-#tlc-ttsurvey .login_form.senduserid .w3-input {
-  width:100%;
-}
-
-
-#tlc-ttsurvey .instruction
-{
-  padding:8px 0 0 0;
-  color:gray;
-}
-
-#tlc-ttsurvey form .info
-{
-  margin:0;
-  padding:8px;
-  width:100%;
-}
-
-@media (min-width:480px)
-{
-  #tlc-ttsurvey form .info
-  {
-    margin:0 0 0 25px;
-    width:80%;
-  }
-}
-
-#tlc-ttsurvey form .info p
-{
-  margin:0;
-  font-size:small;
-}
-
-#tlc-ttsurvey form .info .info-list
-{
-  margin-left:10px;
-}
-
-#tlc-ttsurvey form .info .info-list::before
-{
-  content:"> ";
-  color:gray;
 }
