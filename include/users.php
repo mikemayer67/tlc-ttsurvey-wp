@@ -150,34 +150,30 @@ class NameValidator
     $name = preg_replace('/-+/',"-",$name);   // condense multiple hyphens
     $name = preg_replace('/~+/',"~",$name);   // consense multiple tildes
 
-    $valid_first = 'A-Za-z\x{00C0}-\x{00FF}';
-    $valid = $valid_first . "'~\\-'";
-    $pattern = "/^[$valid_first][$valid]+(\\s[$valid_first][$valid]+)*$/u";
+    $names = explode(' ',$name);
+    if(count($names)<2) {
+      $this->error = "Name must contain both first and last names";
+      return;
+    }
 
-    if(preg_match($pattern,$name)) 
-    {
-      $this->sanitized = $name;
-    } 
-    else 
+    $valid = "A-Za-z\x{00C0}-\x{00FF}'~-";
+    $invalid_first = "'~-";
+    foreach($names as $n)
     {
       $m = array();
-      if(preg_match("/([^\\s$valid])/",$name,$m)) 
+      if(preg_match("/([^$valid])/",$n,$m))
       {
-        $this->error = "Name cannot contain '".$m[1]."'";
+        $this->error = "Name cannot contain '$m[1]'";
+        return;
       }
-      elseif(preg_match("/^([^$valid_first])/",$name,$m))
+      if(preg_match("/^([$invalid_first])/",$n,$m))
       {
-        $this->error = "Names cannot start with '".$m[1]."'";
-      }
-      elseif(preg_match("/\s([^$valid_first])/",$name,$m))
-      {
-        $this->error = "Names cannot start with '".$m[1]."'";
-      }
-      else
-      {
-        $this->error = "Name is invalid";
+        $this->error = "Name cannot start with '$m[1]'";
+        return;
       }
     }
+
+    $this->sanitized = $name;
   }
 
   public function is_valid()  { return is_null($this->error); }
