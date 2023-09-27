@@ -165,7 +165,15 @@ function register_new_user()
     return null;
   }
 
-  log_info("Registered new user $name with userid $userid and password '$password'");
+  $email = validate_and_adjust_email($_POST['email'],$error);
+  if(!$email)
+  {
+    set_survey_error($error);
+    log_info("Failed registration attempt:: $error (".$_POST['email'].")");
+    return null;
+  }
+
+  log_info("Registered new user $name with userid $userid and password '$password' and email='$email'");
 }
 
 function validate_and_adjust_username($name,&$error=null)
@@ -254,7 +262,19 @@ function validate_and_adjust_password($password,&$error=null)
     return null;
   }
   return $password;
+}
 
+function validate_and_adjust_email($email,&$error=null)
+{
+  $email = stripslashes($email);              // resolve escaped characters
+  $email = trim($email);                      // trim leading/trailing whitespace
+  $email = filter_var($email,FILTER_VALIDATE_EMAIL);
+  if(!$email)
+  {
+    if(!$is_null) {$error = "Invalid email address";}
+    return null;
+  }
+  return $email;
 }
 
 //[$userid,$anonid] = create_unique_ids('QQ');
