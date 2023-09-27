@@ -134,21 +134,6 @@ add_action('init',ns('users_init'));
  * Input validation
  **/
 
-function is_valid_password($password)
-{
-  $password = trim($password);
-  log_dev("is_valid_password($password)");
-  return true;
-}
-
-function is_valid_email($email)
-{
-  $email = trim($email);
-  log_dev("is_valid_email($email)");
-  if(empty($email)) { return true; }
-
-  return true;
-}
 
 function validate_password($userid,$password)
 {
