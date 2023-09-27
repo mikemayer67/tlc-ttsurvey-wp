@@ -90,8 +90,11 @@ function save_survey_cookies()
   setcookie( ACCESS_TOKEN_COOKIE, $_COOKIE[ACCESS_TOKEN_COOKIE], time() + 86400*365);
 }
 
+add_action('init',ns('login_init'));
+
 function login_init()
 {
+  log_dev(print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
@@ -113,6 +116,10 @@ function login_init()
         remove_userid_from_cookie($userid);
       }
     }
+    elseif( $action == 'register')
+    {
+      register_new_user();
+    }
     elseif( $action == 'logout') 
     {
       logout_active_user();
@@ -131,7 +138,144 @@ function login_init()
   }
 }
 
-add_action('init',ns('login_init'));
+function register_new_user()
+{
+  $error = '';
+  $name = validate_and_adjust_username($_POST['name'],$error);
+  if(!$name)
+  {
+    set_survey_error($error);
+    log_info("Failed registration attempt:: $error (".$_POST['name'].")");
+    return null;
+  }
+
+  $userid = validate_and_adjust_userid($_POST['userid'],$error);
+  if(!$userid)
+  {
+    set_survey_error($error);
+    log_info("Failed registration attempt:: $error (".$_POST['userid'].")");
+    return null;
+  }
+
+  $password = validate_and_adjust_password($_POST['password'],$error);
+  if(!$password)
+  {
+    set_survey_error($error);
+    log_info("Failed registration attempt:: $error");
+    return null;
+  }
+
+  $email = validate_and_adjust_email($_POST['email'],$error);
+  if(!$email)
+  {
+    set_survey_error($error);
+    log_info("Failed registration attempt:: $error (".$_POST['email'].")");
+    return null;
+  }
+
+  log_info("Registered new user $name with userid $userid and password '$password' and email='$email'");
+}
+
+function validate_and_adjust_username($name,&$error=null)
+{
+  $name = stripslashes($name);              // resolve escaped characters
+  $name = trim($name);                      // trim leading/trailing whitespace
+  $name = preg_replace('/\s+/',' ',$name);  // condense multiple whitespace
+  $name = preg_replace('/\s/',' ',$name);   // only use ' ' for whitespace
+  $name = preg_replace('/\'+/',"'",$name);  // condense multiple apostrophes
+  $name = preg_replace('/-+/',"-",$name);   // condense multiple hyphens
+  $name = preg_replace('/~+/',"~",$name);   // consense multiple tildes
+
+  $names = explode(' ',$name);
+  if(count($names)<2) {
+    if(!is_null($error)) { $error = "Names must contain both first and last names"; }
+    return null;
+  }
+
+  $valid_first = "A-Za-z\x{00C0}-\x{00FF}";
+  $invalid_first = "'~-";
+  $valid = $valid_first . $invalid_first;
+  foreach($names as $n)
+  {
+    $m = array();
+    if(preg_match("/([^$valid])/",$n,$m))
+    {
+      if(!is_null($error)) { $error = "Names cannot contain '$m[1]'"; }
+      return null;
+    }
+    if(preg_match("/^([$invalid_first])/",$n,$m))
+    {
+      if(!is_null($error)) { $error = "Names cannot start with '$m[1]'"; }
+      return null;
+    }
+  }
+  return $name;
+}
+
+function validate_and_adjust_userid($userid,&$error=null)
+{
+  $userid = stripslashes($userid);  // resolve escaped characters
+  $userid = trim($userid);          // trim leading/trailing whitespace
+
+  if(strlen($userid)<8 || strlen($userid)>16) 
+  {
+    if(!is_null($error)) { $error = "Userids must be between 8 and 16 characters"; }
+    return null;
+  } 
+  if(preg_match("/\s/",$userid))
+  {
+    if(!is_null($error)) { $error = "Userids cannot contain spaces"; }
+    return null;
+  }
+  if(!preg_match("/^[a-zA-Z]/",$userid)) 
+  {
+    if(!is_null($error)) { $error = "Userids must be begin with a lettter"; }
+    return null;
+  }
+  if(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$userid)) {
+    if(!is_null($error)) { $error = "Userids may only contain letters and numbers"; }
+    return null;
+  }
+  return $userid;
+}
+
+function validate_and_adjust_password($password,&$error=null)
+{
+  $password = stripslashes($password);              // resolve escaped characters
+  $password = trim($password);                      // trim leading/trailing whitespace
+  $password = preg_replace('/\s+/',' ',$password);  // condense multiple whitespace
+  $password = preg_replace('/\s/',' ',$password);   // only use ' ' for whitespace
+
+  if(strlen($password)<8 || strlen($password)>128) 
+  {
+    if(!is_null($error)) { $error = "Password must be between 8 and 16 characters"; }
+    return null;
+  } 
+  if(!preg_match("/[a-zA-Z]/",$password))
+  {
+    if(!is_null($error)) { $error = "Passwords must contain at least one letter"; }
+    return null;
+  }
+  if(!preg_match("/^[a-zA-Z0-9 !@%^*_=~,.-]+$/",$password)) 
+  {
+    if(!is_null($error)) { $error = "Invalid character in password"; }
+    return null;
+  }
+  return $password;
+}
+
+function validate_and_adjust_email($email,&$error=null)
+{
+  $email = stripslashes($email);              // resolve escaped characters
+  $email = trim($email);                      // trim leading/trailing whitespace
+  $email = filter_var($email,FILTER_VALIDATE_EMAIL);
+  if(!$email)
+  {
+    if(!$is_null) {$error = "Invalid email address";}
+    return null;
+  }
+  return $email;
+}
 
 //[$userid,$anonid] = create_unique_ids('QQ');
 //$login_cookie->add($userid,$anonid,false);
