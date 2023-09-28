@@ -94,7 +94,6 @@ add_action('init',ns('login_init'));
 
 function login_init()
 {
-  log_dev(print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
@@ -118,7 +117,16 @@ function login_init()
     }
     elseif( $action == 'register')
     {
-      register_new_user();
+      $error = '';
+      if(register_new_user($error))
+      {
+        log_dev("where to go now that I have a new user registered?");
+      }
+      else
+      {
+        set_survey_warning($error);
+        set_shortcode_page('register');
+      }
     }
     elseif( $action == 'logout') 
     {
@@ -138,39 +146,38 @@ function login_init()
   }
 }
 
-function register_new_user()
+function register_new_user(&$error=null)
 {
-  $error = '';
-  $name = validate_and_adjust_username($_POST['name'],$error);
+  log_dev("register_new_user POST=".print_r($_POST,true));
+  $name = validate_and_adjust_username($_POST['username'],$error);
   if(!$name)
   {
-    set_survey_error($error);
-    log_info("Failed registration attempt:: $error (".$_POST['name'].")");
+    $error = "Failed registration attempt:: $error (".$_POST['name'].")";
     return null;
   }
 
   $userid = validate_and_adjust_userid($_POST['userid'],$error);
   if(!$userid)
   {
-    set_survey_error($error);
-    log_info("Failed registration attempt:: $error (".$_POST['userid'].")");
+    $error = "Failed registration attempt:: $error (".$_POST['userid'].")";
     return null;
   }
 
   $password = validate_and_adjust_password($_POST['password'],$error);
   if(!$password)
   {
-    set_survey_error($error);
-    log_info("Failed registration attempt:: $error");
+    $error = "Failed registration attempt:: $error";
     return null;
   }
 
-  $email = validate_and_adjust_email($_POST['email'],$error);
-  if(!$email)
-  {
-    set_survey_error($error);
-    log_info("Failed registration attempt:: $error (".$_POST['email'].")");
-    return null;
+  $email = $_POST['email'] ?? null;
+  if($email) {
+    $email = validate_and_adjust_email($_POST['email'],$error);
+    if(!$email)
+    {
+      $error = "Failed registration attempt:: $error (".$_POST['email'].")";
+      return null;
+    }
   }
 
   log_info("Registered new user $name with userid $userid and password '$password' and email='$email'");
@@ -188,7 +195,7 @@ function validate_and_adjust_username($name,&$error=null)
 
   $names = explode(' ',$name);
   if(count($names)<2) {
-    if(!is_null($error)) { $error = "Names must contain both first and last names"; }
+    $error = "Names must contain both first and last names";
     return null;
   }
 
@@ -200,12 +207,12 @@ function validate_and_adjust_username($name,&$error=null)
     $m = array();
     if(preg_match("/([^$valid])/",$n,$m))
     {
-      if(!is_null($error)) { $error = "Names cannot contain '$m[1]'"; }
+      $error = "Names cannot contain '$m[1]'";
       return null;
     }
     if(preg_match("/^([$invalid_first])/",$n,$m))
     {
-      if(!is_null($error)) { $error = "Names cannot start with '$m[1]'"; }
+      $error = "Names cannot start with '$m[1]'";
       return null;
     }
   }
@@ -219,21 +226,21 @@ function validate_and_adjust_userid($userid,&$error=null)
 
   if(strlen($userid)<8 || strlen($userid)>16) 
   {
-    if(!is_null($error)) { $error = "Userids must be between 8 and 16 characters"; }
+    $error = "Userids must be between 8 and 16 characters";
     return null;
   } 
   if(preg_match("/\s/",$userid))
   {
-    if(!is_null($error)) { $error = "Userids cannot contain spaces"; }
+    $error = "Userids cannot contain spaces";
     return null;
   }
   if(!preg_match("/^[a-zA-Z]/",$userid)) 
   {
-    if(!is_null($error)) { $error = "Userids must be begin with a lettter"; }
+    $error = "Userids must be begin with a lettter";
     return null;
   }
   if(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$userid)) {
-    if(!is_null($error)) { $error = "Userids may only contain letters and numbers"; }
+    $error = "Userids may only contain letters and numbers";
     return null;
   }
   return $userid;
@@ -248,17 +255,17 @@ function validate_and_adjust_password($password,&$error=null)
 
   if(strlen($password)<8 || strlen($password)>128) 
   {
-    if(!is_null($error)) { $error = "Password must be between 8 and 16 characters"; }
+    $error = "Password must be between 8 and 16 characters";
     return null;
   } 
   if(!preg_match("/[a-zA-Z]/",$password))
   {
-    if(!is_null($error)) { $error = "Passwords must contain at least one letter"; }
+    $error = "Passwords must contain at least one letter";
     return null;
   }
   if(!preg_match("/^[a-zA-Z0-9 !@%^*_=~,.-]+$/",$password)) 
   {
-    if(!is_null($error)) { $error = "Invalid character in password"; }
+    $error = "Invalid character in password";
     return null;
   }
   return $password;

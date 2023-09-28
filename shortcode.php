@@ -99,7 +99,6 @@ function add_status()
 function add_shortcode_content()
 {
   $active_year = active_survey_year();
-  log_dev("active_year: $active_year");
   if(!$active_year) {
     require plugin_path('shortcode/inactive_survey.php');
     return;
@@ -110,7 +109,6 @@ function add_shortcode_content()
     require plugin_path("shortcode/$shortcode_page.php");
     return;
   }
-
   $page_uri=$_SERVER['REQUEST_URI'];
   log_info("GET: ".print_r($_GET,true));
   log_info("URL: ".print_r(parse_url($page_uri),true));
