@@ -19,7 +19,7 @@ How your name will appear on the survey summary report
 <p class=info-list>Extra whitespace will be removed</p>
 INFO;
 
-add_login_input("text","name","Name",["info"=>$name_info]);
+add_login_input("text","username","Name",["info"=>$name_info]);
 
 $userid_info = <<<INFO
 Used to log into the survey
