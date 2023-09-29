@@ -35,6 +35,7 @@ function add_login_instructions($instructions)
 
 function add_login_input($type,$name,$label,$kwargs=array())
 {
+  log_dev("add_login_name($type,$name,$label,".print_r($kwargs,true).")");
   echo("<!-- $label -->");
   echo("<div class='input $name'>");
 
@@ -45,7 +46,10 @@ function add_login_input($type,$name,$label,$kwargs=array())
     } else {
       $required = 'required';
     }
-    echo("<input class='w3-input' type=$type name=$name $required>");
+    $value = $kwargs['value'] ?? '';
+    if($value) { $value = "value='$value'"; }
+
+    echo("<input class='w3-input' type=$type name=$name $value $required>");
     echo("<label>$label</label>");
   }  
   elseif($type == "checkbox")
