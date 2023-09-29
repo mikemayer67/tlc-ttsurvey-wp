@@ -93,7 +93,7 @@ function add_status()
       return;
   }
 
-  echo("<div class='w3-panel w3-card $w3_status w3-border w3-leftbar'>$survey_status[1]</div>");
+  echo("<div class='status w3-panel w3-card $w3_status w3-border w3-leftbar'>$survey_status[1]</div>");
 }
 
 function add_shortcode_content()
