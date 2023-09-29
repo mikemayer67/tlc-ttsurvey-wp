@@ -129,4 +129,5 @@ else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
   require_once plugin_path('shortcode.php');
+  require_once plugin_path('ajax.php');
 }

@@ -42,7 +42,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   $page_has_shortcode = True;
 
   log_info("enqueue script when shortcode is rendered");
-  wp_enqueue_script('tlc_shortcode_scripts');
+  register_shortcode_scripts();
 
   ob_start();
 
@@ -114,9 +114,12 @@ function add_shortcode_content()
   log_info("URL: ".print_r(parse_url($page_uri),true));
   if(key_exists('tlcpage',$_GET)) {
     $page = $_GET['tlcpage'];
-    if(in_array($page,['register','login','page','senduserid','survey']))
+    if(in_array($page,['register','login','page','senduserid']))
     {
+      register_login_ajax_scripts();
       require plugin_path("shortcode/$page.php");
+    } elseif( $page=='survey' ) {
+      require plugin_path("shortcode/survey.php");
     } else {
       require plugin_path('shortcode/bad_page.php');
     }
@@ -133,6 +136,7 @@ function add_shortcode_content()
     require plugin_path('shortcode/resume.php');
   }
   else {
+    register_login_ajax_scripts();
     require plugin_path('shortcode/login.php');
   }
 }
@@ -141,19 +145,45 @@ function add_shortcode_content()
  * Add the script and style enqueing
  */
 
-wp_register_script(
-  'tlc_shortcode_scripts',
-  plugin_url('js/shortcode.js'),
-  array('jquery'),
-  '1.0.3',
-  true
-);
+function register_shortcode_scripts()
+{
+  wp_register_script(
+    'tlc_ttsurvey_shortcode',
+    plugin_url('js/shortcode.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
 
-wp_localize_script(
-  'tlc_shortcode_scripts',
-  'shortcode_vars',
-  array(),
-);
+  wp_localize_script(
+    'tlc_ttsurvey_shortcode',
+    'shortcode_vars',
+    array(),
+  );
+
+  wp_enqueue_script('tlc_ttsurvey_shortcode');
+}
+
+function register_login_ajax_scripts()
+{
+  wp_register_script(
+    'tlc_ttsurvey_login_ajax',
+    plugin_url('js/login_ajax.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+
+  wp_localize_script(
+    'tlc_ttsurvey_login_ajax',
+    'login_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => wp_create_nonce( 'login_ajax' ),
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_login_ajax');
+}
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
 wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
