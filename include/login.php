@@ -162,13 +162,14 @@ function register_new_user(&$error=null)
     }
   }
 
+  $userid = $values['userid'];
   if(!is_userid_available($userid)) {
     $error = "Userid '$userid' is already in use";
     return false;
   }
 
   add_new_user(
-    $values["userid"],
+    $userid,
     $values["password"],
     $values["username"],
     $values["email"],
