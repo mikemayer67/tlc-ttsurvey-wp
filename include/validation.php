@@ -35,13 +35,13 @@ function validate_login_input($key,$value,&$error=null)
     $invalid_end = "'~-";
     $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
     if(preg_match("/([^$valid])/",$value,$m)) {
-      $error = "cannot contain $m[1]";
+      $error = "names cannot contain $m[1]";
     }
     elseif(preg_match("/(?:^|\s)([$invalid_end])/",$value,$m)) {
-      $error = "improper use of $m[1]";
+      $error = "names cannot start with $m[1]";
     }
     elseif(preg_match("/([$invalid_end])(?:$|\s)/",$value,$m)) {
-      $error = "improper use of $m[1]";
+      $error = "names cannot end with $m[1]";
     }
     elseif(!preg_match("/^\S\S+(?:\s\S+)*(\s\S\S+)$/",$value,$m)) {
       $error = "need first and last name";
@@ -66,11 +66,11 @@ function validate_login_input($key,$value,&$error=null)
     if(strlen($value)<8)       { $error = "too short"; }
     elseif(strlen($value)>128) { $error = "too long"; }
     elseif(!preg_match("/[a-zA-Z]/",$value)) {
-      $error = "must contain a letter";
+      $error = "must contain at least one letter";
     }
     elseif(preg_match("/([^a-zA-Z0-9 !@%^*_=~,.-])$/",$value,$m)) 
     {
-      $error = "Invalid character ($m[1])";
+      $error = "cannot contain ($m[1])";
     }
   }
   elseif($key=="email")

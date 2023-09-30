@@ -62,6 +62,14 @@
   margin-top:16px;
 }
 
+#tlc-ttsurvey div.login_form form input.invalid {
+  background-color:#ffdddd;
+}
+
+#tlc-ttsurvey div.login_form form input.empty {
+  background-color:#ffffcc;
+}
+
 #tlc-ttsurvey div.login_form form input.w3-input 
 { 
   width:100%; 

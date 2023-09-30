@@ -20,20 +20,25 @@ function evaluate_register_inputs($,form)
       all_ok = true;
       keys.forEach( function(key) {
         error_box = form.find('.input .error.'+key);
+        input = form.find('.input.'+key+' input');
+        input.removeClass(['invalid','empty']);
         if( key in response ) {
-          error_box.show();
-          error_box.html(response[key]);
           all_ok = false;
+          if(response[key]==="#empty") {
+            error_box.hide();
+            error_box.html("");
+            input.addClass('empty');
+          } else {
+            error_box.show();
+            error_box.html(response[key]);
+            input.addClass('invalid');
+          }
         } else {
           error_box.hide();
           error_box.html("");
         }
       });
-      if(response.complete && all_ok) {
-        submit.prop("disabled",false);
-      } else {
-        submit.prop("disabled",true);
-      }
+      submit.prop("disabled",!all_ok);
     },
     'json',
   );

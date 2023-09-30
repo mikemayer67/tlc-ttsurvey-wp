@@ -40,15 +40,18 @@ function add_login_input($type,$name,$label,$kwargs=array())
 
   if(in_array($type,['text','password','email']))
   {
+    $classes = ['w3-input'];
     if($kwargs['optional'] ?? False) {
       $required = 'placeholder=[optional]';
     } else {
       $required = 'required';
+      $classes[] = 'empty';
     }
     $value = $kwargs['value'] ?? '';
     if($value) { $value = "value='$value'"; }
 
-    echo("<input class='w3-input' type=$type name=$name $value $required>");
+    $classes = implode(' ',$classes);
+    echo("<input class='$classes' type=$type name=$name $value $required>");
   }  
   elseif($type == "checkbox")
   {

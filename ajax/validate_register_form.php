@@ -6,7 +6,7 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
-$response = array('complete'=>true);
+$response = array();
 $keys = explode(" ","username userid password email");
 foreach( $keys as $key )
 {
@@ -17,7 +17,7 @@ foreach( $keys as $key )
       $response[$key] = $error;
     }
   } elseif($key != "email") {
-    $response['complete'] = false;
+    $response[$key] = '#empty';
   }
 }
 
