@@ -35,7 +35,6 @@ function add_login_instructions($instructions)
 
 function add_login_input($type,$name,$label,$kwargs=array())
 {
-  log_dev("add_login_name($type,$name,$label,".print_r($kwargs,true).")");
   echo("<!-- $label -->");
   echo("<div class='input $name'>");
 

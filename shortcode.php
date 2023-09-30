@@ -26,29 +26,62 @@ require_once plugin_path('include/login.php');
  * @param string $tag shortcode tag
  */
 
-$page_has_shortcode = False;
+function is_first_survey_on_page()
+{
+  static $is_first = true;
+
+  if($is_first) {
+    $is_first = false;
+    return true;
+  } else {
+    log_error("Cannot include multiple tlc-ttsurvey shortcodes on a given page");
+    if(current_user_can('edit_pages')) {
+      set_status_error("Can only include one tlc-ttsurvey shortcode per page");
+      add_status_message();
+    }
+    return false;
+  }
+}
+
+const INFO_STATUS = 0;
+const WARNING_STATUS = 1;
+const ERROR_STATUS = 2;
+function status_message($msg=null,$level=INFO_STATUS)
+{
+  static $status = null;
+  if($msg) {
+    $status = [$level,$msg];
+  } else {
+    $status = null;
+  }
+  return $status;
+}
+function set_status_info($msg) { status_message($msg,SURVEY_STATUS_INFO); }
+function set_status_warning($msg) { status_message($msg,SURVEY_STATUS_WARNING); }
+function set_status_error($msg) { status_message($msg,SURVEY_STATUS_ERROR); }
+
+
+function shortcode_page($page=null)
+{
+  static $shortcut_page = null;
+  if($page) { $shortcut_page = $page; }
+  return $shortcut_page;
+}
+
+
 
 function handle_shortcode($attr,$content=null,$tag=null)
 {
-  global $page_has_shortcode;
-  if($page_has_shortcode) {
-    log_error("Cannot include multiple tlc-ttsurvey shortcodes on a given page");
-    if(current_user_can('edit_pages')) {
-      set_survey_error("Can only include one tlc-ttsurvey shortcode per page");
-      add_status();
-    }
-    return;
-  }
-  $page_has_shortcode = True;
+  if(!is_first_survey_on_page()) { return; }
 
-  log_info("enqueue script when shortcode is rendered");
+  log_dev("enqueue shortcode scripts");
   register_shortcode_scripts();
 
   ob_start();
 
   echo "<div id=tlc-ttsurvey>";
   add_noscript();
-  add_status();
+  add_status_message();
   add_shortcode_content();
   echo "</div>";
 
@@ -73,27 +106,35 @@ function add_noscript()
 <?php
 }
 
-function add_status()
+function add_status_message()
 {
-  global $survey_status;
-  if(is_null($survey_status)) { return ; }
-  switch($survey_status[0]) 
+  $status = status_message();
+  if(is_null($status)) { return ; }
+
+  $classes = explode(' ','status w3-panel w3-card w3-border w3-leftbar');
+
+  [$level,$msg] = $status;
+  switch($level)
   {
     case SURVEY_STATUS_INFO:
-      $w3_status = "w3-pale-green w3-border-green";
+      $classes[] = 'w3-pale-green';
+      $classes[] = 'w3-border-green';
       break;
     case SURVEY_STATUS_WARNING;
-      $w3_status = "w3-pale-yellow w3-border-orange";
+      $classes[] = 'w3-pale-yellow';
+      $classes[] = 'w3-border-orange';
       break;
     case SURVEY_STATUS_ERROR:
-      $w3_status = "w3-pale-red w3-border-red";
+      $classes[] = 'w3-pale-red';
+      $classes[] = 'w3-border-red';
       break;
     default:
-      log_error("Unexpected survey status level encountered: $survey_status[0]");
+      log_error("Unexpected survey status level encountered: $level");
       return;
   }
 
-  echo("<div class='status w3-panel w3-card $w3_status w3-border w3-leftbar'>$survey_status[1]</div>");
+  $classes = implode(' ',$classes);
+  echo("<div class='$classes'>$msg</div>");
 }
 
 function add_shortcode_content()
@@ -104,11 +145,12 @@ function add_shortcode_content()
     return;
   }
 
-  global $shortcode_page;
-  if($shortcode_page) {
-    require plugin_path("shortcode/$shortcode_page.php");
+  $page = shortcode_page();
+  if($page) {
+    require plugin_path("shortcode/$page.php");
     return;
   }
+
   $page_uri=$_SERVER['REQUEST_URI'];
   log_info("GET: ".print_r($_GET,true));
   log_info("URL: ".print_r(parse_url($page_uri),true));
@@ -116,7 +158,7 @@ function add_shortcode_content()
     $page = $_GET['tlcpage'];
     if(in_array($page,['register','login','page','senduserid']))
     {
-      register_login_ajax_scripts();
+      enqueue_login_ajax_scripts();
       require plugin_path("shortcode/$page.php");
     } elseif( $page=='survey' ) {
       require plugin_path("shortcode/survey.php");
@@ -136,7 +178,7 @@ function add_shortcode_content()
     require plugin_path('shortcode/resume.php');
   }
   else {
-    register_login_ajax_scripts();
+    enqueue_login_ajax_scripts();
     require plugin_path('shortcode/login.php');
   }
 }
@@ -164,8 +206,9 @@ function register_shortcode_scripts()
   wp_enqueue_script('tlc_ttsurvey_shortcode');
 }
 
-function register_login_ajax_scripts()
+function enqueue_login_ajax_scripts()
 {
+  error_log("register login ajax scripts");
   wp_register_script(
     'tlc_ttsurvey_login_ajax',
     plugin_url('js/login_ajax.js'),
@@ -179,9 +222,10 @@ function register_login_ajax_scripts()
     'login_vars',
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => wp_create_nonce( 'login_ajax' ),
+      'nonce' => wp_create_nonce('login_ajax'),
     ),
   );
+
   wp_enqueue_script('tlc_ttsurvey_login_ajax');
 }
 

@@ -16,68 +16,43 @@ if( ! defined('WPINC') ) { die; }
 
 /**
  * scope the specified string to the plugin namespace
- *
- * @param string $name function, variable, class, etc. in plugin namespace
- * @return string namespace scoped name
  */
-function ns($s)
-{
-  return __NAMESPACE__.'\\'.$s;
-}
+function ns($s) { return __NAMESPACE__.'\\'.$s; }
 
 /**
- * return absolute path to the plugin file
- * 
- * @return absolute path to plugin file
+ * absolute path to the plugin file
  */
-function plugin_file()
-{
-  return __FILE__;
-}
+function plugin_file() { return __FILE__; }
 
 /**
- * return absolute path to the plugin directory
- * 
- * @return absolute path to plugin directory
+ * absolute path to the plugin directory
  */
-function plugin_dir()
-{
-  return plugin_dir_path(__FILE__);
-}
+function plugin_dir() { return plugin_dir_path(__FILE__); }
 
 /**
- * Converts path relative to the plugin directory to an absoute path
- *
- * @param path relative to the plugin directory
- * @return absolute path
+ * convert path relative to the plugin directory to an absoute path
  */
-function plugin_path($path)
-{
-  return plugin_dir() . '/' . $path;
-}
+function plugin_path($path) { return plugin_dir() . '/' . $path; }
 
 /**
- * return url to a plugin resource
- * 
- * @param resource path relative to plugin directory
- * @return string url to plugin resource
+ * connvert path relative to the plugin directory to a URL
  */
-function plugin_url($rel_url)
-{
-  return plugin_dir_url(__FILE__).'/'.$rel_url;
-}
+function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
 
-require_once plugin_path('include/logger.php');
-require_once plugin_path('include/settings.php');
-require_once plugin_path('include/surveys.php');
-require_once plugin_path('include/users.php');
 
 /**
  * plugin activation hooks
  */
 
+register_activation_hook(   __FILE__, ns('handle_activate') );
+register_deactivation_hook( __FILE__, ns('handle_deactivate') );
+register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
+
 function handle_activate()
 {
+  require_once plugin_path('include/logger.php');
+  require_once plugin_path('include/surveys.php');
+  require_once plugin_path('include/users.php');
   log_info('activate: '.__NAMESPACE__);
   users_activate();
   surveys_activate();
@@ -85,6 +60,9 @@ function handle_activate()
 
 function handle_deactivate()
 {
+  require_once plugin_path('include/logger.php');
+  require_once plugin_path('include/surveys.php');
+  require_once plugin_path('include/users.php');
   log_info('deactivate: '.__NAMESPACE__);
   users_deactivate();
   surveys_deactivate();
@@ -92,34 +70,26 @@ function handle_deactivate()
 
 function handle_uninstall()
 {
+  require_once plugin_path('include/logger.php');
+  require_once plugin_path('include/settings.php');
   log_info('uninstall: '.__NAMESPACE__);
   uninstall_options();
 }
 
-register_activation_hook(   __FILE__, ns('handle_activate') );
-register_deactivation_hook( __FILE__, ns('handle_deactivate') );
-register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
+/**
+ * Ajax support
+ *   This is just a shallow wrapper that will pull in the 
+ *   ajax specific code only if needed.
+ **/
 
-const SURVEY_STATUS_INFO = 0;
-const SURVEY_STATUS_WARNING = 1;
-const SURVEY_STATUS_ERROR = 2;
-$survey_status = null;
-function set_survey_status($msg,$level)
-{
-  global $survey_status;
-  $survey_status = [$level,$msg];
-}
-function set_survey_info($msg) { set_survey_status($msg,SURVEY_STATUS_INFO); }
-function set_survey_warning($msg) { set_survey_status($msg,SURVEY_STATUS_WARNING); }
-function set_survey_error($msg) { set_survey_status($msg,SURVEY_STATUS_ERROR); }
+add_action('wp_ajax_nopriv_tlc_ttsurvey', ns('ajax_wrapper'));
+add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 
-$shortcode_page = null;
-function set_shortcode_page($page)
-{
-  global $shortcode_page;
-  $shortcode_page=$page;
-}
+function ajax_wrapper() { require plugin_path('ajax.php'); }
 
+/**
+ * Import admin/shortcode specific functions
+ **/
 
 if( is_admin() ) /* Admin setup */
 {
@@ -129,5 +99,6 @@ else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
   require_once plugin_path('shortcode.php');
-  require_once plugin_path('ajax.php');
 }
+
+

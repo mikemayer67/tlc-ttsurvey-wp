@@ -124,8 +124,8 @@ function login_init()
       }
       else
       {
-        set_survey_warning($error);
-        set_shortcode_page('register');
+        set_status_warning($error);
+        shortcode_page('register');
       }
     }
     elseif( $action == 'logout') 
@@ -137,10 +137,10 @@ function login_init()
       require_once plugin_path('include/sendmail.php');
       $email = $_POST['email'];
       if(sendmail_userid($email)) {
-        set_survey_info("Sent userid/password to $email");
+        set_status_info("Sent userid/password to $email");
       } else {
-        set_survey_warning("Unrecognized email address");
-        set_shortcode_page("senduserid");
+        set_status_warning("Unrecognized email address");
+        shortcode_page("senduserid");
       }
     }
   }

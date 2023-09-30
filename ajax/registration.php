@@ -9,6 +9,8 @@ function validate_registration()
 {
   log_dev('ajax/validate_registration()');
   log_dev("POST: ".print_r($_POST,true));
-  echo("ok");
+  $response = json_encode(array('hello'=>'world'));
+  log_dev("response: $response");
+  echo($response);
   wp_die();
 }
