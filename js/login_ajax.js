@@ -16,6 +16,7 @@ function register_validation($,form)
         {
           'action':'tlc_ttsurvey',
           'nonce':login_vars['nonce'],
+          'query':'validate_register_form',
           'username':$(form).find('.input.username input').val(),
           'userid':$(form).find('.input.userid input').val(),
           'password':$(form).find('.input.password input').val(),
@@ -32,9 +33,6 @@ function register_validation($,form)
     }
   );
 }
-
-
-
 
 jQuery(document).ready(
   function($) {

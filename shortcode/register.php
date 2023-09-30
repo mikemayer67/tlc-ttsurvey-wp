@@ -9,8 +9,6 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/login_form_builder.php');
 
-log_dev("Populating registration form: ".print_r($_POST,true));
-
 start_login_form("Register for the Survey","register");
 
 $args = array( "info" => <<<INFO

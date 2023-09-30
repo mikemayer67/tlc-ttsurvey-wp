@@ -1,106 +1,87 @@
 <?php
 namespace TLC\TTSurvey;
 
-function validate_and_adjust_username(&$name,&$error=null)
+function adjust_and_validate_login_input($key,&$value,&$error=null)
 {
-  $name = stripslashes($name);              // resolve escaped characters
-  $name = trim($name);                      // trim leading/trailing whitespace
-  $name = preg_replace('/\s+/',' ',$name);  // condense multiple whitespace
-  $name = preg_replace('/\s/',' ',$name);   // only use ' ' for whitespace
-  $name = preg_replace('/\'+/',"'",$name);  // condense multiple apostrophes
-  $name = preg_replace('/-+/',"-",$name);   // condense multiple hyphens
-  $name = preg_replace('/~+/',"~",$name);   // consense multiple tildes
+  $value = ajust_login_input($key,$value);
+  return validate_login_input($key,$value,$error);
+}
 
-  $names = explode(' ',$name);
-  if(count($names)<2) {
-    $error = "Names must contain both first and last names";
-    return null;
-  }
+function adjust_login_input($key,$value)
+{
+  $value = trim(stripslashes($value??''));
 
-  $valid_first = "A-Za-z\x{00C0}-\x{00FF}";
-  $invalid_first = "'~-";
-  $valid = $valid_first . $invalid_first;
-  foreach($names as $n)
+  switch($key)
   {
-    $m = array();
-    if(preg_match("/([^$valid])/",$n,$m))
-    {
-      $error = "Names cannot contain '$m[1]'";
-      return null;
+  case 'username':
+    $value = preg_replace('/\'+/',"'",$value);  // condense multiple apostrophes
+    $value = preg_replace('/-+/',"-",$value);   // condense multiple hyphens
+    $value = preg_replace('/~+/',"~",$value);   // consense multiple tildes
+    // fallthrough is intentional
+  case 'password':
+    $value = preg_replace('/\s+/',' ',$value);  // condense multiple whitespace
+    $value = preg_replace('/\s/',' ',$value);   // only use ' ' for whitespace
+    break;
+  }
+  return $value;
+}
+
+function validate_login_input($key,$value,&$error=null)
+{
+  $error = '';
+
+  if($key=='username')
+  {
+    $invalid_end = "'~-";
+    $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
+    if(preg_match("/([^$valid])/",$value,$m)) {
+      $error = "cannot contain $m[1]";
     }
-    if(preg_match("/^([$invalid_first])/",$n,$m))
-    {
-      $error = "Names cannot start with '$m[1]'";
-      return null;
+    elseif(preg_match("/(?:^|\s)([$invalid_end])/",$value,$m)) {
+      $error = "improper use of $m[1]";
     }
-  }
-  return true;
-}
-
-function validate_and_adjust_userid(&$userid,&$error=null)
-{
-  $userid = stripslashes($userid);  // resolve escaped characters
-  $userid = trim($userid);          // trim leading/trailing whitespace
-
-  if(strlen($userid)<8 || strlen($userid)>16) 
-  {
-    $error = "Userids must be between 8 and 16 characters";
-    return null;
-  } 
-  if(preg_match("/\s/",$userid))
-  {
-    $error = "Userids cannot contain spaces";
-    return null;
-  }
-  if(!preg_match("/^[a-zA-Z]/",$userid)) 
-  {
-    $error = "Userids must be begin with a lettter";
-    return null;
-  }
-  if(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$userid)) {
-    $error = "Userids may only contain letters and numbers";
-    return null;
-  }
-  return true;
-}
-
-function validate_and_adjust_password(&$password,&$error=null)
-{
-  $password = stripslashes($password);              // resolve escaped characters
-  $password = trim($password);                      // trim leading/trailing whitespace
-  $password = preg_replace('/\s+/',' ',$password);  // condense multiple whitespace
-  $password = preg_replace('/\s/',' ',$password);   // only use ' ' for whitespace
-
-  if(strlen($password)<8 || strlen($password)>128) 
-  {
-    $error = "Password must be between 8 and 16 characters";
-    return null;
-  } 
-  if(!preg_match("/[a-zA-Z]/",$password))
-  {
-    $error = "Passwords must contain at least one letter";
-    return null;
-  }
-  if(!preg_match("/^[a-zA-Z0-9 !@%^*_=~,.-]+$/",$password)) 
-  {
-    $error = "Invalid character in password";
-    return null;
-  }
-  return true;
-}
-
-function validate_and_adjust_email(&$email,&$error=null)
-{
-  if($email) {
-    $email = stripslashes($email);              // resolve escaped characters
-    $email = trim($email);                      // trim leading/trailing whitespace
-    $email = filter_var($email,FILTER_VALIDATE_EMAIL);
-    if(!$email)
-    {
-      if(!$is_null) {$error = "Invalid email address";}
-      return null;
+    elseif(preg_match("/([$invalid_end])(?:$|\s)/",$value,$m)) {
+      $error = "improper use of $m[1]";
+    }
+    elseif(!preg_match("/^\S\S+(?:\s\S+)*(\s\S\S+)$/",$value,$m)) {
+      $error = "need first and last name";
     }
   }
-  return true;
-}
+  elseif($key=='userid')
+  {
+    if(strlen($value)<8)      { $error = "too short"; }
+    elseif(strlen($value)>16) { $error = "too long"; }
+    elseif(preg_match("/\s/",$value)) {
+      $error = "cannot contain spaces";
+    }
+    elseif(preg_match("/^[^a-zA-Z]/",$value)) {
+      $error = "must start with a letter";
+    }
+    elseif(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$value)) {
+      $error = "letters/numbers only";
+    }
+  }
+  elseif($key=='password')
+  {
+    if(strlen($value)<8)       { $error = "too short"; }
+    elseif(strlen($value)>128) { $error = "too long"; }
+    elseif(!preg_match("/[a-zA-Z]/",$value)) {
+      $error = "must contain a letter";
+    }
+    elseif(preg_match("/([^a-zA-Z0-9 !@%^*_=~,.-])$/",$value,$m)) 
+    {
+      $error = "Invalid character ($m[1])";
+    }
+  }
+  elseif($key=="email")
+  {
+    # email is optional, so empty is ok
+    if($value)
+    {
+      $email = filter_var($value,FILTER_VALIDATE_EMAIL);
+      if(!$email) { $error = "invalid format"; }
+    }
+  }
 
+  return strlen($error) == 0;
+}

@@ -49,16 +49,19 @@ const ERROR_STATUS = 2;
 function status_message($msg=null,$level=INFO_STATUS)
 {
   static $status = null;
-  if($msg) {
-    $status = [$level,$msg];
-  } else {
-    $status = null;
+  if(!is_null($msg))
+  {
+    if($msg) {
+      $status = [$level,$msg];
+    } else {
+      $status = null;
+    }
   }
   return $status;
 }
-function set_status_info($msg) { status_message($msg,SURVEY_STATUS_INFO); }
-function set_status_warning($msg) { status_message($msg,SURVEY_STATUS_WARNING); }
-function set_status_error($msg) { status_message($msg,SURVEY_STATUS_ERROR); }
+function set_status_info($msg) { status_message($msg,INFO_STATUS); }
+function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
+function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
 
 
 function shortcode_page($page=null)
@@ -74,7 +77,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
 {
   if(!is_first_survey_on_page()) { return; }
 
-  log_dev("enqueue shortcode scripts");
   register_shortcode_scripts();
 
   ob_start();
@@ -101,7 +103,7 @@ function add_noscript()
 ?>
   <noscript>
   <div class=noscript>This survey works best with Javascript enabled</div>
-  <p class=noscript>If you cannot (or prefer not) to turn on Javascript, you may need to complete a paper copy of the survey. <?=$download?></p>
+  <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
 }
@@ -116,21 +118,21 @@ function add_status_message()
   [$level,$msg] = $status;
   switch($level)
   {
-    case SURVEY_STATUS_INFO:
-      $classes[] = 'w3-pale-green';
-      $classes[] = 'w3-border-green';
-      break;
-    case SURVEY_STATUS_WARNING;
-      $classes[] = 'w3-pale-yellow';
-      $classes[] = 'w3-border-orange';
-      break;
-    case SURVEY_STATUS_ERROR:
-      $classes[] = 'w3-pale-red';
-      $classes[] = 'w3-border-red';
-      break;
-    default:
-      log_error("Unexpected survey status level encountered: $level");
-      return;
+  case INFO_STATUS:
+    $classes[] = 'w3-pale-green';
+    $classes[] = 'w3-border-green';
+    break;
+  case WARNING_STATUS:
+    $classes[] = 'w3-pale-yellow';
+    $classes[] = 'w3-border-orange';
+    break;
+  case ERROR_STATUS:
+    $classes[] = 'w3-pale-red';
+    $classes[] = 'w3-border-red';
+    break;
+  default:
+    log_error("Unexpected survey status level encountered: $level");
+    return;
   }
 
   $classes = implode(' ',$classes);
@@ -208,7 +210,6 @@ function register_shortcode_scripts()
 
 function enqueue_login_ajax_scripts()
 {
-  error_log("register login ajax scripts");
   wp_register_script(
     'tlc_ttsurvey_login_ajax',
     plugin_url('js/login_ajax.js'),
@@ -217,12 +218,13 @@ function enqueue_login_ajax_scripts()
     true
   );
 
+  $key = 'login_ajax';
   wp_localize_script(
     'tlc_ttsurvey_login_ajax',
     'login_vars',
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => wp_create_nonce('login_ajax'),
+      'nonce' => array($key,wp_create_nonce($key)),
     ),
   );
 
