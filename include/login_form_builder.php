@@ -35,32 +35,40 @@ function add_login_instructions($instructions)
 
 function add_login_input($type,$name,$label,$kwargs=array())
 {
-  log_dev("add_login_name($type,$name,$label,".print_r($kwargs,true).")");
   echo("<!-- $label -->");
   echo("<div class='input $name'>");
 
   if(in_array($type,['text','password','email']))
   {
+    $classes = ['w3-input'];
     if($kwargs['optional'] ?? False) {
       $required = 'placeholder=[optional]';
     } else {
       $required = 'required';
+      $classes[] = 'empty';
     }
     $value = $kwargs['value'] ?? '';
     if($value) { $value = "value='$value'"; }
 
-    echo("<input class='w3-input' type=$type name=$name $value $required>");
-    echo("<label>$label</label>");
+    $classes = implode(' ',$classes);
+    echo("<input class='$classes' type=$type name=$name $value $required>");
   }  
   elseif($type == "checkbox")
   {
     $checked = ($kwargs['checked'] ?? False) ? 'checked' : '';
     echo("<input class='w3-check' type=checkbox name=$name $checked>");
-    echo("<label>$label</label>");
   }
   else
   {
     log_error("Unrecognized input type ($type) passed to add_login_name");
+  }
+
+
+  echo("<div class=w3-container>");
+  echo("<label>$label</label>");
+  if($type != 'checkbox')
+  {
+    echo("<div class='w3-right error $name'></div>");
   }
 
   $info = $kwargs['info'] ?? null;
@@ -72,7 +80,8 @@ function add_login_input($type,$name,$label,$kwargs=array())
     echo("<div id=$link class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
   }
 
-  echo("</div>");
+  echo("</div>");  // label container
+  echo("</div>");  // input
 }
 
 function add_login_submit($label,$action,$kwargs=array())
@@ -80,8 +89,8 @@ function add_login_submit($label,$action,$kwargs=array())
   $cancel = $kwargs['cancel'] ?? False;
 
   $btn_classes = 'w3-button w3-section w3-ripple w3-right w3-margin-left';
-  $submit_classes = "$btn_classes w3-blue-gray";
-  $cancel_classes = "$btn_classes w3-light-gray";
+  $submit_classes = "submit $btn_classes w3-blue-gray";
+  $cancel_classes = "cancel $btn_classes w3-light-gray";
 
   $action = "name=action value='$action'";
 

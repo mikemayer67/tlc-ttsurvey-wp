@@ -124,8 +124,9 @@ function login_init()
       }
       else
       {
-        set_survey_warning($error);
-        set_shortcode_page('register');
+        log_dev("need to set status warning: $error");
+        set_status_warning($error);
+        shortcode_page('register');
       }
     }
     elseif( $action == 'logout') 
@@ -137,10 +138,10 @@ function login_init()
       require_once plugin_path('include/sendmail.php');
       $email = $_POST['email'];
       if(sendmail_userid($email)) {
-        set_survey_info("Sent userid/password to $email");
+        set_status_info("Sent userid/password to $email");
       } else {
-        set_survey_warning("Unrecognized email address");
-        set_shortcode_page("senduserid");
+        set_status_warning("Unrecognized email address");
+        shortcode_page("senduserid");
       }
     }
   }
@@ -148,34 +149,37 @@ function login_init()
 
 function register_new_user(&$error=null)
 {
-  $name = $_POST['username'];
-  $userid = $_POST['userid'];
-  $password = $_POST['password'];
-  $email = $_POST['email'];
-
-  $validated = (
-    validate_and_adjust_username($name,$error) &&
-    validate_and_adjust_userid($userid,$error) &&
-    validate_and_adjust_password($password,$error) &&
-    validate_and_adjust_email($email,$error)
-  );
-  if(!$validated) {
-    $error = "Failed registration attempt:: $error";
-    return null;
+  $keys = explode(" ","username userid password email");
+  $values = array();
+  foreach($keys as $key) {
+    $value = adjust_login_input($key,$_POST[$key]);
+    if(validate_login_input($key,$value,$error)) {
+      $values[$key] = $value;
+    } else {
+      $label = ($key == "username") ? "name" : $key;
+      $error = "Failed registartion. Invalid $label: $error";
+      return false;
+    }
   }
 
+  $userid = $values['userid'];
   if(!is_userid_available($userid)) {
     $error = "Userid '$userid' is already in use";
-    return null;
+    return false;
   }
 
-  add_new_user($userid, $password, $name, $email);
-  if($email) {
-    log_info("Registered new user $name with userid $userid and email='$email'");
-  } else {
-    log_info("Registered new user $name with userid $userid and no email");
-  }
+  add_new_user(
+    $userid,
+    $values["password"],
+    $values["username"],
+    $values["email"],
+  );
 
+  $name = $values['username'];
+  $userid = $values['userid'];
+  log_info("Registered new user $name with userid $userid");
+
+  $error = '';
   return true;
 }
 

@@ -9,19 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/login_form_builder.php');
 
-log_dev("Populating registration form: ".print_r($_POST,true));
-
 start_login_form("Register for the Survey","register");
-
-$args = array( "info" => <<<INFO
-How your name will appear on the survey summary report
-<p class=info-list><b>must</b> contain a valid name</p>
-<p class=info-list><b>may</b> contain apostrophes</p>
-<p class=info-list><b>may></b> contain hyphens</p>
-<p class=info-list>Extra whitespace will be removed</p>
-INFO);
-if(key_exists('username',$_POST)) { $args['value'] = $_POST['username']; }
-add_login_input("text","username","Name",$args);
 
 $args = array( "info" => <<<INFO
 Used to log into the survey
@@ -40,6 +28,16 @@ Used to log into the survey
 <p class=info-list><b>may</b> contain spaces</p>
 INFO);
 add_login_input("password","password","Password",$args);
+
+$args = array( "info" => <<<INFO
+How your name will appear on the survey summary report
+<p class=info-list><b>must</b> contain a valid name</p>
+<p class=info-list><b>may</b> contain apostrophes</p>
+<p class=info-list><b>may></b> contain hyphens</p>
+<p class=info-list>Extra whitespace will be removed</p>
+INFO);
+if(key_exists('username',$_POST)) { $args['value'] = $_POST['username']; }
+add_login_input("text","username","Full Name",$args);
 
 $args = array( "optional"=>True, "info" => <<<INFO
 The email address is <b>optional</b>. It will only be used in conjunction with 

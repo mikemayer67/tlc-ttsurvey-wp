@@ -6,7 +6,6 @@ require_once plugin_path('include/logger.php');
 
 $year = date('Y');
 $survey_status = current_survey_status();
-log_dev("survey status for $year: $survey_status");
 
 if($survey_status==SURVEY_IS_PENDING) { ?>
 

@@ -171,7 +171,6 @@ function validate_user_access_token($userid,$token)
 
 function get_user_post($userid)
 {
-  log_dev("get_user_post($userid");
   $posts = get_posts(
     array(
       'post_type' => USERID_POST_TYPE,
@@ -194,40 +193,33 @@ function get_user_post($userid)
 
 function get_user_post_id($userid)
 {
-  log_dev("get_user_post_id($userid)");
   $post = get_user_post($userid);
   if(!$post) { return null; }
 
   $post_id = $post->ID;
-  log_dev("  $userid => $post_id");
   return $post_id;
 }
 
 function get_user_name($userid)
 {
-  log_dev("get_user_name($userid)");
   $post_id = get_user_post_id($userid);
   if(!$post_id) { return null; }
 
   $name = get_post_meta($post_id,'name');
-  log_dev(" $userid => $name");
   return $name;
 }
 
 function get_user_email($userid)
 {
-  log_dev("get_user_email($userid)");
   $post_id = get_user_post_id($userid);
   if(!$post_id) { return null; }
 
   $email = get_post_meta($post_id,'email');
-  log_dev(" $userid => $email");
   return $email;
 }
 
 function get_user_anonid($userid)
 {
-  log_dev("get_user_anonid($userid)");
   $user_post_id = get_user_post_id($userid);
   if(!$user_post_id) { return null; }
 
@@ -242,7 +234,6 @@ function get_user_anonid($userid)
     $anonid = $post->title;
     $hash = $post->content;
     if(password_verify("$anonid/$user_post_id",$hash)) {
-      log_dev(" $userid => anonid found for $userid");
       return $anonid;
     }
   }
@@ -273,16 +264,6 @@ function gen_access_token()
 
 function add_new_user($userid, $password, $name, $email=null)
 {
-  //
-  // using asserts here as all of this info should have been checked
-  // prior ta calling this function... but to protect the database
-  // we're checking here before adding a new wp_post entry
-  assert(validate_and_adjust_userid($userid), "Invalid userid: '$userid'");
-  assert(validate_and_adjust_username($name),"Invalid name: '$name'");
-  assert(validate_and_adjust_password($password), "Invalid password: '$pasword'");
-  assert(validate_and_adjust_email($email), "Invalid email address: '$email'");
-  assert(is_userid_available($userid), "Userid $userid is already in use");
-
   $user_hash = password_hash($password,PASSWORD_DEFAULT);
 
   $post_args = array(
@@ -323,66 +304,65 @@ function add_new_user($userid, $password, $name, $email=null)
 
 function update_user_name($userid,$name)
 {
-  log_dev("update_user_name($userid)");
-  $name = trim($name);
   $user_post_id = get_user_post_id($userid);
   if($user_post_id) { 
-    assert(validate_and_adjust_username($name),"Invalid name: '$name'");
-    update_post_meta($user_post_id,'name',$name);
+    if( adjust_and_validate_login_input('username',$name) ) {
+      update_post_meta($user_post_id,'name',$name);
+      return true;
+    } else {
+      log_warning("Cannot update name for $userid: invalid name ($name)");
+    }
   } else {
-    log_warning("Attempt to update name for invalid userid $userid");
+    log_warning("Cannot update name for invalid userid ($userid)");
   }
+  return false;
 }
 
 function update_user_email($userid,$email)
 {
-  log_dev("update_user_email($userid)");
-  $email = trim($email);
   $user_post_id = get_user_post_id($userid);
   if($user_post_id) { 
-    assert(validate_and_adjust_email($email),"Invalid email: '$email'");
-    if($email) {
-      update_post_meta($user_post_id,'email',$email);
-    } else {
-      delete_post_meta($user_post_id,'email');
+    if(adjust_and_validate_login_input('email',$email) ) {
+      if($email) {
+        update_post_meta($user_post_id,'email',$email);
+      } else {
+        delete_post_meta($user_post_id,'email');
+      }
+      return true;
     }
+    log_warning("Cannot update email for $userid: invalid email ($email)");
   } else {
-    log_warning("Attempt to update email for invalid userid $userid");
+    log_warning("Cannot update email for invalid userid ($userid)");
   }
+  return false;
 }
 
-function update_user_password($userid, $password)
+function update_user_password($userid,$password)
 {
-  log_dev("update_user_password($userid)");
-  $password = trim($password);
   $user_post_id = get_user_post_id($userid);
-  if($user_post_id) {
-    assert(validate_and_adjust_password($password), "Invalid password");
-    $update_args = array(
-      'ID' => $post->ID,
-      'post_content' => password_hash($password),
-    );
-    log_dev("  update_args: ".print_r($update_args.true));
-    $updated_post_id = wp_update_post($update_args);
-    if($updated_post_id == $user_post_id) {
-      log_dev("updated password for $userid");
+  if($user_post_id) { 
+    if( adjust_and_validate_login_input('password',$password) ) {
+      wp_update_post(array(
+        'ID' => $user_post_id,
+        'post_content' => password_hash($password),
+      ));
+      return true;
     } else {
-      log_warning("Failed to update password for $userid");
+      log_warning("Cannot update password for $userid: invalid password");
     }
   } else {
-    log_warning("Attempt to update password for invalid userid $userid");
+    log_warning("Cannot update password for invalid userid ($userid)");
   }
+  return false;
 }
 
 function regenerate_user_access_token($userid)
 {
-  log_dev("regenerate_user_access_token($userid)");
   $user_post_id = get_user_post_id($userid);
   if($user_post_id) {
     $access_token = gen_access_token();
     update_post_meta($user_post_id,'access_token',$access_token);
-    log_dev("Updated access token for $userid to $access_token");
   } else {
-    log_wrning("Attempt to regenerate access token for invalid userid $userid");
+    log_warning("Cannot regenerate access token for invalid userid ($userid)");
   }
 }
