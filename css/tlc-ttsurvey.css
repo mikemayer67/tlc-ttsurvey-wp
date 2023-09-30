@@ -74,6 +74,12 @@
   }
 }
 
+#tlc-ttsurvey .login_form form .error {
+  color:#c00000;
+  font-size:x-small;
+  display:none;
+}
+
 #tlc-ttsurvey .login_form button {
   box-sizing: border-box;
 }
