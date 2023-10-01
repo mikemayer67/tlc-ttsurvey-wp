@@ -157,7 +157,6 @@ function validate_user_access_token($userid,$token)
 {
   log_dev("validate_user_access_token($userid,$token)");
   $post_id = get_user_post_id($userid);
-  log_dev("  post_id: $post_id");
   if(!$post_id) { return false; }
 
   $expected_token = get_post_meta($post_id,'access_token');
@@ -296,6 +295,8 @@ function add_new_user($userid, $password, $name, $email=null)
   );
 
   $anon_post_id = wp_insert_post($anonid_args,true);
+
+  return $access_token;
 }
 
 /**
