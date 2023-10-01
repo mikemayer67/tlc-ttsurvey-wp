@@ -168,7 +168,7 @@ function register_new_user(&$error=null)
     return false;
   }
 
-  add_new_user(
+  $token = add_new_user(
     $userid,
     $values["password"],
     $values["username"],
@@ -177,7 +177,16 @@ function register_new_user(&$error=null)
 
   $name = $values['username'];
   $userid = $values['userid'];
-  log_info("Registered new user $name with userid $userid");
+  log_info("Registered new user $name with userid $userid and token $token");
+
+  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
+  $remember = $_POST['remember-me'] ?? null;
+  if($remember) {
+    $tokens = cookie_tokens();
+    $tokens[$userid] = $token;
+    $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
+  }
+  save_survey_cookies();
 
   $error = '';
   return true;
