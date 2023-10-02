@@ -6,6 +6,8 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
+log_dev("ajax_validate_register POST: ".print_r($_POST,true));
+
 $response = array();
 $keys = explode(" ","username userid password email");
 foreach( $keys as $key )
@@ -19,6 +21,20 @@ foreach( $keys as $key )
   } elseif($key != "email") {
     $response[$key] = '#empty';
   }
+}
+
+if(!key_exists('password',$response))
+{
+  $confirm = adjust_login_input('password',$_POST['pw-confirm']);
+  if($confirm) {
+    $password = adjust_login_input('password',$_POST['password']);
+    if($confirm!=$password) {
+      $response['password'] = 'does not match confirmation';
+    }
+  } else {
+    $response['password'] = 'missing confirmation';
+  }
+
 }
 
 $rval = json_encode($response);

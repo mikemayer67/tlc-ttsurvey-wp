@@ -65,12 +65,12 @@ function add_login_input($type,$name,$label,$kwargs=array())
     if($value) { $value = "value='$value'"; }
 
     $classes = implode(' ',$classes);
-    echo("<input class='$classes' type=$type name=$name $value $required>");
+    echo("<input class='$classes primary' type=$type name=$name $value $required>");
 
     if($kwargs['confirm'] ?? False) {
       $placeholder = "placeholder='Conform $label'";
       $required = $optional ? '' : 'required';
-      echo("<input class='$classes' type=$type name='$name-confirm' $value $placeholder $required>");
+      echo("<input class='$classes confirm' type=$type name='$name-confirm' $value $placeholder $required>");
     }
   }  
   elseif($type == "checkbox")

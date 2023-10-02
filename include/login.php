@@ -161,6 +161,12 @@ function register_new_user(&$error=null)
       return false;
     }
   }
+  $pw_confirm = adjust_login_input('password',$_POST['password-confirm']);
+  if(!(validate_login_input('password',$pw_confirm,$error) && ($pw_confirm == $values['password'])))
+  {
+    $error = "Failed registration. Password did not match its confirmation";
+    return false;
+  }
 
   $userid = $values['userid'];
   if(!is_userid_available($userid)) {
