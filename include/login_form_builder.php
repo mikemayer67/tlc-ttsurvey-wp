@@ -35,13 +35,27 @@ function add_login_instructions($instructions)
 
 function add_login_input($type,$name,$label,$kwargs=array())
 {
+  $info = $kwargs['info'] ?? null;
+  if($info) {
+    $info_link = "tlc-ttsurvey-$name-info";
+    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+  }
+
   echo("<!-- $label -->");
   echo("<div class='input $name'>");
 
   if(in_array($type,['text','password','email']))
   {
+    echo("<div class='label w3-container'><label>$label</label>");
+    if($info) { echo($info_trigger); }
+    echo("<div class='w3-right error $name'></div>");
+    echo("</div>"); // ends label div
+
+    $optional = $kwargs['optional'] ?? False;
+
     $classes = ['w3-input'];
-    if($kwargs['optional'] ?? False) {
+    if($optional) {
       $required = 'placeholder=[optional]';
     } else {
       $required = 'required';
@@ -52,35 +66,32 @@ function add_login_input($type,$name,$label,$kwargs=array())
 
     $classes = implode(' ',$classes);
     echo("<input class='$classes' type=$type name=$name $value $required>");
+
+    if($kwargs['confirm'] ?? False) {
+      $placeholder = "placeholder='Conform $label'";
+      $required = $optional ? '' : 'required';
+      echo("<input class='$classes' type=$type name='$name-confirm' $value $placeholder $required>");
+    }
   }  
   elseif($type == "checkbox")
   {
     $checked = ($kwargs['checked'] ?? False) ? 'checked' : '';
     echo("<input class='w3-check' type=checkbox name=$name $checked>");
+    echo("<label>$label</label>");
+    if($info) { echo($info_trigger); }
   }
   else
   {
     log_error("Unrecognized input type ($type) passed to add_login_name");
   }
 
-
-  echo("<div class=w3-container>");
-  echo("<label>$label</label>");
-  if($type != 'checkbox')
-  {
-    echo("<div class='w3-right error $name'></div>");
-  }
-
-  $info = $kwargs['info'] ?? null;
   if($info)
   {
-    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
-    $link = "tlc-ttsurvey-$name-info";
-    echo("<a class='info-trigger' data-target=$link>$info_icon</a>");
-    echo("<div id=$link class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
+    echo("<div id='$info_link' class='info-box w3-container'>");
+    echo("<div class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
+    echo("</div>");
   }
 
-  echo("</div>");  // label container
   echo("</div>");  // input
 }
 

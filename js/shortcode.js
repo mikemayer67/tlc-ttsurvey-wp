@@ -3,7 +3,7 @@ jQuery(document).ready(
   function($) {
     var info_trigger_timer;
     $('div#tlc-ttsurvey form .info-trigger').show();
-    $('div#tlc-ttsurvey form .info').hide();
+    $('div#tlc-ttsurvey form .info-box').hide();
 
     $('div#tlc-ttsurvey form .info-trigger').each(
       function() {
@@ -18,7 +18,7 @@ jQuery(document).ready(
             }
             info_trigger_timer = setTimeout(function() {
               tgt.slideDown(100)
-            }, 100);
+            }, 500);
           },
           function(e) { 
             if(info_trigger_timer) {
