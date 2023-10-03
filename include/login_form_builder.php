@@ -73,10 +73,10 @@ function add_login_input($type,$kwargs=array())
   # add label unless type is 'remember
   if( $type == 'remember' )
   {
-    echo("<div class='label w3-container'><label>$label</label>");
+    $checked = $value ? 'checked' : '';
+    echo("<input type=checkbox class='w3-check' name=$name $checked>");
+    echo("<label>$label</label>");
     if($info) { echo($info_trigger); }
-    echo("<div class='w3-right error $name'></div>");
-    echo("</div>"); // ends label div
   }
   else
   {
@@ -97,12 +97,12 @@ function add_login_input($type,$kwargs=array())
     case 'userid':
       $type = "text";
       if($value) { $extra = "value='$value' $extra"; }
-      $input_attrs = array("classes='$classes' name='$name' $extra");
+      $input_attrs = array("class='$classes' name='$name' $extra");
       break;
 
     case 'email':
       if($value) { $extra = "value='$value' $extra"; }
-      $input_attrs = array("classes='$classes' name='$name' $extra");
+      $input_attrs = array("class='$classes' name='$name' $extra");
       break;
 
     case 'password':
@@ -110,11 +110,11 @@ function add_login_input($type,$kwargs=array())
       if($confirm) {
         # confirm overrides the optional parameter ... always required
         $input_attrs = array(
-          "classes='w3-input empty primary' name='$name' required",
-          "classes='w3-input empty confirm' name='$name-confirm' required",
+          "class='w3-input empty primary' name='$name' required",
+          "class='w3-input empty confirm' name='$name-confirm' required",
         );
       } else {
-        $input_attrs = array("classes='$classes' name='$name' $extra");
+        $input_attrs = array("class='$classes' name='$name' $extra");
       }
       break;
 
@@ -127,8 +127,8 @@ function add_login_input($type,$kwargs=array())
         $extra2 = "value='$last' $extra";
       }
       $input_attrs = array(
-       "classes='$classes first' name='$name-first' placeholder='First' $extra1",
-       "classes='$classes last' name='$name-last' placeholder='First' $extra2",
+       "class='$classes first' name='$name-first' placeholder='First' $extra1",
+       "class='$classes last' name='$name-last' placeholder='Last' $extra2",
       );
       break;
 

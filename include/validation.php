@@ -30,7 +30,7 @@ function validate_login_input($key,$value,&$error=null)
 {
   $error = '';
 
-  if($key=='username')
+  if($key=='name')
   {
     $invalid_end = "'~-";
     $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
@@ -42,9 +42,6 @@ function validate_login_input($key,$value,&$error=null)
     }
     elseif(preg_match("/([$invalid_end])(?:$|\s)/",$value,$m)) {
       $error = "names cannot end with $m[1]";
-    }
-    elseif(!preg_match("/^\S\S+(?:\s\S+)*(\s\S\S+)$/",$value,$m)) {
-      $error = "need first and last name";
     }
   }
   elseif($key=='userid')
