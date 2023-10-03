@@ -11,9 +11,9 @@ function start_login_form($header,$name)
 {
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-  echo("<div class='login_form $name w3-container'>");
+  echo("<div class='login_form $name w3-container w3-card-4 w3-border w3-border-blue-gray'>");
   echo("<header class='w3-container w3-blue-gray'><h3>$header</h3></header>");
-  echo("<form class='login w3-container w3-card-4' method=post action='$form_uri'>");
+  echo("<form class='login w3-container' method=post action='$form_uri'>");
   wp_nonce_field(LOGIN_FORM_NONCE);
 }
 
@@ -88,7 +88,7 @@ function add_login_input($type,$name,$label,$kwargs=array())
   if($info)
   {
     echo("<div id='$info_link' class='info-box w3-container'>");
-    echo("<div class='info w3-panel w3-pale-yellow w3-border'><p>$info</p></div>");
+    echo("<div class='info w3-panel w3-card'><p>$info</p></div>");
     echo("</div>");
   }
 

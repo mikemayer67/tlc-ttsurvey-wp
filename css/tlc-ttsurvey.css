@@ -35,12 +35,9 @@
  * div containing a login form (class = login_form)
  **/
 
-#tlc-ttsurvey div.login_form {
-  width:min(100%,400px);
-}
-
 #tlc-ttsurvey div.login_form
 {
+  width:min(100%,400px);
   margin:0;
   padding:0;
 }
@@ -48,10 +45,15 @@
 {
   #tlc-ttsurvey div.login_form
   { 
-    padding:0 16px; 
     margin:0 auto;
   }
 }
+
+#tlc-ttsurvey div.login_form form
+{
+  background-color:#e8e8e8;
+}
+
 
 
 /**
@@ -110,6 +112,8 @@
 
 #tlc-ttsurvey form .info
 {
+  background-color:#fff;
+
   margin:5px 0 0 0;
   padding:8px;
   width:100%;
