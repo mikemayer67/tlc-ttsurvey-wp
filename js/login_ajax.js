@@ -4,17 +4,20 @@ function evaluate_register_inputs($,form)
   submit = $(form).find('button.submit').prop('disabled',true);
   submit.prop('disabled',true);
 
+  data = {
+    'action':'tlc_ttsurvey',
+    'nonce':login_vars['nonce'],
+    'query':'validate_register_form',
+    'username':$(form).find('.input.username input').val(),
+    'userid':$(form).find('.input.userid input').val(),
+    'password':$(form).find('.input.password input.primary').val(),
+    'pw-confirm':$(form).find('.input.password input.confirm').val(),
+    'email':$(form).find('.input.email input').val(),
+  };
+
   $.post(
     login_vars['ajaxurl'],
-    {
-      'action':'tlc_ttsurvey',
-      'nonce':login_vars['nonce'],
-      'query':'validate_register_form',
-      'username':$(form).find('.input.username input').val(),
-      'userid':$(form).find('.input.userid input').val(),
-      'password':$(form).find('.input.password input').val(),
-      'email':$(form).find('.input.email input').val(),
-    },
+    data,
     function(response) {
       let keys = ['username','userid','password','email'];
       all_ok = true;

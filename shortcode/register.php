@@ -20,7 +20,9 @@ INFO);
 if(key_exists('userid',$_POST)) { $args['value'] = $_POST['userid']; }
 add_login_input("text","userid","Userid",$args);
 
-$args = array( "info" => <<<INFO
+$args = array(
+  "confirm" => true,
+  "info" => <<<INFO
 Used to log into the survey
 <p class=info-list><b>must</b> be between 8 and 128 characters</p>
 <p class=info-list><b>must</b> contain at least one letter</p>
