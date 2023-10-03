@@ -16,7 +16,7 @@ add_login_instructions([
   'You will be sent an email with your userid and link to reset your password',
 ]);
 
-add_login_input("email","email","Email");
+add_login_input("email");
 
 add_login_submit('Send email','senduserid',['cancel'=>True]);
 
