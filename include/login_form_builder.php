@@ -15,6 +15,7 @@ function start_login_form($header,$name)
   echo("<header class='w3-container w3-blue-gray'><h3>$header</h3></header>");
   echo("<form class='login w3-container' method=post action='$form_uri'>");
   wp_nonce_field(LOGIN_FORM_NONCE);
+  echo("<input type=hidden name=refresh value=1>");
 }
 
 function close_login_form()
@@ -33,8 +34,32 @@ function add_login_instructions($instructions)
   echo("</div>");
 }
 
-function add_login_input($type,$name,$label,$kwargs=array())
+/**
+ * Function for providing commong look and feel to form inputs
+ *
+ * Recognized input types:
+ *   userid 
+ *   password
+ *   username
+ *   email
+ *   remember
+ *
+ * Recognized kwargs
+ *   name: defaults to type
+ *   label: defaults to ucfirst of name
+ *   value: defaults to null
+ *   optional: defaults to false
+ *   confirm: defaults to false (only applies to password)
+ *   info: defaults to null
+ **/
+function add_login_input($type,$kwargs=array())
 {
+  $name = $kwargs['name'] ?? $type;
+  $label = $kwargs['label'] ?? ucwords($name);
+  $value = $kwargs['value'] ?? null;
+  $optional = $kwargs['optional'] ?? False;
+  $confirm = $kwargs['confirm'] ?? False;
+
   $info = $kwargs['info'] ?? null;
   if($info) {
     $info_link = "tlc-ttsurvey-$name-info";
@@ -45,44 +70,76 @@ function add_login_input($type,$name,$label,$kwargs=array())
   echo("<!-- $label -->");
   echo("<div class='input $name'>");
 
-  if(in_array($type,['text','password','email']))
+  # add label unless type is 'remember
+  if( $type == 'remember' )
+  {
+    $checked = $value ? 'checked' : '';
+    echo("<input type=checkbox class='w3-check' name=$name $checked>");
+    echo("<label>$label</label>");
+    if($info) { echo($info_trigger); }
+  }
+  else
   {
     echo("<div class='label w3-container'><label>$label</label>");
     if($info) { echo($info_trigger); }
     echo("<div class='w3-right error $name'></div>");
     echo("</div>"); // ends label div
 
-    $optional = $kwargs['optional'] ?? False;
-
-    $classes = ['w3-input'];
     if($optional) {
-      $required = 'placeholder=[optional]';
+      $classes = 'w3-input';
+      $extra = "placeholder='[optional]'";
     } else {
-      $required = 'required';
-      $classes[] = 'empty';
+      $classes = "w3-input empty";
+      $extra = 'required';
     }
-    $value = $kwargs['value'] ?? '';
-    if($value) { $value = "value='$value'"; }
 
-    $classes = implode(' ',$classes);
-    echo("<input class='$classes primary' type=$type name=$name $value $required>");
+    switch($type) {
+    case 'userid':
+      $type = "text";
+      if($value) { $extra = "value='$value' $extra"; }
+      $input_attrs = array("class='$classes' name='$name' $extra");
+      break;
 
-    if($kwargs['confirm'] ?? False) {
-      $placeholder = "placeholder='Conform $label'";
-      $required = $optional ? '' : 'required';
-      echo("<input class='$classes confirm' type=$type name='$name-confirm' $value $placeholder $required>");
+    case 'email':
+      if($value) { $extra = "value='$value' $extra"; }
+      $input_attrs = array("class='$classes' name='$name' $extra");
+      break;
+
+    case 'password':
+      if($value) { $extra = "value='$value' $extra"; }
+      if($confirm) {
+        # confirm overrides the optional parameter ... always required
+        $input_attrs = array(
+          "class='w3-input empty primary' name='$name' required",
+          "class='w3-input empty confirm' name='$name-confirm' required",
+        );
+      } else {
+        $input_attrs = array("class='$classes' name='$name' $extra");
+      }
+      break;
+
+    case 'username':
+      $type = "text";
+      $extra = $optional ? '' : 'required';
+      if($value) { 
+        [$first,$last] = $value;
+        $extra1 = "value='$first' $extra";
+        $extra2 = "value='$last' $extra";
+      }
+      $input_attrs = array(
+       "class='$classes first' name='$name-first' placeholder='First' $extra1",
+       "class='$classes last' name='$name-last' placeholder='Last' $extra2",
+      );
+      break;
+
+    default:
+      log_error("Unrecognized input type ($type) passed to add_login_name");
+      break;
     }
-  }  
-  elseif($type == "checkbox")
-  {
-    $checked = ($kwargs['checked'] ?? False) ? 'checked' : '';
-    echo("<input class='w3-check' type=checkbox name=$name $checked>");
-    echo("<label>$label</label>");
-    if($info) { echo($info_trigger); }
-  }
-  else
-  {
-    log_error("Unrecognized input type ($type) passed to add_login_name");
+
+    foreach( $input_attrs as $attr ) {
+      echo("<input type=$type $attr>");
+    }
   }
 
   if($info)

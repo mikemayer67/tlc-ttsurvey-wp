@@ -11,13 +11,14 @@ require_once plugin_path('include/login_form_builder.php');
 
 start_login_form("Survey Login","login");
 
-add_login_input("text", "userid", "Userid");
-add_login_input("password",'password','Password');
+add_login_input("userid");
+add_login_input("password");
 
-add_login_input("checkbox",'remember-me','Remember me',[
-  'checked' => True,
+add_login_input("remember",array(
+  "label" => "Remember Me",
+  "value" => True,
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",
-  ]);
+));
 
 add_login_submit("Log in","login");
 

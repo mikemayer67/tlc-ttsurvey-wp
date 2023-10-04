@@ -1,6 +1,8 @@
 <?php
 namespace TLC\TTSurvey;
 
+require_once plugin_path('include/users.php');
+
 function adjust_and_validate_login_input($key,&$value,&$error=null)
 {
   $value = ajust_login_input($key,$value);
@@ -30,7 +32,7 @@ function validate_login_input($key,$value,&$error=null)
 {
   $error = '';
 
-  if($key=='username')
+  if($key=='name')
   {
     $invalid_end = "'~-";
     $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
@@ -43,8 +45,8 @@ function validate_login_input($key,$value,&$error=null)
     elseif(preg_match("/([$invalid_end])(?:$|\s)/",$value,$m)) {
       $error = "names cannot end with $m[1]";
     }
-    elseif(!preg_match("/^\S\S+(?:\s\S+)*(\s\S\S+)$/",$value,$m)) {
-      $error = "need first and last name";
+    elseif(strlen($value)<2) {
+      $error = "no initials, please";
     }
   }
   elseif($key=='userid')
@@ -60,6 +62,11 @@ function validate_login_input($key,$value,&$error=null)
     elseif(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$value)) {
       $error = "letters/numbers only";
     }
+    if(!is_userid_available($value))
+    {
+      $error = 'already in use';
+    }
+    
   }
   elseif($key=='password')
   {

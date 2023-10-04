@@ -8,7 +8,8 @@ function evaluate_register_inputs($,form)
     'action':'tlc_ttsurvey',
     'nonce':login_vars['nonce'],
     'query':'validate_register_form',
-    'username':$(form).find('.input.username input').val(),
+    'firstname':$(form).find('.input.name input.first').val(),
+    'lastname':$(form).find('.input.name input.last').val(),
     'userid':$(form).find('.input.userid input').val(),
     'password':$(form).find('.input.password input.primary').val(),
     'pw-confirm':$(form).find('.input.password input.confirm').val(),
@@ -19,7 +20,7 @@ function evaluate_register_inputs($,form)
     login_vars['ajaxurl'],
     data,
     function(response) {
-      let keys = ['username','userid','password','email'];
+      let keys = ['userid','password','name','email'];
       all_ok = true;
       keys.forEach( function(key) {
         error_box = form.find('.input .error.'+key);

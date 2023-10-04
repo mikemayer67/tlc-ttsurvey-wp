@@ -22,7 +22,7 @@ require_once plugin_path('include/validation.php');
  *   For anonymous posts, contains a hash of the user's post id with the anonid
  *
  * Post metadata is used to provide additional user information
- *   - name: actual name, not userid
+ *   - name: actual name stored as an associate array with keys 'first' and 'last'
  *   - email: optional
  *   - access token: set in cookie
  * There is no biographical metadata associated with anonymous posts
@@ -132,7 +132,7 @@ add_action('init',ns('users_init'));
 
 
 /**
- * Input validation
+ * login validation
  **/
 
 
@@ -203,9 +203,24 @@ function get_user_name($userid)
 {
   $post_id = get_user_post_id($userid);
   if(!$post_id) { return null; }
-
   $name = get_post_meta($post_id,'name');
-  return $name;
+  return $name['first'] . ' ' . $name['last'];
+}
+
+function get_user_firstname($userid)
+{
+  $post_id = get_user_post_id($userid);
+  if(!$post_id) { return null; }
+  $name = get_post_meta($post_id,'name');
+  return $name['first'];
+}
+
+function get_user_lastname($userid)
+{
+  $post_id = get_user_post_id($userid);
+  if(!$post_id) { return null; }
+  $name = get_post_meta($post_id,'name');
+  return $name['last'];
 }
 
 function get_user_email($userid)
@@ -261,7 +276,7 @@ function gen_access_token()
   return $access_token;
 }
 
-function add_new_user($userid, $password, $name, $email=null)
+function add_new_user($userid, $password, $firstname, $lastname, $email=null)
 {
   $user_hash = password_hash($password,PASSWORD_DEFAULT);
 
@@ -272,6 +287,7 @@ function add_new_user($userid, $password, $name, $email=null)
     'post_status' => 'publish',
   );
   $user_post_id = wp_insert_post($post_args,true);
+  $name = array('first'=>$firstname, 'last'=>$lastname);
   $name_id = update_post_meta($user_post_id,'name',$name);
 
   if($email) {
@@ -303,20 +319,25 @@ function add_new_user($userid, $password, $name, $email=null)
  * Functions to update user attributes
  **/
 
-function update_user_name($userid,$name)
+function update_user_name($userid,$firstsname, $lastname)
 {
   $user_post_id = get_user_post_id($userid);
-  if($user_post_id) { 
-    if( adjust_and_validate_login_input('username',$name) ) {
-      update_post_meta($user_post_id,'name',$name);
-      return true;
-    } else {
-      log_warning("Cannot update name for $userid: invalid name ($name)");
-    }
-  } else {
+  if(!$user_post_id) { 
     log_warning("Cannot update name for invalid userid ($userid)");
+    return false;
   }
-  return false;
+  if(!adjust_and_validate_login_input('name',$firstname)) {
+    log_warning("Cannot update name for $userid: invalid first name ($firstname)");
+    return false;
+  }
+  if(!adjust_and_validate_login_input('name',$lastname)) {
+    log_warning("Cannot update name for $userid: invalid last name ($lastname)");
+    return false;
+  }
+
+  $name = array('first'=>$firstname, 'last'=>$lastname);
+  update_post_meta($user_post_id,'name',$name);
+  return true;
 }
 
 function update_user_email($userid,$email)

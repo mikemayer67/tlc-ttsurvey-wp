@@ -9,7 +9,7 @@ require_once plugin_path('include/validation.php');
 log_dev("ajax_validate_register POST: ".print_r($_POST,true));
 
 $response = array();
-$keys = explode(" ","username userid password email");
+$keys = array("userid","password","email");
 foreach( $keys as $key )
 {
   $value = adjust_login_input($key,$_POST[$key]);
@@ -21,6 +21,24 @@ foreach( $keys as $key )
   } elseif($key != "email") {
     $response[$key] = '#empty';
   }
+}
+
+$firstname = adjust_login_input('name',$_POST['firstname']);
+$lastname = adjust_login_input('name',$_POST['lastname']);
+if($firstname) {
+  $error = '';
+  if(!validate_login_input("name",$firstname,$error)) {
+    $response['name'] = $error;
+  }
+}
+if($lastname) {
+  $error = '';
+  if(!validate_login_input("name",$lastname,$error)) {
+    $response['name'] = $error;
+  }
+}
+if(!($firstname && $lastname)) {
+  $response['name'] = "#empty";
 }
 
 if(!key_exists('password',$response))

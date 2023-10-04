@@ -149,44 +149,51 @@ function login_init()
 
 function register_new_user(&$error=null)
 {
-  $keys = explode(" ","username userid password email");
-  $values = array();
-  foreach($keys as $key) {
-    $value = adjust_login_input($key,$_POST[$key]);
-    if(validate_login_input($key,$value,$error)) {
-      $values[$key] = $value;
-    } else {
-      $label = ($key == "username") ? "name" : $key;
-      $error = "Failed registartion. Invalid $label: $error";
-      return false;
-    }
+  $userid = adjust_login_input('userid',$_POST['userid']);
+  $password1 = adjust_login_input('password',$_POST['password']);
+  $password2 = adjust_login_input('password',$_POST['password-confirm']);
+  $firstname = adjust_login_input('name',$_POST['name-first']);
+  $lastname = adjust_login_input('name',$_POST['name-last']);
+  $email = adjust_login_input('email',$_POST['email']);
+
+  $error='';
+  if(!validate_login_input('userid',$userid,$error)) {
+    $error = "Failed registration. Invalid userid: $error";
+    return false;
   }
-  $pw_confirm = adjust_login_input('password',$_POST['password-confirm']);
-  if(!(validate_login_input('password',$pw_confirm,$error) && ($pw_confirm == $values['password'])))
+  if(!validate_login_input('password',$password1,$error)) {
+    $error = "Failed registration. Invalid password: $error";
+    return false;
+  }
+  if(!validate_login_input('name',$firstname,$error)) {
+    $error = "Failed registration. Invalid first name";
+    return false;
+  }
+  if(!validate_login_input('name',$lastname,$error)) {
+    $error = "Failed registration. Invalid last name: $error";
+    return false;
+  }
+  if(!validate_login_input('email',$email,$error)) {
+    $error = "Failed registration. Invalid email: $error";
+    return false;
+  }
+  if($password1 != $password2)
   {
     $error = "Failed registration. Password did not match its confirmation";
     return false;
   }
 
-  $userid = $values['userid'];
   if(!is_userid_available($userid)) {
     $error = "Userid '$userid' is already in use";
     return false;
   }
 
-  $token = add_new_user(
-    $userid,
-    $values["password"],
-    $values["username"],
-    $values["email"],
-  );
+  $token = add_new_user($userid,$password1,$firstname,$lastname,$email);
 
-  $name = $values['username'];
-  $userid = $values['userid'];
-  log_info("Registered new user $name with userid $userid and token $token");
+  log_info("Registered new user $firstname $lastname with userid $userid and token $token");
 
   $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
-  $remember = $_POST['remember-me'] ?? null;
+  $remember = $_POST['remember'] ?? null;
   if($remember) {
     $tokens = cookie_tokens();
     $tokens[$userid] = $token;
