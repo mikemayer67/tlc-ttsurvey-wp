@@ -23,7 +23,7 @@ if( $_POST['refresh'] ?? False ) {
   $userid = null;
   $username = array(null,null);
   $email = null;
-  $remeber = True;
+  $remember = True;
 }
 
 add_login_input("userid",array(
