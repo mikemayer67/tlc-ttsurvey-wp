@@ -177,7 +177,9 @@ function add_shortcode_content()
     require plugin_path('shortcode/survey.php');
   }
   elseif($tokens) {
-    require plugin_path('shortcode/resume.php');
+    # @@@ TODO: remove this hack
+    require plugin_path('shortcode/login.php');
+    #require plugin_path('shortcode/resume.php');
   }
   else {
     enqueue_login_ajax_scripts();
