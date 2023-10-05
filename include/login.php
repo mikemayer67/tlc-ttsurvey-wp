@@ -15,137 +15,207 @@ require_once plugin_path('include/validation.php');
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
 const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
 
+class CookieJar
+{
+  private static $_instance = null;
+  private $_active_userid = null;
+  private $_access_tokens = null;
+
+  public static function instance()
+  {
+    if(!self::$_instance) { self::$_instance = new CookieJar(); }
+    return self::$_instance;
+  }
+
+  private function __construct()
+  {
+    $this->_active_userid = stripslashes($_COOKIE[ACTIVE_USER_COOKIE]??"");
+    log_dev("CookieJar() active_userid: ".$this->_active_userid);
+    $this->_access_tokens = array();
+    $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
+
+    #reset cookie timeout
+    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365);
+
+    $tokens = json_decode($tokens,true);
+    if($tokens) {
+      foreach( $tokens as $userid=>$token ) {
+        if(validate_user_access_token($userid,$token))
+        {
+          $this->_access_tokens[$userid] = $token;
+        }
+      }
+    }
+  }
+
+  public function get_active_userid()
+  {
+    return $this->_active_userid;
+  }
+
+  public function set_active_userid($userid)
+  {
+    $this->_active_userid = $userid;
+    setcookie( ACTIVE_USER_COOKIE, $userid, 0 );
+  }
+
+  public function clear_active_userid()
+  {
+    $this->set_active_userid(null);
+  }
+
+  public function get_access_token($userid)
+  {
+    return $this->_access_tokens[$userid] ?? null;
+  }
+
+  public function set_access_token($userid,$token)
+  {
+    $this->_access_tokens[$userid] = $token;
+    setcookie( ACCESS_TOKEN_COOKIE, json_encode($this->_access_tokens), time() + 86400*365);
+  }
+
+  public function clear_access_token($userid)
+  {
+    $this->set_access_token($userid,null);
+  }
+
+  public function access_tokens()
+  {
+    return $this->_access_tokens;
+  }
+}
+
+
 function active_userid()
 {
-  $rval = $_COOKIE[ACTIVE_USER_COOKIE] ?? null;
+  $rval = CookieJar::instance()->get_active_userid();
   log_dev("active_userid() => $rval");
   return $rval;
 }
 
 function cookie_tokens()
 {
-  $userids = $_COOKIE[ACCESS_TOKEN_COOKIE] ?? "";
-  $userids = json_decode($userids,true) ?? array();
-  $rval = array();
-  foreach($userids as $userid=>$access_token)
-  {
-    if(validate_user_access_token($userid,$access_token))
-    {
-      $rval[$userid] = $access_token;
-    }
-  }
-  log_dev("cookie_tokens() => ".print_r($rval,true));
+  $rval = CookieJar::instance()->access_tokens();
+  log_dev("access_tokens() => ".print_r($rval,true));
   return $rval;
 }
 
-function reset_cookie_timeout() {
-  log_dev("reset_cookie_timeout()");
-  setcookie(
-    ACCESS_TOKEN_COOKIE,
-    $_COOKIE[ACCESS_TOKEN_COOKIE] ?? "",
-    time() + 86400*365,
-  );
-}
 
 function logout_active_user()
 {
   log_dev("logout_active_user()");
-  unset($_COOKIE[ACTIVE_USER_COOKIE]);
-  save_survey_cookies();
+  CookieJar::instance()->clear_active_userid();
+}
+
+function start_survey_as($userid)
+{
+  log_dev("start_survey_as($userid)");
+  CookieJar::instance()->set_active_userid($userid);
 }
 
 function resume_survey_as($userid,$token)
 {
   log_dev("resume_survey_as($userid,$token)");
-  if( !validate_user_access_token($userid,$token) ) { return false; }
-
-  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
-
-  $tokens = cookie_tokens();
-  $tokens[$userid] = $token;
-  $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
-
-  save_survey_cookies();
-
-  return true;
-}
-
-function remove_userid_from_cookie($userid)
-{
-  log_dev("remove_userid_from_cookie($userid)");
-  if( active_userid() == $userid ) {
-    unset($_COOKIE[ACTIVE_USER_COOKIE]);
+  if( validate_user_access_token($userid,$token) ) { 
+    CookieJar::instance()->set_active_userid($userid);
+    return true;
   }
-
-  $tokens = cookie_tokens();
-  unset($tokens[$userid]);
-  $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
-
-  save_survey_cookies();
+  return false;
 }
 
-function save_survey_cookies()
+function remember_user_token($userid,$token)
 {
-  log_dev("save_survey_cookies()");
-  setcookie( ACTIVE_USER_COOKIE, $_COOKIE[ACTIVE_USER_COOKIE], 0 );
-  setcookie( ACCESS_TOKEN_COOKIE, $_COOKIE[ACCESS_TOKEN_COOKIE], time() + 86400*365);
+  log_dev("remember_user_token($userid,$token)");
+  CookieJar::instance()->set_access_token($userid,$token);
 }
 
-add_action('init',ns('login_init'));
+function forget_user_token($userid)
+{
+  log_dev("forget_user_token($userid)");
+  CookieJar::instance()->clear_access_token($userid);
+}
+
 
 function login_init()
 {
   $nonce = $_POST['_wpnonce'] ?? '';
 
+  # need to instantiate the cookie jar during the init phase before
+  #   the header has been completed.
+  CookieJar::instance();
+
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
     require_once plugin_path('include/users.php');
 
-    reset_cookie_timeout();
-
-    $action = $_POST['action'] ?? null;
-    log_dev("action=$action");
-    if( $action == 'resume' ) {
-      $userid = $_POST['userid'];
-      $token = $_POST['access_token'];
-      if( resume_survey_as($userid,$token) ) {
-        log_dev("resuming survey as $userid");
-      } else {
-        log_dev("invalid access token, removing $userid from cookie");
-        remove_userid_from_cookie($userid);
-      }
-    }
-    elseif( $action == 'register')
+    switch($_POST['action'] ?? null)
     {
-      $error = '';
-      if(register_new_user($error))
-      {
-        log_dev("where to go now that I have a new user registered?");
-      }
-      else
-      {
-        log_dev("need to set status warning: $error");
-        set_status_warning($error);
-        shortcode_page('register');
-      }
-    }
-    elseif( $action == 'logout') 
-    {
-      logout_active_user();
-    }
-    elseif( $action == 'senduserid') 
-    {
-      require_once plugin_path('include/sendmail.php');
-      $email = $_POST['email'];
-      if(sendmail_userid($email)) {
-        set_status_info("Sent userid/password to $email");
-      } else {
-        set_status_warning("Unrecognized email address");
-        shortcode_page("senduserid");
-      }
+    case 'resume':
+      handle_login_resume();
+      break;
+    case 'register':
+      handle_login_register();
+      break;
+    case 'logout':
+      handle_logout();
+      break;
+    case 'senduserid':
+      handle_send_userid();
+      break;
     }
   }
 }
+
+add_action('init',ns('login_init'));
+
+function handle_login_resume()
+{
+  log_dev("handle_login_resume()");
+  $userid = $_POST['userid'];
+  $token = $_POST['access_token'];
+  if( resume_survey_as($userid,$token) ) {
+    log_dev("resuming survey as $userid");
+  } else {
+    log_dev("invalid access token, removing $userid from cookie");
+    forget_user_token($userid);
+  }
+}
+
+function handle_login_register()
+{
+  log_dev("handle_login_register()");
+  $error = '';
+  if(register_new_user($error))
+  {
+    log_dev("where to go now that I have a new user registered?");
+  }
+  else
+  {
+    set_status_warning($error);
+    shortcode_page('register');
+  }
+}
+
+function handle_logout()
+{
+  log_dev("handle_logout()");
+  logout_active_user();
+}
+
+function handle_send_userid()
+{
+  log_dev("handle_send_userid");
+  require_once plugin_path('include/sendmail.php');
+  $email = $_POST['email'];
+  if(sendmail_userid($email)) {
+    set_status_info("Sent userid/password to $email");
+  } else {
+    set_status_warning("Unrecognized email address");
+    shortcode_page("senduserid");
+  }
+}
+
 
 function register_new_user(&$error=null)
 {
@@ -155,6 +225,8 @@ function register_new_user(&$error=null)
   $firstname = adjust_login_input('name',$_POST['name-first']);
   $lastname = adjust_login_input('name',$_POST['name-last']);
   $email = adjust_login_input('email',$_POST['email']);
+
+  $remember = $_POST['remember'] ?? False;
 
   $error='';
   if(!validate_login_input('userid',$userid,$error)) {
@@ -192,18 +264,10 @@ function register_new_user(&$error=null)
 
   log_info("Registered new user $firstname $lastname with userid $userid and token $token");
 
-  $_COOKIE[ACTIVE_USER_COOKIE] = $userid;
-  $remember = $_POST['remember'] ?? null;
-  if($remember) {
-    $tokens = cookie_tokens();
-    $tokens[$userid] = $token;
-    $_COOKIE[ACCESS_TOKEN_COOKIE] = json_encode($tokens);
-  }
-  save_survey_cookies();
+  start_survey_as($userid);
+
+  if($remember) { remember_user_token($userid,$token); }
 
   $error = '';
   return true;
 }
-
-//[$userid,$anonid] = create_unique_ids('QQ');
-//$login_cookie->add($userid,$anonid,false);

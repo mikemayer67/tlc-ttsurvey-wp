@@ -155,13 +155,11 @@ function validate_user_password($userid,$password)
 
 function validate_user_access_token($userid,$token)
 {
-  log_dev("validate_user_access_token($userid,$token)");
   $post_id = get_user_post_id($userid);
   if(!$post_id) { return false; }
 
-  $expected_token = get_post_meta($post_id,'access_token');
-  log_dev("  expected token: $expected_token");
-  return $token == $expected_token;
+  $expected_token = get_post_meta($post_id,'access_token')[0] ?? "#";
+  return $token === $expected_token;
 }
 
 /**
