@@ -7,13 +7,22 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
-$current_year = date('Y');
+$current_survey = current_survey();
+if($current_survey) {
+  [$current_year,$current_status] = $current_survey;
+} else {
+  $current_year = data('Y');
+  $current_status = 'not started';
+}
 
 $survey_years = survey_years();
-$current_status = $survey_years[$current_year] ?? 'not started';
-unset($survey_years[$current_year]);
-$years = array_keys($survey_years);
-arsort($years);
+$other_years = array();
+foreach(array_keys($survey_years) as $year)
+{
+  if($year != $current_year) { $other_years[] = $year; }
+}
+
+arsort($other_years);
 
 $log_level = survey_log_level();
 
@@ -44,7 +53,7 @@ $pdf_uri = survey_pdf_uri();
 if(!$survey_years) {
   echo "<tr><td class=year>n/a</td></tr>";
 }
-foreach($years as $year) {
+foreach($other_years as $year) {
   $status = $survey_years[$year];
   echo "<tr><td class=year>$year</td><td class=status>$status</td></tr>";
 }

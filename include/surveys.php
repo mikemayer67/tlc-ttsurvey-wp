@@ -16,6 +16,11 @@ if( ! defined('WPINC') ) { die; }
  * The post content contains a json encoded array containing all of the 
  * survey content
  *
+ * NOTE... while the intent of the year is to indicate the year the
+ *   survey is conducted, it can actually be any valid string.  This
+ *   means that it can be more flexible, e.g there could be both a
+ *   "2023" and "2023b" survey or even something like "2022-2023" 
+ *
  * Post metadata is used to provide additional information about each
  * year's survey status
  *   - state: pending, active, closed
@@ -97,8 +102,7 @@ function get_survey_post_id($year)
   if(count($ids) > 1) {
     # log error both to the plugin log and to the php error log
     log_error("Multiple posts associated with year $year");
-    error_log("Multiple posts associated with year $year");
-    die;
+    wp_die();
   }
   if(!$ids) { 
     log_info("No post found for year $year");
@@ -118,33 +122,6 @@ function get_survey_post($year)
   }
 }
 
-function current_survey_status()
-{
-  $current_year = date('Y');
-  $post_id = get_survey_post_id($current_year);
-  if(!$post_id) { return null; }
-  $status = get_post_meta($post_id,'status')[0] ?? null;
-  return $status;
-}
-
-function active_survey_year()
-{
-  $query = array(
-      'post_type' => SURVEY_POST_TYPE,
-      'numberposts' => -1,
-      'meta_key' => 'status',
-      'meta_value' => SURVEY_IS_ACTIVE,
-      'orderby' => 'title',
-    );
-  $posts = get_posts($query);
-  if($posts) {
-    $post = end($posts);
-    return end($posts)->post_title;
-  }
-  return null;
-}
-
-
 function survey_years()
 {
   $posts = get_posts(
@@ -159,28 +136,135 @@ function survey_years()
     if( array_key_exists($year,$rval) ) {
       # log error both to the plugin log and to the php error log
       log_error("Multiple posts associated with year $year");
-      error_log("Multiple posts associated with year $year");
-      die;
+      wp_die();
     }
 
     $status = get_post_meta($post->ID,'status') ?? null;
     if($status) {
       if(count($status) > 1) {
         log_error("Multiple status associated $year with survey");
-        error_log("Multiple status associated $year with survey");
-        die;
+        wp_die();
       }
       $status = $status[0];
     }
     $rval[$year] = $status;
   }
 
-  $current_year = date('Y');
-  if(!array_key_exists($current_year,$rval)) {
-    $rval[$current_year] = null;
+  return $rval;
+}
+
+function current_survey()
+{
+  $years = survey_years();
+
+  $summary = array();
+  foreach($years as $year=>$status) {
+    if(!key_exists($status,$summary)) {
+      $summary[$status] = array();
+    }
+    $summary[$status][] = $year;
   }
 
-  return $rval;
+  foreach([SURVEY_IS_ACTIVE,SURVEY_IS_PENDING] as $status)
+  {
+    if(key_exists($status,$summary))
+    {
+      $years = $summary[$status];
+      if(count($years) > 1) {
+        error_log("Too many $status surveys");
+        wp_die();
+      }
+      return array($years[0],$status);
+    }
+  }
+
+  return null;
+}
+
+function reopen_closed_survey($year)
+{
+  $current = current_survey();
+  if($current) {
+    log_error("$current[0] already $current[1]");
+    return null;
+  }
+  $status = survey_years();
+  if(!key_exists($year,$status)) {
+    log_error("No survey found for $year");
+    return null;
+  }
+  if($status[$year] != SURVEY_IS_CLOSED) {
+    log_error("$year is not currently closed");
+    return null;
+  }
+
+  $post_id = get_survey_post_id($year);
+  if(!$post_id) {
+    log_error("Cannot find survey for $year");
+    return null;
+  }
+
+  update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
+  return true;
+}
+
+function return_current_survey_to_pending()
+{
+  $current = current_survey();
+  if(!$current) {
+    log_error("No current survey found");
+    return null;
+  }
+  [$year,$status] = $current;
+  if($status!=SURVEY_IS_ACTIVE) {
+    log_error("Current survey is already pending");
+    return null;
+  }
+  $post_id = get_survey_post_id($year);
+  if(!$post_id) {
+    log_error("Cannot find survey for $year");
+    return null;
+  }
+  update_post_meta($post_id,'status',SURVEY_IS_PENDING);
+  return true;
+}
+
+function activate_current_survey()
+{
+  $current = current_survey();
+  if(!$current) {
+    log_error("No current survey found");
+    return null;
+  }
+  [$year,$status] = $current;
+  if($status != SURVEY_IS_PENDING) {
+    log_error("Current survey is already active");
+    return null;
+  }
+  $post_id = get_survey_post_id($year);
+  if(!$post_id) {
+    log_error("Cannot find survey for $year");
+    return null;
+  }
+  update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
+  return true;
+}
+
+function close_current_survey()
+{
+  $current = current_survey();
+  if(!$current) {
+    log_error("No current survey found");
+    return null;
+  }
+  [$year,$status] = $current;
+  $post_id = get_survey_post_id($year);
+  if(!$post_id) {
+    log_error("Cannot find survey for $year");
+    return null;
+  }
+  update_post_meta($post_id,'status',SURVEY_IS_CLOSED);
+  return true;
 }
 
 function survey_form($year)
