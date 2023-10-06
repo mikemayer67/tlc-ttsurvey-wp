@@ -11,15 +11,15 @@ $current_survey = current_survey();
 if($current_survey) {
   [$current_year,$current_status] = $current_survey;
 } else {
-  $current_year = data('Y');
-  $current_status = 'not started';
+  $current_year = date('Y');
+  $current_status = survey_years()[$current_year] ?? 'not started';
 }
 
 $survey_years = survey_years();
 $other_years = array();
 foreach(array_keys($survey_years) as $year)
 {
-  if($year != $current_year) { $other_years[] = $year; }
+  if($year !== $current_year) { $other_years[] = $year; }
 }
 
 arsort($other_years);
