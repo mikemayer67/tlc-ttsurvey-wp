@@ -10,11 +10,22 @@ form.tlc div.label {
   margin-top: 20px;
 }
 
-form.tlc div.info {
+form.tlc div.info,
+form.tlc div.warning{
   font-weight: 200;
   margin-left: 30px;
   margin-bottom: 5px;
 }
+
+form.tlc div.warning {
+  color:#800;
+}
+
+form.tlc span.info {
+  font-weight: 200;
+  font-size: smaller;
+}
+  
 
 form.tlc div.info ul {
   margin-left: 20px;
@@ -48,16 +59,26 @@ form.tlc span.input-info {
   font-weight:200;
 }
 
+form.tlc.new-survey span.new-name {
+  margin-left:1.5rem;
+  display:none;
+}
+
+form.tlc.new-survey input.new-name {
+  width:100px;
+}
+
+form.tlc.new-survey input.submit {
+  display:none;
+}
+
 form.tlc .settings {
   margin-left:3em;
+  margin-top:10px;
 }
 
 form.tlc table {
   border-collapse:collapse;
-}
-
-form.tlc select {
-  margin-top:10px;
 }
 
 form.tlc table td.name {
@@ -84,6 +105,15 @@ form.tlc table td {
   padding-top:10px;
 }
 
+div.tlc-survey-status div.info
+{
+  margin-left:3em;
+}
+div.tlc-survey-status div.warning
+{
+  color:#800;
+}
+
 span.tlc-status {
   margin-left:20px;
   padding-left:10px;
@@ -94,20 +124,6 @@ span.tlc-status {
   border:solid;
   border-width:1px;
   border-color:lightgray;
-}
-
-div.link {
-  margin-top:30px;
-}
-
-div.link a {
-  font-weight:bold;
-  font-size:larger;
-}
-
-
-input:invalid {
-  background-color:lightpink;
 }
 
 div.tlc-overview div,
@@ -165,7 +181,7 @@ div.tlc-overview table table.admins td.username
   text-align:right;
 }
 
-div.tlc-overview table table.years td.year
+div.tlc-overview table table.names td.name
 {
   width:3em;
   font-weight:bolder;
@@ -173,12 +189,12 @@ div.tlc-overview table table.years td.year
 }
 
 div.tlc-overview table table.admins td.usercaps
-div.tlc-overview table table.years td.status
+div.tlc-overview table table.names td.status
 {
   padding-left:1em;
 }
 
-div.log-table {
+div.tlc-log {
   margin-left:15px;
   margin-top:15px;
   border-width:1px;
@@ -189,38 +205,38 @@ div.log-table {
   height:500px;
 }
 
-div.log-table table.log-table {
+div.tlc-log table {
   table-layout: auto;
   width:100%;
 }
 
-div.log-table tr.warning td {
+div.tlc-log tr.warning td {
   color:#e88010;
 }
 
-div.log-table tr.error td {
+div.tlc-log tr.error td {
   color:#a00000;
 }
 
-div.log-table tr.info td {
+div.tlc-log tr.info td {
   color:#0000a0;
 }
 
-div.log-table td.date {
+div.tlc-log td.date {
   white-space:nowrap;
 }
 
-div.log-table td.message {
+div.tlc-log td.message {
   padding-left:5px;
   font-weight:600;
   width:100%;
 }
 
-div.log-table tr:nth-child(odd) {
+div.tlc-log tr:nth-child(odd) {
   background: white;
 }
 
-div.log-table tr:nth-child(even) {
+div.tlc-log tr:nth-child(even) {
   background: #e0e0e0;
 }
 

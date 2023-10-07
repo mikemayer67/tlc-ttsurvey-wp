@@ -141,8 +141,8 @@ function add_status_message()
 
 function add_shortcode_content()
 {
-  $active_year = active_survey_year();
-  if(!$active_year) {
+  $current_survey = current_survey();
+  if(!$current_survey) {
     require plugin_path('shortcode/inactive_survey.php');
     return;
   }

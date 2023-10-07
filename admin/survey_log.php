@@ -9,7 +9,7 @@ require_once plugin_path('include/settings.php');
 $action = $_SERVER['REQUEST_URI'];
 ?>
 
-<div class='log-table'>
+<div class='tlc-log'>
 <?php dump_log_to_html("DEV"); ?>
 </div>
 

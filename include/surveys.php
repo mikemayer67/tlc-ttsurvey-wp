@@ -10,21 +10,27 @@ if( ! defined('WPINC') ) { die; }
 /**
  * The survey content information is stored as an entry as wordpress posts
  * using a custome post type of tlc-ttsurvey-form.  Each post corresponds
- * to a single survey year.
+ * to a single survey.
  *
- * The post title contains the year of the survey
+ * The post title contains the name of the survey
  * The post content contains a json encoded array containing all of the 
  * survey content
  *
+ * NOTE... while the intent of the name is to indicate the year the
+ *   survey is conducted, it can actually be any valid string.  This
+ *   means that it can be more flexible, e.g there could be both a
+ *   "2023" and "2023b" survey or even something like "2022-2023" 
+ *
  * Post metadata is used to provide additional information about each
- * year's survey status
- *   - state: pending, active, closed
+ * survey's status
+ *   - state: draft, active, closed
+ *   - responses: number of submitted survey forms
  **/
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 
-const SURVEY_IS_PENDING = 'pending';
+const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
@@ -83,34 +89,36 @@ add_action('init',ns('surveys_init'));
  * Survey lookup functions
  **/
 
-function get_survey_post_id($year)
+function get_survey_post_id($name)
 {
-  log_dev("get_survey_post_id($year)");
   $ids = get_posts(
     array(
       'post_type' => SURVEY_POST_TYPE,
       'numberposts' => -1,
-      'title' => $year,
+      'title' => $name,
       'fields' => 'ids',
     )
   );
   if(count($ids) > 1) {
     # log error both to the plugin log and to the php error log
-    log_error("Multiple posts associated with year $year");
-    error_log("Multiple posts associated with year $year");
-    die;
+    log_error("Multiple posts associated with $name survey");
+    wp_die();
   }
   if(!$ids) { 
-    log_info("No post found for year $year");
+    log_info("No post found for name '$name'");
     return null;
   }
   return $ids[0];
 }
 
-function get_survey_post($year)
+function get_survey_post_by_name($name)
 {
-  log_dev("get_survey_post($year)");
-  $post_id = get_survey_post_id($year);
+  $post_id = get_survey_post_id($name);
+  return get_survey_post_by_id($post_id);
+}
+
+function get_survey_post_by_id($post_id)
+{
   if($post_id) {
     return get_post($post_id);
   } else {
@@ -118,34 +126,7 @@ function get_survey_post($year)
   }
 }
 
-function current_survey_status()
-{
-  $current_year = date('Y');
-  $post_id = get_survey_post_id($current_year);
-  if(!$post_id) { return null; }
-  $status = get_post_meta($post_id,'status')[0] ?? null;
-  return $status;
-}
-
-function active_survey_year()
-{
-  $query = array(
-      'post_type' => SURVEY_POST_TYPE,
-      'numberposts' => -1,
-      'meta_key' => 'status',
-      'meta_value' => SURVEY_IS_ACTIVE,
-      'orderby' => 'title',
-    );
-  $posts = get_posts($query);
-  if($posts) {
-    $post = end($posts);
-    return end($posts)->post_title;
-  }
-  return null;
-}
-
-
-function survey_years()
+function survey_catalog()
 {
   $posts = get_posts(
     array(
@@ -155,41 +136,129 @@ function survey_years()
   );
   $rval = array();
   foreach( $posts as $post ) {
-    $year = $post->post_title;
-    if( array_key_exists($year,$rval) ) {
-      # log error both to the plugin log and to the php error log
-      log_error("Multiple posts associated with year $year");
-      error_log("Multiple posts associated with year $year");
-      die;
+    $name = $post->post_title;
+    $post_id = $post->ID;
+    if( array_key_exists($name,$rval) ) {
+      log_error("Multiple posts associated with name '$name'");
+      wp_die();
     }
 
-    $status = get_post_meta($post->ID,'status') ?? null;
+    $status = get_post_meta($post_id,'status') ?? null;
     if($status) {
       if(count($status) > 1) {
-        log_error("Multiple status associated $year with survey");
-        error_log("Multiple status associated $year with survey");
-        die;
+        log_error("Multiple statuses associated with $name survey");
+        wp_die();
       }
       $status = $status[0];
     }
-    $rval[$year] = $status;
-  }
-
-  $current_year = date('Y');
-  if(!array_key_exists($current_year,$rval)) {
-    $rval[$current_year] = null;
+    $rval[$post_id] = array('post_id'=>$post_id, 'name'=>$name, 'status'=>$status);
   }
 
   return $rval;
 }
 
-function survey_form($year)
+function current_survey()
 {
-  log_dev("survey_form($year)");
-  $post_id = get_survey_post_id($id);
+  $rval = null;
+  $catalog = survey_catalog();
+  foreach($catalog as $post_id=>$survey) {
+    if( in_array($survey['status'],[SURVEY_IS_ACTIVE,SURVEY_IS_DRAFT]) )
+    {
+      if($rval) {
+        error_log("Multiple active/draft surveys found");
+        wp_die();
+      }
+      $rval = $survey;
+    }
+  }
+  return $rval;
+}
+
+function survey_response_count($post_id)
+{
+  return get_post_meta($post_id,'responses') ?? 0;
+}
+
+function survey_form($post_id)
+{
+  log_dev("survey_form($post_id)");
   if(!$post_id) { return null; }
   $post = get_post($post_id);
   return $post->content;
 }
 
+function reopen_survey($post_id)
+{
+  $current = current_survey();
+  if($current) {
+    $name = $current['name'];
+    $status = $current['status'];
+    if($status == SURVEY_IS_ACTIVE) {
+      log_error("Attempted to reopen survey when $name is already open");
+    } else {
+      log_error("Attempted to reopen survey when draft $name exists");
+    }
+    return null;
+  }
+  $post = get_post($post_id);
+  if(!$post) {
+    log_error("Attempted to reopen nonexistent survey ($post_id)");
+    return null;
+  }
+  if($post->post_type != SURVEY_POST_TYPE) {
+    log_error("Post $post_id is not a survey post");
+    return null;
+  }
 
+  update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
+
+  return true;
+}
+
+function create_new_survey($name)
+{
+  $current = current_survey();
+  if($current) {
+    $name = $current['name'];
+    $status = $current['status'];
+    if($status == SURVEY_IS_ACTIVE) {
+      log_error("Attempted to reopen survey when $name is already open");
+    } else {
+      log_error("Attempted to reopen survey when draft $name exists");
+    }
+    return null;
+  }
+
+  $post_id = wp_insert_post(
+    array(
+      'post_content' => '',
+      'post_title' => $name,
+      'post_type' => SURVEY_POST_TYPE,
+      'post_status' => 'publish',
+    ),
+    true,
+  );
+  if(!$post_id) {
+    log_warning("Failed to insert new survey into wp_posts");
+    return null;
+  }
+
+  update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
+  update_post_meta($post_id,'responses',0);
+}
+
+
+/**
+ * Update survey status from settings
+ **/
+
+function update_survey_from_post()
+{
+  $current = current_survey();
+  if(!$current) { return null; }
+
+  $new_status = $_POST['survey_status'] ?? null;
+  if(!$new_status) { return null; }
+
+  update_post_meta($current['post_id'],'status',$new_status);
+}

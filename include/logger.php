@@ -99,4 +99,5 @@ function log_warning($msg) {
 
 function log_error($msg) {
   write_to_logger("ERROR",$msg);
+  error_log(plugin_name().": $msg");
 }

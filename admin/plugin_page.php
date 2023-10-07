@@ -7,6 +7,7 @@ $title = esc_html(get_admin_page_title());
 $status = "";
 
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
 $action = $_POST['action'] ?? null;
@@ -14,6 +15,7 @@ if($action == "update")
 {
   /* nonce is checked within the update_from_post method */
   update_options_from_post();
+  update_survey_from_post();
   $status = "<span class='tlc-status'>udpated</span>";
 }
 elseif($action == "clear-log") 
@@ -24,6 +26,23 @@ elseif($action == "clear-log")
     wp_die("Bad nonce");
   }
   clear_logger();
+}
+elseif($action == "start-survey")
+{
+  $option = $_POST['option'] ?? null;
+  $m = array();
+  if($option == "create")
+  {
+    $name = $_POST['name'];
+    log_info("Create new survey with name $name");
+    create_new_survey($name);
+  }
+  elseif(preg_match('/^reopen-(\d+)$/',$option,$m))
+  {
+    $post_id = $m[1];
+    log_info("Reopen survey with post_id $post_id");
+    reopen_survey($post_id);
+  }
 }
 
 echo "<h1>$title$status</h1>";
@@ -58,5 +77,5 @@ foreach($tabs as $tab) {
 
 echo "</div>";
 
-require plugin_path("admin/plugin_${cur_tab}.php");
+require plugin_path("admin/survey_${cur_tab}.php");
 
