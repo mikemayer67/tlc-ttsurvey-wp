@@ -10,8 +10,6 @@ if( !current_user_can('tlc-ttsurvey-content') ) {
 
 require_once plugin_path('include/surveys.php');
 
-log_dev("SERVER: ".print_r($_SERVER,true));
-
 add_noscript_body();
 add_script_body();
 
@@ -61,22 +59,32 @@ function add_current_survey_info($current)
   {
     $action = $_SERVER['REQUEST_URI'];
     echo("<h2>Create or Reopen a Survey</h2>");
-    echo("<form id='tlc-new-survey' class=tlc action='$action' method=POST>");
+    echo("<form class='tlc new-survey' action='$action' method=POST>");
     wp_nonce_field(OPTIONS_NONCE);
     echo("<input type=hidden name=action value=start-survey>");
     echo("<span class=option>");
     echo("<span class=label>There is no currently active or draft survey: </span>");
     echo("<select class=tlc name=option>");
     echo("<option value=''>That's fine...</option>");
-    echo("<option value=new>Create a new survey</option>");
+    echo("<option value=create>Create a new survey</option>");
     foreach(survey_catalog() as $post_id=>$survey) {
       if($survey['status'] == SURVEY_IS_CLOSED) {
         $name = $survey['name'];
         echo("<option value='reopen-$post_id'>Reopen $name survey</option>");
       }
     }
+    $current_year = date('Y');
     echo("</select>");
+
+    echo("<span class=new-name>");
+    echo("with name:");
+    echo("<input type=text class=new-name name=name value=$current_year>");
     echo("</span>");
+
+    echo("</span>");
+    echo("<div>");
+    echo("<input type=submit value=Proceed class='submit button button-primary button-large'>");
+    echo("</div>");
     echo("</form>");
   }
   echo("</div>"); // div.tlc-survey-status

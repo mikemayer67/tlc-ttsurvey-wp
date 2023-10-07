@@ -91,7 +91,6 @@ add_action('init',ns('surveys_init'));
 
 function get_survey_post_id($name)
 {
-  log_dev("get_survey_post_id($name)");
   $ids = get_posts(
     array(
       'post_type' => SURVEY_POST_TYPE,
@@ -114,14 +113,12 @@ function get_survey_post_id($name)
 
 function get_survey_post_by_name($name)
 {
-  log_dev("get_survey_post_by_name($name)");
   $post_id = get_survey_post_id($name);
   return get_survey_post_by_id($post_id);
 }
 
 function get_survey_post_by_id($post_id)
 {
-  log_dev("get_survey_post_by_id($post_id)");
   if($post_id) {
     return get_post($post_id);
   } else {
@@ -171,7 +168,7 @@ function current_survey()
         error_log("Multiple active/draft surveys found");
         wp_die();
       }
-      $rval = $info;
+      $rval = $survey;
     }
   }
   return $rval;
@@ -190,33 +187,78 @@ function survey_form($post_id)
   return $post->content;
 }
 
+function reopen_survey($post_id)
+{
+  $current = current_survey();
+  if($current) {
+    $name = $current['name'];
+    $status = $current['status'];
+    if($status == SURVEY_IS_ACTIVE) {
+      log_error("Attempted to reopen survey when $name is already open");
+    } else {
+      log_error("Attempted to reopen survey when draft $name exists");
+    }
+    return null;
+  }
+  $post = get_post($post_id);
+  if(!$post) {
+    log_error("Attempted to reopen nonexistent survey ($post_id)");
+    return null;
+  }
+  if($post->post_type != SURVEY_POST_TYPE) {
+    log_error("Post $post_id is not a survey post");
+    return null;
+  }
+
+  update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
+
+  return true;
+}
+
+function create_new_survey($name)
+{
+  $current = current_survey();
+  if($current) {
+    $name = $current['name'];
+    $status = $current['status'];
+    if($status == SURVEY_IS_ACTIVE) {
+      log_error("Attempted to reopen survey when $name is already open");
+    } else {
+      log_error("Attempted to reopen survey when draft $name exists");
+    }
+    return null;
+  }
+
+  $post_id = wp_insert_post(
+    array(
+      'post_content' => '',
+      'post_title' => $name,
+      'post_type' => SURVEY_POST_TYPE,
+      'post_status' => 'publish',
+    ),
+    true,
+  );
+  if(!$post_id) {
+    log_warning("Failed to insert new survey into wp_posts");
+    return null;
+  }
+
+  update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
+  update_post_meta($post_id,'responses',0);
+}
+
+
 /**
- * Update status from settings
+ * Update survey status from settings
  **/
 
-// function update_status_from_post()
-// {
-//   log_dev("update_settings_from_post");
-// 
-//   $current = current_survey();
-//   if($current_survey) {
-//     [$current_year,$current_status] = $current;
-//   } else {
-//     $current_year = date('Y');
-//     $current_status = survey_years()[$current_year] ?? null;
-//   }
-// 
-//   $new_status = $_POST['survey_status'] ?? null;
-//   if($new_status) {
-//     log_dev("new status: $new_status");
-//     if($new_status != $current_status) {
-//       log_dev("change status");
-//       $post_id = get_survey_post_id($current_year);
-//       if($post_id) {
-//         update_post_meta($post_id,'status',$new_status);
-//       } else {
-//         log_error("Cannot find survey for $year");
-//       }
-//     }
-//   }
-// }
+function update_survey_from_post()
+{
+  $current = current_survey();
+  if(!$current) { return null; }
+
+  $new_status = $_POST['survey_status'] ?? null;
+  if(!$new_status) { return null; }
+
+  update_post_meta($current['post_id'],'status',$new_status);
+}

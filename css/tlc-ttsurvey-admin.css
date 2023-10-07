@@ -59,17 +59,17 @@ form.tlc span.input-info {
   font-weight:200;
 }
 
-form.tlc div.new-survey span.name {
+form.tlc.new-survey span.new-name {
   margin-left:1.5rem;
   display:none;
 }
 
-form.tlc div.new-survey span * {
-  vertical-align: middle;
+form.tlc.new-survey input.new-name {
+  width:100px;
 }
 
-form.tlc div.new-survey input.name {
-  width:100px;
+form.tlc.new-survey input.submit {
+  display:none;
 }
 
 form.tlc .settings {
