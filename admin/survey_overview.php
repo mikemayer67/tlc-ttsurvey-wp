@@ -11,8 +11,8 @@ $current_survey = current_survey();
 if($current_survey) {
   [$current_year,$current_status] = $current_survey;
 } else {
-  $current_year = date('Y');
-  $current_status = survey_years()[$current_year] ?? 'not started';
+  $current_year = "None";
+  $current_status = "(create/reopen one on the Content tab)";
 }
 
 $survey_years = survey_years();
@@ -35,7 +35,7 @@ $pdf_uri = survey_pdf_uri();
 <h2>Survey Settings</h2>
 <table class='tlc-overview'>
   <tr>
-    <td class=label>Current Year</td>
+    <td class=label>Current Survey</td>
     <td class=value>
       <table class=years>
         <tr>
@@ -46,7 +46,7 @@ $pdf_uri = survey_pdf_uri();
     </td>
   </tr>
   <tr>
-    <td class=label>Past Years</td>
+    <td class=label>Past Surveys</td>
     <td class=value>
       <table class=years>
 <?php

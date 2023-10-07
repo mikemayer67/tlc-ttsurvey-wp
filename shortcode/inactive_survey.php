@@ -6,7 +6,7 @@ require_once plugin_path('include/logger.php');
 
 $current_survey = current_survey();
 
-if(!current_survey) { 
+if(!$current_survey) { 
 ?>
 
 <div class='w3-container w3-panel w3-card-4 w3-pale-yellow w3-leftbar w3-border-yellow w3-border'>

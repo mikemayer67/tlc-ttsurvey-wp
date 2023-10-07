@@ -11,14 +11,7 @@ $action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
   'tab'=>'overview',
 ));
 
-$current_survey = current_survey();
-if($current_survey) {
-  [$current_year,$current_status] = $current_survey;
-} else {
-  $current_year = date('Y');
-  $current_status = survey_years()[$current_year] ?? null;
-}
-
+[$current_year,$current_status] = current_survey()
 ?>
 
 <form id='tlc-ttsurvey-settings' class='tlc' action='<?=$action?>' method="POST">
@@ -57,39 +50,11 @@ if($current_status == SURVEY_IS_DRAFT) {
   </div>
 
 <?php 
-} elseif($current_status == SURVEY_IS_CLOSED) { 
-?>
-  <div class=info>Changing the status back to Active will reopen the survey.</div>
-  <div class=settings>
-    <span class='input-label'>Status</span>
-    <select name=survey_status class='tlc'>
-      <option value=<?=SURVEY_IS_ACTIVE?>>Active</option>
-      <option value=<?=SURVEY_IS_CLOSED?> selected>Closed</option>
-    </select>
-  </div>
-
-<?php 
 } else { 
-  $next_year = 1 + $current_year;
-  $examples = implode(', ', array(
-    "'$current_year'",
-    "'$current_year-$next_year'",
-    "'$current_year round 2'",
-  ));
-  
 ?>
 
-  <div class=info>There is currently no survey for <?=$current_year?></div>
-  <div class='settings new-survey'>
-    <span>
-      <input type=checkbox id=create-new class=toggle value=1 name='create-new-survey'>
-      <label for=create-new>Start survey</label>
-      <span class=year>
-        <span class=label>Label</span>
-        <input type=text class=year value=<?=$current_year?> name=new-survey-year>
-        <span class=info>e.g. <?=$examples?></span>
-      </span>
-    </span>
+  <div class=info>
+    There is no active or draft survey. Create/reopen one in the Content tab.
   </div>
 
 <?php } ?>
