@@ -59,7 +59,7 @@ form.tlc span.input-info {
   font-weight:200;
 }
 
-form.tlc div.new-survey span.year {
+form.tlc div.new-survey span.name {
   margin-left:1.5rem;
   display:none;
 }
@@ -68,7 +68,7 @@ form.tlc div.new-survey span * {
   vertical-align: middle;
 }
 
-form.tlc div.new-survey input.year {
+form.tlc div.new-survey input.name {
   width:100px;
 }
 
@@ -181,7 +181,7 @@ div.tlc-overview table table.admins td.username
   text-align:right;
 }
 
-div.tlc-overview table table.years td.year
+div.tlc-overview table table.names td.name
 {
   width:3em;
   font-weight:bolder;
@@ -189,7 +189,7 @@ div.tlc-overview table table.years td.year
 }
 
 div.tlc-overview table table.admins td.usercaps
-div.tlc-overview table table.years td.status
+div.tlc-overview table table.names td.status
 {
   padding-left:1em;
 }

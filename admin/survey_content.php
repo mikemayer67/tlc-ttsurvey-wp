@@ -24,10 +24,10 @@ function add_noscript_body()
 
 function add_script_body()
 {
-  $current_survey = current_survey();
+  $current = current_survey();
   echo("<div class='requires-javascript'>");
-  add_current_survey_info($current_survey);
-  add_survey_content_tabs($current_survey);
+  add_current_survey_info($current);
+  add_survey_content_tabs($current);
   echo("</div>");
 }
 
@@ -35,20 +35,21 @@ function add_current_survey_info($current)
 {
   echo("<div class='tlc-survey-status'>");
   if($current) {
-    [$year,$status] = $current;
+    $name = $current['name'];
+    $status = $current['status'];
     echo("<h2>Current Survey</h2>");
     if($status==SURVEY_IS_ACTIVE) {
       echo("<div class=info>");
-      echo("The $year Time and Talent Survey is currently open. ");
+      echo("The $name Time and Talent Survey is currently open. ");
       echo("</div><div class=info>");
       echo("No changes can be made to its content without moving it back ");
       echo("to draft status.");
       echo("</div>");
     } else {
       echo("<div class=info>");
-      echo("The $year Time and Talent Survey is in draft status.");
+      echo("The $name Time and Talent Survey is in draft status.");
       echo("</div>");
-      if(current_survey_response_count() > 0) {
+      if(survey_response_count($current['post_id']) > 0) {
         echo("<div class='info warning'>");
         echo("Responses to the survey have been submitted.");
         echo(" Be very careful when making changes to the form.");
@@ -68,9 +69,10 @@ function add_current_survey_info($current)
     echo("<select class=tlc name=option>");
     echo("<option value=''>That's fine...</option>");
     echo("<option value=new>Create a new survey</option>");
-    foreach(survey_years() as $year=>$status) {
-      if($status == SURVEY_IS_CLOSED) {
-        echo("<option value='reopen-$year'>Reopen $year survey</option>");
+    foreach(survey_catalog() as $post_id=>$survey) {
+      if($survey['status'] == SURVEY_IS_CLOSED) {
+        $name = $survey['name'];
+        echo("<option value='reopen-$post_id'>Reopen $name survey</option>");
       }
     }
     echo("</select>");

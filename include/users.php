@@ -30,7 +30,7 @@ require_once plugin_path('include/validation.php');
  * Survey responses from each participant is attached to either a
  *   user post or an anonymous post as meta data. The metadata key 
  *   indicates the survey status.
- *   - Submitted responses use the survey year as the metadata key
+ *   - Submitted responses use the survey post_id as the metadata key
  *   - Working drafts use 'working' as the metadata key
  *
  * The following conventions are used in this module:

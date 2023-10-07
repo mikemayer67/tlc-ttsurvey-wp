@@ -7,99 +7,131 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
-$current_survey = current_survey();
-if($current_survey) {
-  [$current_year,$current_status] = $current_survey;
-} else {
-  $current_year = "None";
-  $current_status = "(create/reopen one on the Content tab)";
-}
 
-$survey_years = survey_years();
-$other_years = array();
-foreach(array_keys($survey_years) as $year)
+echo "<div class=tlc-overview>";
+echo "<h2>Survey Settings</h2>";
+add_tlc_settings_overview();
+add_tlc_survey_usage();
+echo "</div>";
+
+function add_tlc_settings_overview()
 {
-  if(strcmp($year,$current_year)!=0) { $other_years[] = $year; }
+  $current = current_survey();
+  echo "<table class='tlc-overview'>";
+  add_current_survey_overview($current);
+  add_past_survey_overview($current);
+  add_admins_overview();
+  add_survey_url();
+  add_log_level();
+  echo "</table>";
 }
 
-arsort($other_years);
-
-$log_level = survey_log_level();
-
-$caps = survey_capabilities();
-$pdf_uri = survey_pdf_uri();
-
-?>
-
-<div class=tlc-overview>
-<h2>Survey Settings</h2>
-<table class='tlc-overview'>
-  <tr>
-    <td class=label>Current Survey</td>
-    <td class=value>
-      <table class=years>
-        <tr>
-          <td class=year><?=$current_year?></td>
-          <td class=status><?=$current_status?></td>
-        </tr> 
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td class=label>Past Surveys</td>
-    <td class=value>
-      <table class=years>
-<?php
-if(!$survey_years) {
-  echo "<tr><td class=year>n/a</td></tr>";
-}
-foreach($other_years as $year) {
-  $status = $survey_years[$year];
-  echo "<tr><td class=year>$year</td><td class=status>$status</td></tr>";
-}
-?>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td class=label>Admins</td>
-    <td class=value>
-      <table class=admins>
-
-<?php
-foreach(get_users() as $user) {
-  $id = $user->id;
-  $name = $user->display_name;
-  $responses = $caps['responses'][$id];
-  $content = $caps['content'][$id];
-  $user_caps = array();
-  if( $caps['responses'][$id] ) {
-    $user_caps[] = "Responses";
+function add_current_survey_overview($current)
+{
+  if($current) {
+    $name = $current['name'];
+    $status = $current['status'];
+  } else {
+    $name = "None";
+    $status = "(create/reopen one on the Content tab)";
   }
-  if( $caps['content'][$id] ) {
-    $user_caps[] = " Content";
-  }
-  if( !empty($user_caps) ) {
-    $user_caps = implode(", ",$user_caps);
-    echo "<tr><td class=username>$name</td><td class=usercaps>$user_caps</td></tr>";
-  }
+
+  echo "<tr>";
+  echo "  <td class=label>Current Survey</td>";
+  echo "  <td class=value>";
+  echo "    <table class=names>";
+  echo "      <tr>";
+  echo "        <td class=name>$name</td>";
+  echo "        <td class=status>$status</td>";
+  echo "      </tr>";
+  echo "    </table>";
+  echo "  </td>";
+  echo "</tr>";
 }
-?>
-      </table>
-    </td>
-  </tr>
 
-  <tr>
-    <td class=label>Survey URL</td>
-    <td class=value><?=$pdf_uri?></td>
-  </tr>
+function add_past_survey_overview($current)
+{
+  echo "<tr>";
+  echo "  <td class=label>Past Surveys</td>";
+  echo "  <td class=value>";
+  echo "    <table class=names>";
 
-  <tr>
-    <td class=label>Log Level</td>
-    <td class=value><?=$log_level?></td>
-  </tr>
+  $catalog = survey_catalog();
+  if($catalog) {
+    $current_name = $current['name'];
+    $others = array();
+    foreach($catalog as $post_id=>$survey) {
+      $name = $survey['name'];
+      $status = $survey['status'];
+      if(strcmp($current_name,$name)!=0) { $others[$name] = $status; }
+    }
+    krsort($others);
 
-</table>
+    foreach($others as $name=>$status) {
+      echo "<tr><td class=name>$name</td><td class=status>$status</td></tr>";
+    }
+
+  } else {
+    echo "<tr><td class=name>n/a</td></tr>";
+  }
+
+  echo "    </table>";
+  echo "  </td>";
+  echo "</tr>";
+}
+
+function add_admins_overview()
+{
+  echo "<tr>";
+  echo "  <td class=label>Admins</td>";
+  echo "  <td class=value>";
+  echo "    <table class=admins>";
+
+  $caps = survey_capabilities();
+
+  foreach(get_users() as $user) {
+    $id = $user->id;
+    $name = $user->display_name;
+    $responses = $caps['responses'][$id];
+    $content = $caps['content'][$id];
+    $user_caps = array();
+    if( $caps['responses'][$id] ) {
+      $user_caps[] = "Responses";
+    }
+    if( $caps['content'][$id] ) {
+      $user_caps[] = " Content";
+    }
+    if( !empty($user_caps) ) {
+      $user_caps = implode(", ",$user_caps);
+      echo "<tr><td class=username>$name</td><td class=usercaps>$user_caps</td></tr>";
+    }
+  }
+  echo "    </table>";
+  echo "  </td>";
+  echo "</tr>";
+}
+
+function add_survey_url()
+{
+  $pdf_uri = survey_pdf_uri();
+  echo "<tr>";
+  echo "  <td class=label>Survey URL</td>";
+  echo "  <td class=value>$pdf_uri</td>";
+  echo "</tr>";
+}
+
+
+function add_log_level()
+{
+  $log_level = survey_log_level();
+  echo "<tr>";
+  echo "  <td class=label>Log Level</td>";
+  echo "  <td class=value>$log_level</td>";
+  echo "</tr>";
+}
+
+
+function add_tlc_survey_usage() { ?>
 
 <h2>Usage</h2>
 
@@ -120,12 +152,12 @@ Any unspecified argument defaults to the value defined in the plugin settings
 </div>
 
 <div class=tlc-shortcode-args>
-<div class=tlc-shortcode-arg>year</div>
-<div class=tlc-shortcode-arg-info>Must match one of the survey years.</div>
+<div class=tlc-shortcode-arg>name</div>
+<div class=tlc-shortcode-arg-info>Must match one of the survey names.</div>
 
 <div class=tlc-shortcode-info>Example</div>
 <div class=tlc-shortcode-example><span>
-[tlc-ttsurvey year=2023]
+[tlc-ttsurvey name=2023]
 </span></div>
 
 <h2>Theme Compatibility</h2>
@@ -138,4 +170,4 @@ Any unspecified argument defaults to the value defined in the plugin settings
 </ul>
 </div>
 
-</div>
+<?php }
