@@ -15,7 +15,6 @@ if($action == "update")
 {
   /* nonce is checked within the update_from_post method */
   update_options_from_post();
-  update_status_from_post();
   $status = "<span class='tlc-status'>udpated</span>";
 }
 elseif($action == "clear-log") 

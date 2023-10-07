@@ -11,7 +11,7 @@ $action = explode('?',$_SERVER['REQUEST_URI'])[0].'?'.http_build_query(array(
   'tab'=>'overview',
 ));
 
-[$current_year,$current_status] = current_survey()
+$current_status = current_survey()['status'] ?? null;
 ?>
 
 <form id='tlc-ttsurvey-settings' class='tlc' action='<?=$action?>' method="POST">

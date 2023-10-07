@@ -7,22 +7,24 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
-$current_survey = current_survey();
+$current = current_survey();
 if($current_survey) {
-  [$current_year,$current_status] = $current_survey;
+  $current_name = $current['name'];
+  $current_sttus = $current['status'];
 } else {
-  $current_year = "None";
+  $current_name = "None";
   $current_status = "(create/reopen one on the Content tab)";
 }
 
-$survey_years = survey_years();
-$other_years = array();
-foreach(array_keys($survey_years) as $year)
+$catalog = survey_catalog();
+$others = array();
+foreach($catalog as $post_id=>$survey) {
 {
-  if(strcmp($year,$current_year)!=0) { $other_years[] = $year; }
+  $name = $survey['name'];
+  if(strcmp($current_name,$name)!=0) { $others[$name] = $survey['status'] }
 }
 
-arsort($other_years);
+krsort($others);
 
 $log_level = survey_log_level();
 
@@ -37,9 +39,9 @@ $pdf_uri = survey_pdf_uri();
   <tr>
     <td class=label>Current Survey</td>
     <td class=value>
-      <table class=years>
+      <table class=names>
         <tr>
-          <td class=year><?=$current_year?></td>
+          <td class=name><?=$current_name?></td>
           <td class=status><?=$current_status?></td>
         </tr> 
       </table>
@@ -48,14 +50,13 @@ $pdf_uri = survey_pdf_uri();
   <tr>
     <td class=label>Past Surveys</td>
     <td class=value>
-      <table class=years>
+      <table class=names>
 <?php
-if(!$survey_years) {
-  echo "<tr><td class=year>n/a</td></tr>";
+if(!$catalog) {
+  echo "<tr><td class=name>n/a</td></tr>";
 }
-foreach($other_years as $year) {
-  $status = $survey_years[$year];
-  echo "<tr><td class=year>$year</td><td class=status>$status</td></tr>";
+foreach($others as $name=>$status) {
+  echo "<tr><td class=name>$name</td><td class=status>$status</td></tr>";
 }
 ?>
       </table>
@@ -120,12 +121,12 @@ Any unspecified argument defaults to the value defined in the plugin settings
 </div>
 
 <div class=tlc-shortcode-args>
-<div class=tlc-shortcode-arg>year</div>
-<div class=tlc-shortcode-arg-info>Must match one of the survey years.</div>
+<div class=tlc-shortcode-arg>name</div>
+<div class=tlc-shortcode-arg-info>Must match one of the survey names.</div>
 
 <div class=tlc-shortcode-info>Example</div>
 <div class=tlc-shortcode-example><span>
-[tlc-ttsurvey year=2023]
+[tlc-ttsurvey name=2023]
 </span></div>
 
 <h2>Theme Compatibility</h2>
