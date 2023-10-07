@@ -23,13 +23,13 @@ if( ! defined('WPINC') ) { die; }
  *
  * Post metadata is used to provide additional information about each
  * year's survey status
- *   - state: pending, active, closed
+ *   - state: draft, active, closed
  **/
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 
-const SURVEY_IS_PENDING = 'pending';
+const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
@@ -165,7 +165,7 @@ function current_survey()
     $summary[$status][] = $year;
   }
 
-  foreach([SURVEY_IS_ACTIVE,SURVEY_IS_PENDING] as $status)
+  foreach([SURVEY_IS_ACTIVE,SURVEY_IS_DRAFT] as $status)
   {
     if(key_exists($status,$summary))
     {
@@ -208,7 +208,7 @@ function reopen_closed_survey($year)
   return true;
 }
 
-function return_current_survey_to_pending()
+function return_current_survey_to_draft()
 {
   $current = current_survey();
   if(!$current) {
@@ -217,7 +217,7 @@ function return_current_survey_to_pending()
   }
   [$year,$status] = $current;
   if($status!=SURVEY_IS_ACTIVE) {
-    log_error("Current survey is already pending");
+    log_error("Current survey is already draft");
     return null;
   }
   $post_id = get_survey_post_id($year);
@@ -225,7 +225,7 @@ function return_current_survey_to_pending()
     log_error("Cannot find survey for $year");
     return null;
   }
-  update_post_meta($post_id,'status',SURVEY_IS_PENDING);
+  update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
   return true;
 }
 
@@ -237,7 +237,7 @@ function activate_current_survey()
     return null;
   }
   [$year,$status] = $current;
-  if($status != SURVEY_IS_PENDING) {
+  if($status != SURVEY_IS_DRAFT) {
     log_error("Current survey is already active");
     return null;
   }
@@ -276,4 +276,33 @@ function survey_form($year)
   return $post->content;
 }
 
+/**
+ * Update status from settings
+ **/
 
+function update_status_from_post()
+{
+  log_dev("update_settings_from_post");
+
+  $current = current_survey();
+  if($current_survey) {
+    [$current_year,$current_status] = $current;
+  } else {
+    $current_year = date('Y');
+    $current_status = survey_years()[$current_year] ?? null;
+  }
+
+  $new_status = $_POST['survey_status'] ?? null;
+  if($new_status) {
+    log_dev("new status: $new_status");
+    if($new_status != $current_status) {
+      log_dev("change status");
+      $post_id = get_survey_post_id($current_year);
+      if($post_id) {
+        update_post_meta($post_id,'status',$new_status);
+      } else {
+        log_error("Cannot find survey for $year");
+      }
+    }
+  }
+}

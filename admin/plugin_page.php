@@ -7,6 +7,7 @@ $title = esc_html(get_admin_page_title());
 $status = "";
 
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
 $action = $_POST['action'] ?? null;
@@ -14,6 +15,7 @@ if($action == "update")
 {
   /* nonce is checked within the update_from_post method */
   update_options_from_post();
+  update_status_from_post();
   $status = "<span class='tlc-status'>udpated</span>";
 }
 elseif($action == "clear-log") 
@@ -43,6 +45,9 @@ if(current_user_can('tlc-ttsurvey-responses')) {
 
 $tabs[] = ['log','Log'];
 
+log_dev("GET: ".print_r($_GET,true));
+log_dev("POST: ".print_r($_POST,true));
+
 $cur_tab = $_GET['tab'] ?? 'overview';
 
 foreach($tabs as $tab) {
@@ -58,5 +63,5 @@ foreach($tabs as $tab) {
 
 echo "</div>";
 
-require plugin_path("admin/plugin_${cur_tab}.php");
+require plugin_path("admin/survey_${cur_tab}.php");
 

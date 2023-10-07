@@ -19,7 +19,7 @@ $survey_years = survey_years();
 $other_years = array();
 foreach(array_keys($survey_years) as $year)
 {
-  if($year !== $current_year) { $other_years[] = $year; }
+  if(strcmp($year,$current_year)!=0) { $other_years[] = $year; }
 }
 
 arsort($other_years);

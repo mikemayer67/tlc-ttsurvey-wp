@@ -30,7 +30,6 @@ class CookieJar
   private function __construct()
   {
     $this->_active_userid = stripslashes($_COOKIE[ACTIVE_USER_COOKIE]??"");
-    log_dev("CookieJar() active_userid: ".$this->_active_userid);
     $this->_access_tokens = array();
     $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
 
