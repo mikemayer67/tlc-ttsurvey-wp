@@ -252,12 +252,11 @@ function activate_current_survey()
 
 function close_current_survey()
 {
-  $current = current_survey();
-  if(!$current) {
+  [$year,$status] = current_survey();
+  if(!$year) {
     log_error("No current survey found");
     return null;
   }
-  [$year,$status] = $current;
   $post_id = get_survey_post_id($year);
   if(!$post_id) {
     log_error("Cannot find survey for $year");
@@ -265,6 +264,21 @@ function close_current_survey()
   }
   update_post_meta($post_id,'status',SURVEY_IS_CLOSED);
   return true;
+}
+
+function current_survey_response_count()
+{
+  [$year,$status] = current_survey();
+  if(!$year) {
+    log_error("No current survey found");
+    return null;
+  }
+  $post_id = get_survey_post_id($year);
+  if(!$post_id) {
+    log_error("Cannot find survey for $year");
+    return null;
+  }
+  return get_post_meta($post_id,'responses')[0] ?? 0;
 }
 
 function survey_form($year)

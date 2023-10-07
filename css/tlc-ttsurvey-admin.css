@@ -105,6 +105,15 @@ form.tlc table td {
   padding-top:10px;
 }
 
+div.tlc-survey-status div.info
+{
+  margin-left:3em;
+}
+div.tlc-survey-status div.warning
+{
+  color:#800;
+}
+
 span.tlc-status {
   margin-left:20px;
   padding-left:10px;

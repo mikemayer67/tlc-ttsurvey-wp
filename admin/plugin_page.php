@@ -45,9 +45,6 @@ if(current_user_can('tlc-ttsurvey-responses')) {
 
 $tabs[] = ['log','Log'];
 
-log_dev("GET: ".print_r($_GET,true));
-log_dev("POST: ".print_r($_POST,true));
-
 $cur_tab = $_GET['tab'] ?? 'overview';
 
 foreach($tabs as $tab) {

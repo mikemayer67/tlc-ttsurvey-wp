@@ -6,7 +6,7 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 
-$action = $_SERVER['SCRIPT_URI'].'?'.http_build_query(array(
+$action = explode('?',$_SERVER['REQUEST_URI'])[0].'?'.http_build_query(array(
   'page'=>SETTINGS_PAGE_SLUG,
   'tab'=>'overview',
 ));
