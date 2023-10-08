@@ -61,15 +61,14 @@ form.tlc span.input-info {
 
 form.tlc.new-survey span.new-name {
   margin-left:1.5rem;
-  display:none;
 }
 
 form.tlc.new-survey input.new-name {
   width:100px;
 }
 
-form.tlc.new-survey input.submit {
-  display:none;
+form.tlc.new-survey span.error {
+  color:#800;
 }
 
 form.tlc .settings {

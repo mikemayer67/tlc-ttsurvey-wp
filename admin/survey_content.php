@@ -27,9 +27,9 @@ function add_script_body()
 {
   $current = current_survey();
   echo "<div class=requries-javascript>";
-  $active_tab = determine_content_tab($current);
-  add_survey_tab_bar($active_tab,$current);
-  add_survey_tab_content($active_tab,$current);
+  $active_pid = determine_content_tab($current);
+  add_survey_tab_bar($active_pid,$current);
+  add_survey_tab_content($active_pid,$current);
 
   echo "</div>";
 }
@@ -53,7 +53,7 @@ function determine_content_tab($current)
   // no pid was specified as part of the GET request.
   //   Show the current survey if there is one
   if($current) {
-    return $curren['post_id'];
+    return $current['post_id'];
   }
 
   // no pid specified and no current survey
@@ -69,7 +69,7 @@ function determine_content_tab($current)
   return FIRST_TAB;
 }
 
-function add_survey_tab_bar($active_tab,$current)
+function add_survey_tab_bar($active_pid,$current)
 {
   echo "<div class=nav-tab-wrapper>";
 
@@ -101,7 +101,7 @@ function add_survey_tab_bar($active_tab,$current)
   foreach($tabs as $tab)
   {
     [$label,$pid] = $tab;
-    $class = $pid == $active_tab ? 'nav-tab nav-tab-active' : 'nav-tab';
+    $class = $pid == $active_pid ? 'nav-tab nav-tab-active' : 'nav-tab';
     $query_args['pid'] = $pid;
     $uri = implode('?', array($uri_path,http_build_query($query_args)));
     echo "<a class='$class' href='$uri'>$label</a>";
@@ -110,8 +110,68 @@ function add_survey_tab_bar($active_tab,$current)
   echo "</div>";
 }
 
-function add_survey_tab_content($active_tab,$current)
+function add_survey_tab_content($active_pid,$current)
 {
+  $current_pid = $current['post_id'] ?? '';
+  if($active_pid == FIRST_TAB)
+  {
+    add_new_survey_content();
+  } 
+  elseif( $active_pid == $current_pid )
+  {
+    add_current_survey_content($current);
+  }
+  else
+  {
+    add_past_survey_content($active_pid,$current);
+  }
+}
+
+function add_new_survey_content()
+{
+  $action = $_SERVER['REQUEST_URI'];
+
+  $existing_names = array();
+  foreach(survey_catalog() as $pid=>$survey) {
+    $existing_names[] = $survey['name'];
+  }
+
+  $cur_year = date('Y');
+  $suggested_name = "$cur_year";
+  $n = 2;
+  while(in_array($suggested_name,$existing_names))
+  {
+    $suggested_name = "$suggested_name-$n";
+    ++$n;
+  }
+  $existing_names = json_encode($existing_names);
+
+  echo "<div class=tlc-ttsurvey-new>";
+  echo "  <h2>Create a New Survey</h2>";
+  echo "  <form class='tlc new-survey' action=$action method=POST>";
+  echo "    <input type=hidden name=action value=new-survey>";
+  echo "    <input class=existing type=hidden value='$existing_names'>";
+  echo "    <span class=new-name>";
+  echo "      <span class=label>Survey Name</span>";
+  echo "      <input type=text class=new-name name=name value=$suggested_name>";
+  echo "      <span class=error></span>";
+  echo "    </span>";
+  echo "    <div>";
+  $class = "class='submit button button-primary button-large'";
+  echo "      <input type=submit value='Create Survey' $class'>";
+  echo "    </div>";
+  echo "  </form>";
+  echo "</div>";
+}
+
+function add_current_survey_content($current)
+{
+  print_r($current);
+}
+
+function add_past_survey_content($pid,$current)
+{
+  echo($pid);
 }
 
 /*
