@@ -24,46 +24,44 @@ function add_script_body()
 {
   $current = current_survey();
   echo "<div class=requries-javascript>";
-  add_survey_tab_bar($current);
+  $active_tab = determine_content_tab($current);
+  add_survey_tab_bar($active_tab,$current);
+  add_survey_tab_content($active_tab,$current);
 
   echo "</div>";
 }
 
-function add_survey_tab_bar($current)
+function determine_content_tab($current)
 {
-  $sid = $_GET['sid'] ?? '';
-  echo "<div class=nav-tab-wrapper>";
+  $sid = $_GET['sid'] ?? null;
+  if($sid) {
+    return $sid;
+  }
+  if($current) {
+    return 'first';
+  }
 
   $catalog = survey_catalog();
-  krsort($catalog);
+  if(count($catalog) < 2) {
+    return 'first';
+  }
 
-  // determine the active tab
-  $first_is_active = false;
-  $active_tab = '';
-  if(count($catalog)<2) 
-  {
-    $first_is_active = true;
-  } 
-  elseif($sid) 
-  {
-    $cur_sid = $current['post_id'] ?? '';
-    if( $sid == 'current' ) { $first_is_active = true; } 
-    else { $active_tab = $sid; }
-  }
-  else
-  {
-    if($current) { $first_is_active = true; }
-    else { $active_tab = array_key_first($catalog); }
-  }
+  krsort($catalog);
+  return array_key_first($catalog);
+}
+
+function add_survey_tab_bar($active_tab,$current)
+{
+  echo "<div class=nav-tab-wrapper>";
 
   $query_args = array();
   $uri_path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
   parse_str(parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY),$query_args);
 
   // first tab (current or create)
-  $class = $first_is_active ? 'nav-tab nav-tab-active' : 'nav-tab';
+  $class = $active_tab == "first" ? 'nav-tab nav-tab-active' : 'nav-tab';
   $tab_label = $current['name'] ?? ' + ';
-  $query_args['sid'] = 'current';
+  $query_args['sid'] = 'first';
   $uri = implode('?', array($uri_path,http_build_query($query_args)));
   echo "<a class='$class' href='$uri'>$tab_label</a>";
 
@@ -81,6 +79,11 @@ function add_survey_tab_bar($current)
   }
 
   echo "</div>";
+}
+
+function add_survey_tab_content($active_tab,$current)
+{
+  echo($active_tab);
 }
 
 /*
