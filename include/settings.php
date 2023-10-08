@@ -119,11 +119,6 @@ function uninstall_options()
  */
 function update_options_from_post()
 {
-  if (!wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
-    log_error("failed to validate nonce");
-    wp_die("Bad nonce");
-  }
-
   $options = get_option(OPTIONS_KEY,array());
 
   $new_caps = $_POST['caps'];

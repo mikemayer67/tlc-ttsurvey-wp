@@ -136,7 +136,7 @@ function add_status_message()
   }
 
   $classes = implode(' ',$classes);
-  echo("<div class='$classes'>$msg</div>");
+  echo "<div class='$classes'>$msg</div>";
 }
 
 function add_shortcode_content()
@@ -153,9 +153,6 @@ function add_shortcode_content()
     return;
   }
 
-  $page_uri=$_SERVER['REQUEST_URI'];
-  log_info("GET: ".print_r($_GET,true));
-  log_info("URL: ".print_r(parse_url($page_uri),true));
   if(key_exists('tlcpage',$_GET)) {
     $page = $_GET['tlcpage'];
     if(in_array($page,['register','login','page','senduserid']))

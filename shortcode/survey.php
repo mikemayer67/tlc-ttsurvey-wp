@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-$form_uri=$_SERVER['REQUEST_URI'];
+$form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
 ?>
 <h2>Survey</h2>

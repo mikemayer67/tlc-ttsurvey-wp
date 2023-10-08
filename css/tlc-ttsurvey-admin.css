@@ -61,15 +61,19 @@ form.tlc span.input-info {
 
 form.tlc.new-survey span.new-name {
   margin-left:1.5rem;
-  display:none;
 }
 
 form.tlc.new-survey input.new-name {
   width:100px;
 }
 
-form.tlc.new-survey input.submit {
-  display:none;
+form.tlc.new-survey span.error {
+  color:#800;
+}
+
+form.tlc.reopen-survey input[type=submit] {
+  position:absolute;
+  right:15px;
 }
 
 form.tlc .settings {
@@ -112,6 +116,11 @@ div.tlc-survey-status div.info
 div.tlc-survey-status div.warning
 {
   color:#800;
+}
+
+div.tlc-ttsurvey-current div.info {
+  margin-left:3em;
+  margin-top:15px;
 }
 
 span.tlc-status {
