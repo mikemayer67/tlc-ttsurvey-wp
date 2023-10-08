@@ -8,10 +8,13 @@ if( !current_user_can('tlc-ttsurvey-content') ) {
   return;
 }
 
+const FIRST_TAB = 'first';
+
 require_once plugin_path('include/surveys.php');
 
 add_noscript_body();
 add_script_body();
+
 
 function add_noscript_body()
 {
@@ -33,21 +36,37 @@ function add_script_body()
 
 function determine_content_tab($current)
 {
-  $sid = $_GET['sid'] ?? null;
-  if($sid) {
-    return $sid;
+  // if post_id (pid) was specified as part of the GET request, honor it
+  //   note that if value of pid is 'first', we need to resolve that to
+  //   the current post_id if there is a current survey
+  $pid = $_GET['pid'] ?? null;
+  if($pid)
+  {
+    if($pid == FIRST_TAB) { 
+      return $current['post_id'] ?? FIRST_TAB;
+    }
+    else {
+      return $pid;
+    }
   }
+
+  // no pid was specified as part of the GET request.
+  //   Show the current survey if there is one
   if($current) {
-    return 'first';
+    return $curren['post_id'];
   }
 
+  // no pid specified and no current survey
+  //   Show the newest entry in the survey catalog
   $catalog = survey_catalog();
-  if(count($catalog) < 2) {
-    return 'first';
+  if($catalog) {
+    krsort($catalog);
+    return array_key_first($catalog);
   }
 
-  krsort($catalog);
-  return array_key_first($catalog);
+  // no pid specified, no current survey, and no survey catalog
+  //   Only option is to create a new survey (i.e. first and only tab)
+  return FIRST_TAB;
 }
 
 function add_survey_tab_bar($active_tab,$current)
@@ -58,24 +77,34 @@ function add_survey_tab_bar($active_tab,$current)
   $uri_path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
   parse_str(parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY),$query_args);
 
-  // first tab (current or create)
-  $class = $active_tab == "first" ? 'nav-tab nav-tab-active' : 'nav-tab';
-  $tab_label = $current['name'] ?? ' + ';
-  $query_args['sid'] = 'first';
-  $uri = implode('?', array($uri_path,http_build_query($query_args)));
-  echo "<a class='$class' href='$uri'>$tab_label</a>";
+  // construct array of tabs
+  $tabs = array();
 
-  //Prior surveys
-  
-  foreach( survey_catalog() as $post_id=>$survey )
+  //   first tab is current survey if there is a current survey
+  //     otherwise, it's the new survey tab
+  if($current) {
+    $tabs[] = array($current['name'],$current['post_id']);
+  } else {
+    $tabs[] = array(' + ',FIRST_TAB);
+  }
+
+  // remaning tabs come from the survey catalog (skipping current survey)
+  foreach( survey_catalog() as $pid=>$survey )
   {
-    if($post_id != $current['post_id']) {
-      $class = $post_id==$active_tab ? 'nav-tab nav-tab-active' : 'nav-tab';
-      $name = $survey['name'];
-      $query_args['sid'] = $post_id;
-      $uri = implode('?', array($uri_path,http_build_query($query_args)));
-      echo "<a class='$class' href='$uri'>$name</a>";
+    if($pid != $current['post_id'])
+    {
+      $tabs[] = array($survey['name'],$pid);
     }
+  }
+
+  // populate the tabs
+  foreach($tabs as $tab)
+  {
+    [$label,$pid] = $tab;
+    $class = $pid == $active_tab ? 'nav-tab nav-tab-active' : 'nav-tab';
+    $query_args['pid'] = $pid;
+    $uri = implode('?', array($uri_path,http_build_query($query_args)));
+    echo "<a class='$class' href='$uri'>$label</a>";
   }
 
   echo "</div>";
@@ -83,7 +112,6 @@ function add_survey_tab_bar($active_tab,$current)
 
 function add_survey_tab_content($active_tab,$current)
 {
-  echo($active_tab);
 }
 
 /*
