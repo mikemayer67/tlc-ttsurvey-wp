@@ -166,7 +166,30 @@ function add_new_survey_content()
 
 function add_current_survey_content($current)
 {
-  print_r($current);
+  echo "<div class=tlc-ttsurvey-current>";
+
+  $name = $current['name'];
+  $status = $current['status'];
+  if($status == SURVEY_IS_ACTIVE) {
+    echo "<div class=info>";
+    echo "<div> The $name Time and Talent Survey is currently open. ";
+    echo "</div><div>";
+    echo "No changes can be made to its content without moving it back ";
+    echo "to Draft status on the Settings tab.";
+    echo "</div></div>";
+    add_immutable_survey_content($current);
+  }
+  elseif($status == SURVEY_IS_DRAFT) {
+    echo "<div class=info>";
+    echo "<div> The $name Time and Talent Survey is currently in draft mode.";
+    echo "</div><div>";
+    echo "To open it for participants to submit responses, switch its status";
+    echo " to Active on the Settings tab.";
+    echo "</div></div>";
+    add_mutable_survey_content($current);
+  }
+
+  echo "</div>";
 }
 
 function add_past_survey_content($pid,$current)
@@ -178,7 +201,6 @@ function add_past_survey_content($pid,$current)
     log_error("Attempted to show content for invalid pid ($pid)");
     return null;
   }
-  $survey_name = $survey['name'];
 
   if(!$current) {
     $action = $_SERVER['REQUEST_URI'];
@@ -190,7 +212,21 @@ function add_past_survey_content($pid,$current)
     echo "</form>";
   }
 
+  add_immutable_survey_content($survey);
+
   echo "</div>";
+}
+
+function add_immutable_survey_content($survey)
+{
+  $name = $survey['name'];
+  echo "<h2>$name</h2>";
+}
+
+function add_mutable_survey_content($survey)
+{
+  $name = $survey['name'];
+  echo "<h2>Edit $name</h2>";
 }
 
 /*
