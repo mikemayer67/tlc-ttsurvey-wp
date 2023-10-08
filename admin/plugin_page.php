@@ -64,14 +64,20 @@ $tabs[] = ['log','Log'];
 
 $cur_tab = $_GET['tab'] ?? 'overview';
 
+$query_args = array();
+$uri_path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+parse_str(parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY),$query_args);
+if($cur_tab != 'content') {
+  unset($query_args['sid']);
+}
 foreach($tabs as $tab) {
   $class = 'nav-tab';
-  $tab_key = $tab[0];
   $tab_label = $tab[1];
-  if($cur_tab == $tab_key) {
+  if($cur_tab == $tab[0]) {
     $class .= ' nav-tab-active';
   }
-  $uri = "{$_SERVER['REQUEST_URI']}&tab={$tab_key}";
+  $query_args['tab'] = $tab[0];
+  $uri = $uri_path . '?' .http_build_query($query_args);
   echo "<a class='$class' href='$uri'>$tab_label</a>";
 }
 

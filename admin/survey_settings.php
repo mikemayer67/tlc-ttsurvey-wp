@@ -6,9 +6,12 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 
-$action = explode('?',$_SERVER['REQUEST_URI'])[0].'?'.http_build_query(array(
-  'page'=>SETTINGS_PAGE_SLUG,
-  'tab'=>'overview',
+$action = implode('?', array(
+  parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
+  http_build_query( array(
+    'page'=>SETTINGS_PAGE_SLUG,
+    'tab'=>'overview',
+  ))
 ));
 
 $current_status = current_survey()['status'] ?? null;

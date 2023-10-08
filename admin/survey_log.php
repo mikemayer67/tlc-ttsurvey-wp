@@ -6,7 +6,7 @@ if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 
-$action = $_SERVER['REQUEST_URI'];
+$action = parse_url($_SERVER['REQUEST_URI'],PHP_PERL_PATH);
 ?>
 
 <div class='tlc-log'>
