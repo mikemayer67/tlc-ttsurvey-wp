@@ -136,7 +136,7 @@ function add_status_message()
   }
 
   $classes = implode(' ',$classes);
-  echo("<div class='$classes'>$msg</div>");
+  echo "<div class='$classes'>$msg</div>";
 }
 
 function add_shortcode_content()
