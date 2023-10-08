@@ -26,11 +26,10 @@ function add_noscript_body()
 function add_script_body()
 {
   $current = current_survey();
-  echo "<div class=requries-javascript>";
+  echo "<div class=requires-javascript>";
   $active_pid = determine_content_tab($current);
   add_survey_tab_bar($active_pid,$current);
   add_survey_tab_content($active_pid,$current);
-
   echo "</div>";
 }
 
@@ -141,7 +140,7 @@ function add_new_survey_content()
   $n = 2;
   while(in_array($suggested_name,$existing_names))
   {
-    $suggested_name = "$suggested_name-$n";
+    $suggested_name = "$cur_year-$n";
     ++$n;
   }
   $existing_names = json_encode($existing_names);
@@ -149,6 +148,7 @@ function add_new_survey_content()
   echo "<div class=tlc-ttsurvey-new>";
   echo "  <h2>Create a New Survey</h2>";
   echo "  <form class='tlc new-survey' action=$action method=POST>";
+  wp_nonce_field(OPTIONS_NONCE);
   echo "    <input type=hidden name=action value=new-survey>";
   echo "    <input class=existing type=hidden value='$existing_names'>";
   echo "    <span class=new-name>";
@@ -171,7 +171,26 @@ function add_current_survey_content($current)
 
 function add_past_survey_content($pid,$current)
 {
-  echo($pid);
+  echo "<div class=tlc-ttsurvey-past>";
+
+  $survey = survey_catalog()[$pid] ?? null;
+  if(!$survey) { 
+    log_error("Attempted to show content for invalid pid ($pid)");
+    return null;
+  }
+  $survey_name = $survey['name'];
+
+  if(!$current) {
+    $action = $_SERVER['REQUEST_URI'];
+    echo "<form class='tlc reopen-survey' action=$action method=POST>";
+    wp_nonce_field(OPTIONS_NONCE);
+    echo "<input type=hidden name=action value=reopen-survey>";
+    echo "<input type=hidden name=pid value=$pid>";
+    echo "<input type=submit value='Reopen survey'>";
+    echo "</form>";
+  }
+
+  echo "</div>";
 }
 
 /*

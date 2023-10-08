@@ -10,38 +10,25 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
-$action = $_POST['action'] ?? null;
-if($action == "update") 
-{
-  /* nonce is checked within the update_from_post method */
-  update_options_from_post();
-  update_survey_from_post();
-  $status = "<span class='tlc-status'>udpated</span>";
-}
-elseif($action == "clear-log") 
-{
-  if (!wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) 
+if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
+  $action = $_POST['action'] ?? null;
+  if($action == "update") 
   {
-    log_error("failed to validate nonce");
-    wp_die("Bad nonce");
+    update_options_from_post();
+    update_survey_from_post();
+    $status = "<span class='tlc-status'>udpated</span>";
   }
-  clear_logger();
-}
-elseif($action == "start-survey")
-{
-  $option = $_POST['option'] ?? null;
-  $m = array();
-  if($option == "create")
+  elseif($action == "clear-log") 
   {
-    $name = $_POST['name'];
-    log_info("Create new survey with name $name");
-    create_new_survey($name);
+    clear_logger();
   }
-  elseif(preg_match('/^reopen-(\d+)$/',$option,$m))
+  elseif($action == "new-survey")
   {
-    $post_id = $m[1];
-    log_info("Reopen survey with post_id $post_id");
-    reopen_survey($post_id);
+    create_new_survey($_POST['name']);
+  }
+  elseif($action == "reopen-survey")
+  {
+    reopen_survey($_POST['pid']);
   }
 }
 

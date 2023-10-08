@@ -71,6 +71,12 @@ form.tlc.new-survey span.error {
   color:#800;
 }
 
+form.tlc.reopen-survey input[type=submit] {
+  position:absolute;
+  right:15px;
+  margin-top: 10px;
+}
+
 form.tlc .settings {
   margin-left:3em;
   margin-top:10px;
