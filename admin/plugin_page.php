@@ -12,6 +12,7 @@ require_once plugin_path('include/logger.php');
 
 if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   $action = $_POST['action'] ?? null;
+  if($action) {log_dev("plugin_page POST: ".print_r($_POST,true));}
   if($action == "update") 
   {
     update_options_from_post();

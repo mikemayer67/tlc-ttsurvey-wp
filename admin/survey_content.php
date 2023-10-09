@@ -26,7 +26,7 @@ function add_noscript_body()
 function add_script_body()
 {
   $current = current_survey();
-  echo "<div class=requires-javascript>";
+  echo "<div class='tlc-ttsurvey-content requires-javascript'>";
   $active_pid = determine_content_tab($current);
   add_survey_tab_bar($active_pid,$current);
   add_survey_tab_content($active_pid,$current);
@@ -70,7 +70,7 @@ function determine_content_tab($current)
 
 function add_survey_tab_bar($active_pid,$current)
 {
-  echo "<div class=nav-tab-wrapper>";
+  echo "<div class='nav-tab-wrapper survey'>";
 
   $query_args = array();
   $uri_path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
@@ -145,7 +145,7 @@ function add_new_survey_content()
   }
   $existing_names = json_encode($existing_names);
 
-  echo "<div class=tlc-ttsurvey-new>";
+  echo "<div class=new>";
   echo "  <h2>Create a New Survey</h2>";
   echo "  <form class='tlc new-survey' action=$action method=POST>";
   wp_nonce_field(OPTIONS_NONCE);
@@ -166,7 +166,7 @@ function add_new_survey_content()
 
 function add_current_survey_content($current)
 {
-  echo "<div class=tlc-ttsurvey-current>";
+  echo "<div class=current>";
 
   $name = $current['name'];
   $status = $current['status'];
@@ -183,7 +183,7 @@ function add_current_survey_content($current)
     echo "<div class=info>";
     echo "<div> The $name Time and Talent Survey is currently in draft mode.";
     echo "</div><div>";
-    echo "To open it for participants to submit responses, switch its status";
+    echo "To lock in its structure and open it for participation, switch its status";
     echo " to Active on the Settings tab.";
     echo "</div></div>";
     add_mutable_survey_content($current);
@@ -194,7 +194,7 @@ function add_current_survey_content($current)
 
 function add_past_survey_content($pid,$current)
 {
-  echo "<div class=tlc-ttsurvey-past>";
+  echo "<div class=past>";
 
   $survey = survey_catalog()[$pid] ?? null;
   if(!$survey) { 
@@ -212,6 +212,13 @@ function add_past_survey_content($pid,$current)
     echo "</form>";
   }
 
+  $name = $survey['name'];
+  echo "<div class=info>";
+  echo "<div> The $name Time and Talent Survey is currently closed. ";
+  echo "</div><div>";
+  echo "No changes can be made to its content.";
+  echo "</div></div>";
+
   add_immutable_survey_content($survey);
 
   echo "</div>";
@@ -219,81 +226,60 @@ function add_past_survey_content($pid,$current)
 
 function add_immutable_survey_content($survey)
 {
-  $name = $survey['name'];
-  echo "<h2>$name</h2>";
+  add_survey_content($survey,false);
 }
 
 function add_mutable_survey_content($survey)
 {
+  $action = $_SERVER['REQUEST_URI'];
+  $pid = $survey['post_id'];
+
+  echo "<form class='tlc edit-survey' action=$action method=POST>"; 
+  wp_nonce_field(OPTIONS_NONCE);
+  echo "<input type=hidden name=action value=update-survey>";
+  echo "<input type=hidden name=pid value=$pid>";
+
+  add_survey_content($survey,true);
+
+  $class = "class='submit button button-primary button-large'";
+  echo "<input type=submit value=Save $class>";
+  echo "</form>";
+}
+
+function add_survey_content($survey,$mutable)
+{
   $name = $survey['name'];
-  echo "<h2>Edit $name</h2>";
+
+  $readonly = $mutable ? "" : "readonly";
+
+  echo "<div class=content-block>";
+
+  echo "<h2>Survey Form</h2>";
+  echo "<div class=info>";
+  echo "Instructions go here.";
+  echo "<textarea class='survey' name=survey $readonly></textarea>";
+  echo "</div>";
+
+  echo "<h2>Email Templates</h2>";
+  echo "<div class=info>";
+  echo "All email templates use markdown notation.  For more information, visit ";
+  echo "the <a href='https://www.markdownguide.org/basic-syntax' target=_blank>";
+  echo "Markdown Guid</a>.";
+  echo "</div>";
+  echo "<div class=info>";
+  echo "In addition, the following placeholders may be used to customize the message.";
+  echo "</div>";
+  echo "<table class=info>";
+  echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipent's full name</td></tr>";
+  echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email addrress</td></tr>";
+  echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
+  echo "</table>";
+
+  echo "<div class=email-template>";
+  echo "<h3>Welcome</h3>";
+  echo "<div class=info>Sent when a new participant registers for the survey.</div>";
+  echo "<textarea class='welcome' name=welcome $readonly></textarea>";
+  echo "</div>";
+
+  echo "</div>";
 }
-
-/*
-function add_current_survey_info($current)
-{
-  echo "<div class='tlc-survey-status'>";
-  if($current) {
-    $name = $current['name'];
-    $status = $current['status'];
-    echo "<h2>Current Survey</h2>";
-    if($status==SURVEY_IS_ACTIVE) {
-      echo "<div class=info>";
-      echo "The $name Time and Talent Survey is currently open. ";
-      echo "</div><div class=info>";
-      echo "No changes can be made to its content without moving it back ";
-      echo "to draft status.";
-      echo "</div>";
-    } else {
-      echo "<div class=info>";
-      echo "The $name Time and Talent Survey is in draft status.";
-      echo "</div>";
-      if(survey_response_count($current['post_id']) > 0) {
-        echo "<div class='info warning'>";
-        echo "Responses to the survey have been submitted.";
-        echo " Be very careful when making changes to the form.";
-        echo "</div>";
-      }
-    }
-  } 
-  else 
-  {
-    $action = $_SERVER['REQUEST_URI'];
-    echo "<h2>Create or Reopen a Survey</h2>";
-    echo "<form class='tlc new-survey' action='$action' method=POST>";
-    wp_nonce_field(OPTIONS_NONCE);
-    echo "<input type=hidden name=action value=start-survey>";
-    echo "<span class=option>";
-    echo "<span class=label>There is no currently active or draft survey: </span>";
-    echo "<select class=tlc name=option>";
-    echo "<option value=''>That's fine...</option>";
-    echo "<option value=create>Create a new survey</option>";
-    foreach(survey_catalog() as $post_id=>$survey) {
-      if($survey['status'] == SURVEY_IS_CLOSED) {
-        $name = $survey['name'];
-        echo "<option value='reopen-$post_id'>Reopen $name survey</option>";
-      }
-    }
-    $current_year = date('Y');
-    echo "</select>";
-
-    echo "<span class=new-name>";
-    echo "with name:";
-    echo "<input type=text class=new-name name=name value=$current_year>";
-    echo "</span>";
-
-    echo "</span>";
-    echo "<div>";
-    echo "<input type=submit value=Proceed class='submit button button-primary button-large'>";
-    echo "</div>";
-    echo "</form>";
-  }
-  echo "</div>"; // div.tlc-survey-status
-}
-
-
-function add_survey_content_tabs($current)
-{
-  echo "<h2>Add survey tabs here</h2>";
-}
-*/

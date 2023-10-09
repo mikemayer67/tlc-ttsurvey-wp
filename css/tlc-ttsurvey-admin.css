@@ -118,9 +118,65 @@ div.tlc-survey-status div.warning
   color:#800;
 }
 
-div.tlc-ttsurvey-current div.info {
-  margin-left:3em;
-  margin-top:15px;
+div.tlc-ttsurvey-content {
+  max-width: 775px;
+}
+
+div.tlc-ttsurvey-content div.info {
+  margin-left:1.5em;
+}
+
+div.tlc-ttsurvey-content div.content-block {
+  margin-left:1.5em;
+}
+
+div.tlc-ttsurvey-content div.content-block table.info {
+  margin-left: 3em;
+}
+
+div.tlc-ttsurvey-content div.content-block table.info td{
+  padding-left:1em;
+}
+
+div.tlc-ttsurvey-content div.content-block table.info td:first-child {
+  font-family:monospace;
+  padding:0 5px 0 5px;
+  background-color:#ddd;
+  text-align:center;
+}
+
+div.tlc-ttsurvey-content div.content-block h2 {
+  margin: 20px 0 5px 0;
+}
+
+div.tlc-ttsurvey-content div.email-template {
+  margin: 10px 0 0 20px;
+}
+
+div.tlc-ttsurvey-content div.email-template h3 {
+  margin:0;
+  font-size: 1.2em;
+}
+
+div.tlc-ttsurvey-content div.content-block textarea {
+  width:95%;
+  margin-left:15px;
+}
+
+div.tlc-ttsurvey-content div.nav-tab-wrapper.survey {
+  margin-bottom:15px;
+}
+
+div.tlc-ttsurvey-content div.nav-tab-wrapper.survey a.nav-tab {
+  padding: 0 10px 0 10px;
+}
+
+div.tlc-ttsurvey-content div.menubar {
+  margin: 1em 2em 1em 2em;
+}
+
+div.tlc-ttsurvey-content div.menubar a.nav-tab {
+  padding: 0 10px 0 10px;
 }
 
 span.tlc-status {
