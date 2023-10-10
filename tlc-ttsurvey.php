@@ -35,9 +35,28 @@ function plugin_dir() { return plugin_dir_path(__FILE__); }
 function plugin_path($path) { return plugin_dir() . '/' . $path; }
 
 /**
- * connvert path relative to the plugin directory to a URL
+ * convert path relative to the plugin directory to a URL
  */
 function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
+
+/**
+ * Determine level of admin access
+ *   returns associative array of accesses
+ **/
+function plugin_admin_access()
+{
+  $access = array();
+  $caps = array('view','manage','content','responses');
+  foreach($caps as $cap) {
+    $access[$cap] = current_user_can("tlc-ttsurvey-$cap");
+  }
+  return $access;
+}
+
+function plugin_admin_can($cap) { 
+  return plugin_admin_access()[$cap] ?? false;
+}
+
 
 
 /**
@@ -56,6 +75,9 @@ function handle_activate()
   log_info('activate: '.__NAMESPACE__);
   users_activate();
   surveys_activate();
+
+  $admin = get_role('administrator');
+  $admin->add_cap('tlc-ttsurvey-view');
 }
 
 function handle_deactivate()
@@ -66,6 +88,9 @@ function handle_deactivate()
   log_info('deactivate: '.__NAMESPACE__);
   users_deactivate();
   surveys_deactivate();
+
+  $admin = get_role('administrator');
+  $admin->remove_cap('tlc-ttsurvey-view');
 }
 
 function handle_uninstall()

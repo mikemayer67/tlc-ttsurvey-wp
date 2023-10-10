@@ -1,7 +1,7 @@
 <?php
 namespace TLC\TTSurvey;
 
-if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
@@ -95,12 +95,9 @@ function add_admins_overview()
     $responses = $caps['responses'][$id];
     $content = $caps['content'][$id];
     $user_caps = array();
-    if( $caps['responses'][$id] ) {
-      $user_caps[] = "Responses";
-    }
-    if( $caps['content'][$id] ) {
-      $user_caps[] = " Content";
-    }
+    if( $caps['manage'][$id] ) { $user_caps[] = "Manage"; }
+    if( $caps['content'][$id] ) { $user_caps[] = "Content"; }
+    if( $caps['responses'][$id] ) { $user_caps[] = "Responses"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
       echo "<tr><td class=username>$name</td><td class=usercaps>$user_caps</td></tr>";

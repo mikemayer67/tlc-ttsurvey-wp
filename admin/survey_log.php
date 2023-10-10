@@ -1,7 +1,12 @@
 <?php
 namespace TLC\TTSurvey;
 
-if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
+
+if( !plugin_admin_can('manage') ) { 
+  echo "<h2>oops... you shouldn't be here</h2>";
+  return;
+}
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
