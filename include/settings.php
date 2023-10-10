@@ -133,13 +133,20 @@ function update_options_from_post()
 
   foreach(get_users() as $user) {
     $id = $user->id;
-    foreach(['responses','content'] as $cap) {
+    $view = false;
+    foreach(['manage','responses','content'] as $cap) {
       $key = "tlc-ttsurvey-$cap";
       if($new_caps[$cap][$id]) {
         $user->add_cap($key);
+        $view = true;
       } else {
         $user->remove_cap($key);
       }
+    }
+    if($view) {
+      $user->add_cap('tlc-ttsurvey-view');
+    } else {
+      $user->remove_cap('tlc-ttsurvey-view');
     }
   }
   update_option(OPTIONS_KEY,$options);

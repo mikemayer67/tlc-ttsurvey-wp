@@ -1,7 +1,12 @@
 <?php
 namespace TLC\TTSurvey;
 
-if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
+
+if(!plugin_admin_can('manage')) {
+  echo "<h2>oops... you shouldn't be here</h2>";
+  return;
+}
 
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
@@ -66,24 +71,36 @@ if($current_status == SURVEY_IS_DRAFT) {
   <table id='tlc-ttsurvey-admin-caps' class='tlc settings'>
   <tr>
     <th></th>
-    <th>Responses</th>
+    <th>Manage</th>
     <th>Content</th>
+    <th>Responses</th>
   </tr>
 <?php
 $caps = survey_capabilities();
 foreach(get_users() as $user) {
   $id = $user->id;
   $name = $user->display_name;
-  $response = $caps['responses'][$id] ? "checked" : "";
+  $manage = $caps['manage'][$id] ? "checked" : "";
   $content = $caps['content'][$id] ? "checked" : "";
+  $response = $caps['responses'][$id] ? "checked" : "";
+  $hidden_manage = '';
+
+  if(user_can($id,'manage_options')) {
+    $manage = 'checked disabled';
+    $hidden_manage = "<input type=hidden value=1 name='caps[manage][$id]'>";
+  }
 ?>
   <tr>
     <td class=name><?=$name?></td>
     <td><div class=cap>
-    <input type=checkbox value=1 name="caps[responses][<?=$id?>]" <?=$response?>>
+    <input type=checkbox value=1 name="caps[manage][<?=$id?>]" <?=$manage?>>
+    <?=$hidden_manage?>
     </div></td>
     <td><div class=cap>
     <input type=checkbox value=1 name="caps[content][<?=$id?>]" <?=$content?>>
+    </div></td>
+    <td><div class=cap>
+    <input type=checkbox value=1 name="caps[responses][<?=$id?>]" <?=$response?>>
     </div></td>
   </tr>
 <?php } ?>

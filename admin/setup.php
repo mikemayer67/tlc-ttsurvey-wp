@@ -24,10 +24,11 @@ function handle_admin_init()
 
 function handle_admin_menu()
 {
-  add_options_page(
+  add_submenu_page(
+    'tools.php',
     'Time & Talent Survey', // page title
     'Time & Talent Survey', // menu title
-    'manage_options', // required capability
+    'tlc-ttsurvey-view', // required capability
     SETTINGS_PAGE_SLUG, // settings page slug
     ns('populate_settings_page'), // callback to populate settingsn page
   );
@@ -53,7 +54,8 @@ add_action($action_links, ns('add_settings_link'));
 
 function populate_settings_page()
 {
-  if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+  $has_access = plugin_admin_can('view');
+  if( !$has_access ) { wp_die('Unauthorized user'); }
 
   echo "<div class=wrap>";
   require plugin_path('admin/plugin_page.php');

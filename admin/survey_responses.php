@@ -1,9 +1,9 @@
 <?php
 namespace TLC\TTSurvey;
 
-if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
-if( !current_user_can('tlc-ttsurvey-responses') ) { 
+if( !plugin_admin_can('responses') ) { 
   echo "<h2>oops... you shouldn't be here</h2>";
   return;
 }

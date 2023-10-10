@@ -1,7 +1,7 @@
 <?php
 namespace TLC\TTSurvey;
 
-if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
 $title = esc_html(get_admin_page_title());
 $status = "";
@@ -45,17 +45,12 @@ echo "<div class='nav-tab-wrapper'>";
 
 $tabs = [
   ['overview','Overview'],
-  ['settings','Settings'],
 ];
 
-if(current_user_can('tlc-ttsurvey-content')) {
-  $tabs[] = ['content','Content'];
-}
-if(current_user_can('tlc-ttsurvey-responses')) {
-  $tabs[] = ['responses','Responses'];
-}
-
-$tabs[] = ['log','Log'];
+if(plugin_admin_can('manage')) { $tabs[] = ['settings','Settings']; }
+if(plugin_admin_can('content')) { $tabs[] = ['content','Content']; }
+if(plugin_admin_can('responses')) { $tabs[] = ['responses','Responses']; }
+if(plugin_admin_can('manage')) { $tabs[] = ['log','Log']; }
 
 $cur_tab = $_GET['tab'] ?? 'overview';
 
