@@ -12,12 +12,11 @@ require_once plugin_path('include/logger.php');
 
 if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   $action = $_POST['action'] ?? null;
-  if($action) {log_dev("plugin_page POST: ".print_r($_POST,true));}
   if($action == "update") 
   {
     update_options_from_post();
-    update_survey_from_post();
-    $status = "<span class='tlc-status'>udpated</span>";
+    update_survey_status_from_post();
+    $status = "<span class='tlc-status'>updated</span>";
   }
   elseif($action == "clear-log") 
   {
@@ -30,6 +29,14 @@ if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   elseif($action == "reopen-survey")
   {
     reopen_survey($_POST['pid']);
+  }
+  elseif($action == 'update-survey')
+  {
+    if(update_survey_content_from_post()) {
+      $status = "<span class='tlc-status'>updated</span>";
+    } else {
+      $status = "<span class='tlc-status error'>failed to update</span>";
+    }
   }
 }
 

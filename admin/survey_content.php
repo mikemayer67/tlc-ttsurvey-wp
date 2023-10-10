@@ -252,12 +252,24 @@ function add_survey_content($survey,$mutable)
 
   $readonly = $mutable ? "" : "readonly";
 
+  $pid = $survey['post_id'];
+
+  $post = get_post($pid);
+  if(!$post) {
+    log_warning("Attempted to add survey content for invalid post_id=$pid");
+    return null;
+  }
+
+  $content = $post->post_content;
+  $content = json_decode($content,true);
+
   echo "<div class=content-block>";
 
+  $data = $content['survey'] ?? '';
   echo "<h2>Survey Form</h2>";
   echo "<div class=info>";
   echo "Instructions go here.";
-  echo "<textarea class='survey' name=survey $readonly></textarea>";
+  echo "<textarea class='survey' name=survey $readonly>$data</textarea>";
   echo "</div>";
 
   echo "<h2>Email Templates</h2>";
@@ -270,15 +282,16 @@ function add_survey_content($survey,$mutable)
   echo "In addition, the following placeholders may be used to customize the message.";
   echo "</div>";
   echo "<table class=info>";
-  echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipent's full name</td></tr>";
+  echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipient's full name</td></tr>";
   echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email addrress</td></tr>";
   echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
   echo "</table>";
 
+  $welcome = $content['welcome'];
   echo "<div class=email-template>";
   echo "<h3>Welcome</h3>";
   echo "<div class=info>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='welcome' name=welcome $readonly></textarea>";
+  echo "<textarea class='welcome' name=welcome $readonly>$welcome</textarea>";
   echo "</div>";
 
   echo "</div>";

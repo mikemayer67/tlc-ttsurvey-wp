@@ -135,7 +135,8 @@ div.tlc-ttsurvey-content div.content-block table.info {
 }
 
 div.tlc-ttsurvey-content div.content-block table.info td{
-  padding-left:1em;
+  padding-left:3px;
+  padding-top:0;
 }
 
 div.tlc-ttsurvey-content div.content-block table.info td:first-child {
@@ -163,6 +164,19 @@ div.tlc-ttsurvey-content div.content-block textarea {
   margin-left:15px;
 }
 
+div.tlc-ttsurvey-content div.content-block textarea {
+  width:95%;
+  margin-left:15px;
+}
+
+div.tlc-ttsurvey-content div.content-block textarea.survey {
+  height:10em;
+}
+
+div.tlc-ttsurvey-content div.content-block textarea {
+  height:5em;
+}
+
 div.tlc-ttsurvey-content div.nav-tab-wrapper.survey {
   margin-bottom:15px;
 }
@@ -180,15 +194,20 @@ div.tlc-ttsurvey-content div.menubar a.nav-tab {
 }
 
 span.tlc-status {
+  font-size:smaller;
+  font-weight:200;
   margin-left:20px;
   padding-left:10px;
   padding-right:10px;
-  font-weight:200;
   background:yellow;
   color:black;
   border:solid;
   border-width:1px;
   border-color:lightgray;
+}
+
+span.tlc-status.error {
+  background:pink;
 }
 
 div.tlc-overview div,
