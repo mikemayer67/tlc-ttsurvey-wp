@@ -181,7 +181,6 @@ function survey_response_count($post_id)
 
 function survey_form($post_id)
 {
-  log_dev("survey_form($post_id)");
   if(!$post_id) { return null; }
   $post = get_post($post_id);
   return $post->content;
@@ -249,10 +248,10 @@ function create_new_survey($name)
 
 
 /**
- * Update survey status from settings
+ * Update survey status from admin settings tab
  **/
 
-function update_survey_from_post()
+function update_survey_status_from_post()
 {
   $current = current_survey();
   if(!$current) { return null; }
@@ -261,4 +260,45 @@ function update_survey_from_post()
   if(!$new_status) { return null; }
 
   update_post_meta($current['post_id'],'status',$new_status);
+}
+
+/**
+ * Update survey content from admin content tab
+ **/
+
+function update_survey_content_from_post()
+{
+  $current = current_survey();
+  if(!$current) { 
+    log_warning("Attempted to update survey with no current survey");
+    return null; 
+  }
+
+  $pid = $_POST['pid'] ?? '';
+  $cur_pid = $current['post_id'];
+
+  if(strcmp($pid,$cur_pid)!=0) {
+    log_warning("Attempted to update survey $pid, current is $cur_pid");
+    return null;
+  }
+
+  $data = array();
+  $keys = array('survey','welcome',);
+  foreach( $keys as $key ) {
+    $data[$key] = $_POST[$key] ?? '';
+  }
+
+  $rval = wp_update_post(array(
+    'ID' => $pid,
+    'post_content' => wp_slash(json_encode($data)),
+  ));
+
+  if($rval) {
+    $name = $current['name'];
+    log_info("Content updated for $name survey");
+  } else {
+    log_warning("Failed to update content for survey $pid");
+  }
+
+  return $rval;
 }
