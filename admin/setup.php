@@ -54,7 +54,7 @@ add_action($action_links, ns('add_settings_link'));
 
 function populate_settings_page()
 {
-  $has_access = plugin_admin_can('view') || current_user_can('manage_options');
+  $has_access = plugin_admin_can('view');
   if( !$has_access ) { wp_die('Unauthorized user'); }
 
   echo "<div class=wrap>";
