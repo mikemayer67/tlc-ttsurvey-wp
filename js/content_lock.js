@@ -1,15 +1,14 @@
 
 jQuery(document).ready(
   function($) {
-    var ic = $('input.counter');
+    var lock = $('input[name=lock]');
 
     $(document).on( 'heartbeat-send', function(event,data) {
-      data.tlc_ttsurvey_counter = Number(ic.val());
+      data.tlc_ttsurvey_lock = lock.val();
     });
 
     $(document).on( 'heartbeat-tick', function(event,data) {
-      var n = data.tlc_ttsurvey_new_counter;
-      ic.val(n);
+      var rc = data.tlc_ttsurvey_lock;
     });
   }
 );

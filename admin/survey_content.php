@@ -229,12 +229,22 @@ function add_immutable_survey_content($survey)
 
 function add_mutable_survey_content($survey)
 {
-  add_survey_lock_heartbeat();
-
   $action = $_SERVER['REQUEST_URI'];
   $pid = $survey['post_id'];
 
-  echo "<input class=counter type=number name=counter value=1>";
+  $locked = wp_check_post_lock($pid);
+  if($locked) {
+    $locked_by = get_userdata($locked);
+    $locked_by = implode(" ",array($locked_by->first_name,$locked_by->last_name));
+    log_dev("locked by: [$locked] $locked_by");
+    echo "<input type=hidden name=lock value='$pid:watch'>";
+  } else {
+    log_dev("unlocked");
+    wp_set_post_lock($pid);
+    echo "<input type=hidden name=lock value='$pid:hold'>";
+  }
+  add_survey_lock_heartbeat();
+
 
   echo "<form class='tlc edit-survey' action=$action method=POST>"; 
   wp_nonce_field(OPTIONS_NONCE);
