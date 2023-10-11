@@ -14,7 +14,6 @@ require_once plugin_path('include/surveys.php');
 add_noscript_body();
 add_script_body();
 
-
 function add_noscript_body()
 {
   echo "<noscript class=warning>";
@@ -230,8 +229,12 @@ function add_immutable_survey_content($survey)
 
 function add_mutable_survey_content($survey)
 {
+  add_survey_lock_heartbeat();
+
   $action = $_SERVER['REQUEST_URI'];
   $pid = $survey['post_id'];
+
+  echo "<input class=counter type=number name=counter value=1>";
 
   echo "<form class='tlc edit-survey' action=$action method=POST>"; 
   wp_nonce_field(OPTIONS_NONCE);
@@ -244,6 +247,20 @@ function add_mutable_survey_content($survey)
   echo "<input type=submit value=Save $class>";
   echo "</form>";
 }
+
+function add_survey_lock_heartbeat()
+{
+  wp_register_script(
+    'tlc_content_lock_scripts',
+    plugin_url('js/content_lock.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+
+  wp_enqueue_script('tlc_content_lock_scripts');
+}
+
 
 function add_survey_content($survey,$mutable)
 {

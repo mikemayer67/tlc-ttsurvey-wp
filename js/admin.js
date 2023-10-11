@@ -25,5 +25,6 @@ jQuery(document).ready(
       ns_submit.prop('disabled',err.length>0);
       ns_error.html(err);
     });
-});
+  }
+);
 
