@@ -301,8 +301,11 @@ function add_survey_content($survey)
   echo "<h2>Email Templates</h2>";
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
-  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
-  echo "Markdown Guid</a>.";
+#  I liked this one better, but the site was apparently hijacked
+#  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
+#  echo "Markdown Guid</a>.";
+  echo "this <a href='https://commonmark.org/help' target='_blank'>";
+  echo "Markdown Cheatsheet</a>.";
   echo "</div>";
   echo "<div class='info'>";
   echo "In addition, the following placeholders may be used to customize the message.";
