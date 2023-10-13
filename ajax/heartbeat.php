@@ -5,28 +5,41 @@ if( ! defined('WPINC') ) { die; }
 
 function handle_heartbeat($response, $data, $screen_id)
 {
-  log_dev("handle_heartbeat($response, $data, $screen_id)");
-  log_dev("Current user: ".print_r(get_current_user_id(),true));
-  log_dev("data: ".print_r($data,true));
-
-  $lock = $data['tlc_ttsurvey_lock'] ?? null;
-  if($lock) {
-    [$pid,$action] = explode(':',$lock);
-    log_dev("pid: $pid");
-    log_dev("action: $action");
-    if($action == 'hold') {
-      wp_set_post_lock($pid);
-      $response['tlc_ttsurvey_locked'] = 1;
-    } elseif($action == 'watch') {
-      $locked = wp_check_post_lock($pid);
-      if($locked) {
-        $userdata = get_userdata($locked);
-        $locked = implode(' ',array($userdata->first_name,$userdata->last_name));
+  $lock_query = $data['tlc_ttsurvey_lock'] ?? null;
+  if($lock_query) {
+    $pid = $lock_query['pid'] ?? 0;
+    $is_locked = $lock_query['lock'] ?? null;
+    if($is_locked) {
+      // survey is currently locked by another user
+      //   see if it is still locked
+      $locked_by = wp_check_post_lock($pid);
+      if($locked_by) {
+        // it is still locked
+        //   return the lock status and name of person who has the lock
+        $user = get_userdata($locked_by);
+        $firstname = $user->first_name;
+        $lastname = $user->last_name;
+        $response['tlc_ttsurvey_lock'] = array(
+          'has_lock'=>0, 
+          'locked_by'=>"$firstname $lastname",
+        );
       }
-      $response['tlc_ttsurvey_locked'] = $locked;
+      else
+      {
+        // no longer locked
+        //   acquire the lock and return the new lock status
+        wp_set_post_lock($pid);
+        $response['tlc_ttsurvey_lock'] = array('has_lock'=>1);
+      }
+    }
+    else 
+    {
+      // survey is not currently locked by anyone else
+      //   establish/refresh our lock on it
+      wp_set_post_lock($pid);
+      $response['tlc_ttsurvey_lock'] = array('has_lock'=>1);
     }
   }
 
-  log_dev("Response: ".print_r($response,true));
   return $response;
 }

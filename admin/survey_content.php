@@ -162,34 +162,6 @@ function add_new_survey_content()
   echo "</div>";
 }
 
-function add_current_survey_content($current)
-{
-  echo "<div class=current>";
-
-  $name = $current['name'];
-  $status = $current['status'];
-  if($status == SURVEY_IS_ACTIVE) {
-    echo "<div class=info>";
-    echo "<div> The $name Time and Talent Survey is currently open. ";
-    echo "</div><div>";
-    echo "No changes can be made to its content without moving it back ";
-    echo "to Draft status on the Settings tab.";
-    echo "</div></div>";
-    add_immutable_survey_content($current);
-  }
-  elseif($status == SURVEY_IS_DRAFT) {
-    echo "<div class=info>";
-    echo "<div> The $name Time and Talent Survey is currently in draft mode.";
-    echo "</div><div>";
-    echo "To lock in its structure and open it for participation, switch its status";
-    echo " to Active on the Settings tab.";
-    echo "</div></div>";
-    add_mutable_survey_content($current);
-  }
-
-  echo "</div>";
-}
-
 function add_past_survey_content($pid,$current)
 {
   echo "<div class=past>";
@@ -217,49 +189,68 @@ function add_past_survey_content($pid,$current)
   echo "No changes can be made to its content.";
   echo "</div></div>";
 
-  add_immutable_survey_content($survey);
+  add_survey_content($survey);
 
   echo "</div>";
 }
 
-function add_immutable_survey_content($survey)
+function add_current_survey_content($current)
 {
-  add_survey_content($survey,false);
+  echo "<div class=current>";
+
+  $name = $current['name'];
+  $status = $current['status'];
+  if($status == SURVEY_IS_ACTIVE) {
+    echo "<div class=info>";
+    echo "<div> The $name Time and Talent Survey is currently open. ";
+    echo "</div><div>";
+    echo "No changes can be made to its content without moving it back ";
+    echo "to Draft status on the Settings tab.";
+    echo "</div></div>";
+    add_survey_content($current);
+  }
+  elseif($status == SURVEY_IS_DRAFT) {
+    echo "<div class=info>";
+    echo "<div>The $name Time and Talent Survey is currently in draft mode.";
+    echo "</div><div>";
+    echo "To lock in its structure and open it for participation, switch its status";
+    echo " to Active on the Settings tab.";
+    echo "</div></div>";
+    add_mutable_survey_content($current);
+  }
+
+  echo "</div>";
 }
+
 
 function add_mutable_survey_content($survey)
 {
   $action = $_SERVER['REQUEST_URI'];
   $pid = $survey['post_id'];
 
-  $locked = wp_check_post_lock($pid);
-  if($locked) {
-    $locked_by = get_userdata($locked);
-    $locked_by = implode(" ",array($locked_by->first_name,$locked_by->last_name));
-    log_dev("locked by: [$locked] $locked_by");
-    echo "<input type=hidden name=lock value='$pid:watch'>";
-  } else {
-    log_dev("unlocked");
-    wp_set_post_lock($pid);
-    echo "<input type=hidden name=lock value='$pid:hold'>";
-  }
-  add_survey_lock_heartbeat();
-
-
-  echo "<form class='tlc edit-survey' action=$action method=POST>"; 
-  wp_nonce_field(OPTIONS_NONCE);
-  echo "<input type=hidden name=action value=update-survey>";
+  // check to see if there is currently a lock on the content
+  // lock will be set to 0 if we're acquiring the lock
+  $lock = wp_check_post_lock($pid) ?? 0;
   echo "<input type=hidden name=pid value=$pid>";
+  echo "<input type=hidden name=lock value=$lock>";
+  if($lock) {
+    // someone else has a lock, post a warning about this
+    // the actual disabling/enabling of the form is handled by javascript
+    $locked_by = get_userdata($lock);
+    $locked_by = implode(" ",array($locked_by->first_name,$locked_by->last_name));
+    echo "<div class='info lock'>";
+    echo "<div>The survey is currently being edited by $locked_by.</div>";
+    echo "<div>You cannot make any changes until they have completed their edits.</div>";
+    echo "<div>You can stay on this page and wait... we'll watch for you.</div>";
+    echo "</div>";
+  } else {
+    // nobody else has a lock, acquire it now
+    wp_set_post_lock($pid);
+  }
 
-  add_survey_content($survey,true);
-
-  $class = "class='submit button button-primary button-large'";
-  echo "<input type=submit value=Save $class>";
-  echo "</form>";
-}
-
-function add_survey_lock_heartbeat()
-{
+  // add heartbeat to keep tabs on lock status
+  //   if we have the lock, renew it
+  //   if we don't have the lock, watch for it to become available
   wp_register_script(
     'tlc_content_lock_scripts',
     plugin_url('js/content_lock.js'),
@@ -267,16 +258,24 @@ function add_survey_lock_heartbeat()
     '1.0.3',
     true
   );
-
   wp_enqueue_script('tlc_content_lock_scripts');
+
+  // wrap the content in a form
+  echo "<form class='tlc edit-survey' action=$action method=POST>"; 
+  wp_nonce_field(OPTIONS_NONCE);
+  echo "<input type=hidden name=action value=update-survey>";
+
+  add_survey_content($survey,true);
+
+  // note that the submit button is disabled until javascript checks the lock status
+  echo "<input type='submit' value='Save' class='submit button button-primary button-large' disabled>";
+  echo "</form>";
 }
 
 
-function add_survey_content($survey,$mutable)
+function add_survey_content($survey)
 {
   $name = $survey['name'];
-
-  $readonly = $mutable ? "" : "readonly";
 
   $pid = $survey['post_id'];
 
@@ -295,7 +294,7 @@ function add_survey_content($survey,$mutable)
   echo "<h2>Survey Form</h2>";
   echo "<div class=info>";
   echo "Instructions go here.";
-  echo "<textarea class='survey' name=survey $readonly>$data</textarea>";
+  echo "<textarea class='survey' name=survey readonly>$data</textarea>";
   echo "</div>";
 
   echo "<h2>Email Templates</h2>";
@@ -317,7 +316,7 @@ function add_survey_content($survey,$mutable)
   echo "<div class=email-template>";
   echo "<h3>Welcome</h3>";
   echo "<div class=info>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='welcome' name=welcome $readonly>$welcome</textarea>";
+  echo "<textarea class='welcome' name=welcome readonly>$welcome</textarea>";
   echo "</div>";
 
   echo "</div>";
