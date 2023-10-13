@@ -65,9 +65,9 @@ function dump_log_to_html()
     $m = array();
     if(preg_match($entry_re,$line,$m))
     {
-      $entry = "<tr class=" . strtolower($m[2]). ">";
-      $entry .= "<td class=date>" . $m[1] . "</td>";
-      $entry .= "<td class=message>" . $m[3] . "</td>";
+      $entry = "<tr class='" . strtolower($m[2]). "'>";
+      $entry .= "<td class='date'>" . $m[1] . "</td>";
+      $entry .= "<td class='message'>" . $m[3] . "</td>";
       $entry .= "</tr>";
       $entries[] = $entry;
     }
@@ -79,24 +79,37 @@ function dump_log_to_html()
   echo "</table>";
 }
 
+/**
+ * log_dev is intended to only be useful during development debugging
+ */
 function log_dev($msg) {
   if(survey_log_level() == "DEV") {
     write_to_logger("DEV",$msg);
   }
 }
 
+/**
+ * log_info is intended to show normal flow through the plugin code
+ **/
 function log_info($msg) {
   if(in_array(survey_log_level(),array("DEV","INFO"))) {
     write_to_logger("INFO",$msg);
   }
 }
 
+/**
+ * log_warning is intended to show abnormal, but not necessarily
+ *   critical flows through the plugin code
+ */
 function log_warning($msg) {
   if(in_array(survey_log_level(),array("DEV","INFO","WARNING"))) {
     write_to_logger("WARNING",$msg);
   }
 }
 
+/**
+ * log_error is intended to show critical errors in the plugin code
+ **/
 function log_error($msg) {
   write_to_logger("ERROR",$msg);
   error_log(plugin_name().": $msg");

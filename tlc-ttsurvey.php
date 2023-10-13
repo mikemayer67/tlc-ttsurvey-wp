@@ -114,7 +114,7 @@ add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 add_filter('heartbeat_received',ns('heartbeat_wrapper'),10,3);
 
 function ajax_wrapper() {
-  require plugin_path('ajax.php');
+  require plugin_path('ajax/wrapper.php');
 }
 
 function heartbeat_wrapper($response,$data,$screen_id) {

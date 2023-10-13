@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
+const LOGIN_FORM_NONCE = 'tlc-ttsurvey-login';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
@@ -81,7 +81,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
   ob_start();
 
-  echo "<div id=tlc-ttsurvey>";
+  echo "<div id='tlc-ttsurvey'>";
   add_noscript();
   add_status_message();
   add_shortcode_content();
@@ -102,8 +102,8 @@ function add_noscript()
   }
 ?>
   <noscript>
-  <div class=noscript>This survey works best with Javascript enabled</div>
-  <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
+  <div class='noscript'>This survey works best with Javascript enabled</div>
+  <p class='noscript'>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
 }
@@ -113,29 +113,24 @@ function add_status_message()
   $status = status_message();
   if(is_null($status)) { return ; }
 
-  $classes = explode(' ','status w3-panel w3-card w3-border w3-leftbar');
+  $classes = 'status w3-panel w3-card w3-border w3-leftbar';
 
   [$level,$msg] = $status;
   switch($level)
   {
   case INFO_STATUS:
-    $classes[] = 'w3-pale-green';
-    $classes[] = 'w3-border-green';
+    $classes .= 'w3-pale-green w3-border-green';
     break;
   case WARNING_STATUS:
-    $classes[] = 'w3-pale-yellow';
-    $classes[] = 'w3-border-orange';
+    $classes .= 'w3-pale-yellow w3-border-orange';
     break;
   case ERROR_STATUS:
-    $classes[] = 'w3-pale-red';
-    $classes[] = 'w3-border-red';
+    $classes .= 'w3-pale-red w3-border-red';
     break;
   default:
     log_error("Unexpected survey status level encountered: $level");
     return;
   }
-
-  $classes = implode(' ',$classes);
   echo "<div class='$classes'>$msg</div>";
 }
 
@@ -230,7 +225,7 @@ function enqueue_login_ajax_scripts()
   wp_enqueue_script('tlc_ttsurvey_login_ajax');
 }
 
-wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
+wp_enqueue_style('tlc-ttsurvey', plugin_url('css/shortcode.css'));
 wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));

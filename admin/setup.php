@@ -10,14 +10,13 @@ if( ! is_admin() ) { return; }
 
 const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
-const LOG_PAGE_SLUG = 'tlc-ttsurvey-log';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 
 function handle_admin_init()
 {
-  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('css/tlc-ttsurvey-admin.css'));
+  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('css/admin.css'));
 
   #add_javascript goes here
 }
@@ -48,7 +47,6 @@ function add_settings_link($links)
 $action_links = 'plugin_action_links_' . plugin_basename(plugin_file());
 
 add_action('admin_menu',  ns('handle_admin_menu'));
-#add_action('admin_init', ns('handle_admin_init'));
 add_action('init',        ns('handle_admin_init'));
 add_action($action_links, ns('add_settings_link'));
 
@@ -57,7 +55,7 @@ function populate_settings_page()
   $has_access = plugin_admin_can('view');
   if( !$has_access ) { wp_die('Unauthorized user'); }
 
-  echo "<div class=wrap>";
+  echo "<div class='wrap'>";
   require plugin_path('admin/plugin_page.php');
   echo "</div>";
 }

@@ -178,7 +178,6 @@ function get_user_post($userid)
   if(count($posts) > 1) {
     # log error both to the plugin log and to the php error log
     log_error("Multiple posts associated with userid $userid");
-    error_log("Multiple posts associated with userid $userid");
     die;
   }
   if(!$posts) { 
@@ -249,7 +248,7 @@ function get_user_anonid($userid)
       return $anonid;
     }
   }
-  log_error("No anonid found for $userid");
+  log_warning("No anonid found for $userid");
   return null;
 }
 

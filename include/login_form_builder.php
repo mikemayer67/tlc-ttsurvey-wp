@@ -13,9 +13,9 @@ function start_login_form($header,$name)
 
   echo "<div class='login_form $name w3-container w3-card-4 w3-border w3-border-blue-gray'>";
   echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
-  echo "<form class='login w3-container' method=post action='$form_uri'>";
+  echo "<form class='login w3-container' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
-  echo "<input type=hidden name=refresh value=1>";
+  echo "<input type='hidden' name='refresh' value='1'>";
 }
 
 function close_login_form()
@@ -29,7 +29,7 @@ function add_login_instructions($instructions)
   echo "<div>";
   foreach($instructions as $instruction)
   {
-    echo "<div class=instruction>$instruction</div>";
+    echo "<div class='instruction'>$instruction</div>";
   }
   echo "</div>";
 }
@@ -74,7 +74,7 @@ function add_login_input($type,$kwargs=array())
   if( $type == 'remember' )
   {
     $checked = $value ? 'checked' : '';
-    echo "<input type=checkbox class='w3-check' name=$name $checked>";
+    echo "<input type='checkbox' class='w3-check' name='$name' $checked>";
     echo "<label>$label</label>";
     if($info) { echo($info_trigger); }
   }
@@ -138,7 +138,7 @@ function add_login_input($type,$kwargs=array())
     }
 
     foreach( $input_attrs as $attr ) {
-      echo "<input type=$type $attr>";
+      echo "<input type='$type' $attr>";
     }
   }
 
@@ -160,12 +160,12 @@ function add_login_submit($label,$action,$kwargs=array())
   $submit_classes = "submit $btn_classes w3-blue-gray";
   $cancel_classes = "cancel $btn_classes w3-light-gray";
 
-  $action = "name=action value='$action'";
+  $action = "name='action' value='$action'";
 
   echo "<!-- Button bar-->";
   if($cancel)
   {
-    $cancel_attr= "name=action value=cancel formnovalidate";
+    $cancel_attr= "name='action' value='cancel' formnovalidate";
     echo "<div class='w3-bar'>";
     echo "<button class='$submit_classes' $action>$label</button>";
     echo "<button class='$cancel_classes' $cancel_attr>Cancel</button>";
