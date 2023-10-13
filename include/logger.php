@@ -57,28 +57,6 @@ function write_to_logger($prefix,$msg)
   fwrite(logger(), "[{$timestamp}] {$prefix} {$msg}\n");
 }
 
-function dump_log_to_html()
-{
-  $entries = array();
-  $entry_re = '/^\[(.*?)\]\s*(\w+)\s*(.*?)\s*$/';
-  foreach(file(plugin_path(PLUGIN_LOG_FILE)) as $line) {
-    $m = array();
-    if(preg_match($entry_re,$line,$m))
-    {
-      $entry = "<tr class='" . strtolower($m[2]). "'>";
-      $entry .= "<td class='date'>" . $m[1] . "</td>";
-      $entry .= "<td class='message'>" . $m[3] . "</td>";
-      $entry .= "</tr>";
-      $entries[] = $entry;
-    }
-  }
-  echo "<table class=log-table>";
-  foreach (array_reverse($entries) as $entry) {
-    echo $entry;
-  }
-  echo "</table>";
-}
-
 /**
  * log_dev is intended to only be useful during development debugging
  */

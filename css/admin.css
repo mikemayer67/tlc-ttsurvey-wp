@@ -30,16 +30,6 @@
   font-size: smaller;
 }
 
-#tlc-ttsurvey-admin form div.info ul {
-  margin-left: 20px;
-  margin-top:5px;
-}
-
-#tlc-ttsurvey-admin form div.info ul li {
-  margin-top:0px;
-  margin-bottom:0px;
-}
-
 #tlc-ttsurvey-admin form div.input {
   margin-left: 30px;
 }
@@ -48,64 +38,62 @@
   margin-top:20px;
 }
 
-#tlc-ttsurvey-admin form span.input-label {
+#tlc-ttsurvey-admin form .input-label {
   font-weight:bold;
 }
 
-#tlc-ttsurvey-admin form span.input-info {
+#tlc-ttsurvey-admin form .input-info {
   margin-left: 5px;
   font-weight:200;
-}
-
-#tlc-ttsurvey-admin form.new-survey span.new-name {
-  margin-left:1.5rem;
-}
-
-#tlc-ttsurvey-admin form.new-survey input.new-name {
-  width:100px;
-}
-
-#tlc-ttsurvey-admin form.new-survey span.error {
-  color:#800;
-}
-
-#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
-  position:absolute;
-  right:15px;
-}
-
-#tlc-ttsurvey-admin form .settings {
-  margin-left:3em;
-  margin-top:10px;
 }
 
 #tlc-ttsurvey-admin form table {
   border-collapse:collapse;
 }
 
-#tlc-ttsurvey-admin form table td.name {
-  font-weight:bold;
-  text-align:right;
-}
-
-#tlc-ttsurvey-admin form table td.cap {
-  font-weight:bold;
-}
-
-#tlc-ttsurvey-admin form table div.cap {
-  text-align:center;
-}
-
-#tlc-ttsurvey-admin form table th {
+#tlc-ttsurvey-admin form th {
   border-bottom: 1px solid;
   padding-left:5px;
   padding-right:5px;
 }
 
-#tlc-ttsurvey-admin form table td {
+#tlc-ttsurvey-admin form td {
   margin:3px;
   padding-top:10px;
 }
+
+#tlc-ttsurvey-admin form td.name {
+  font-weight:bold;
+  text-align:right;
+}
+
+#tlc-ttsurvey-admin .tlc-status {
+  font-size:smaller;
+  font-weight:200;
+  margin-left:20px;
+  padding-left:10px;
+  padding-right:10px;
+  background:yellow;
+  color:black;
+  border:solid;
+  border-width:1px;
+  border-color:lightgray;
+}
+
+#tlc-ttsurvey-admin .tlc-status.error {
+  background:pink;
+}
+
+#tlc-ttsurvey-admin noscript.warning p {
+  font-weight:bold;
+  font-size:large;
+  color:#c00000;
+}
+
+#tlc-ttsurvey-admin .requires-javascript {
+  display:none;
+}
+
 
 /** 
  * Overview Tab
@@ -204,11 +192,20 @@
  * Settings Tab
  */
 
+#tlc-ttsurvey-admin form .settings,
+#tlc-ttsurvey-admin .settings form table {
+  margin-left:3em;
+  margin-top:10px;
+}
+
+#tlc-ttsurvey-admin .settings table.caps td div {
+  text-align:center;
+}
+
 
 /**
  * Content Tab
  */
-
 
 #tlc-ttsurvey-admin .content {
   max-width: 775px;
@@ -301,24 +298,29 @@
   padding: 0 10px 0 10px;
 }
 
-span.tlc-status {
-  font-size:smaller;
-  font-weight:200;
-  margin-left:20px;
-  padding-left:10px;
-  padding-right:10px;
-  background:yellow;
-  color:black;
-  border:solid;
-  border-width:1px;
-  border-color:lightgray;
+#tlc-ttsurvey-admin form.new-survey span.new-name {
+  margin-left:1.5rem;
 }
 
-span.tlc-status.error {
-  background:pink;
+#tlc-ttsurvey-admin form.new-survey input.new-name {
+  width:100px;
 }
 
-div.tlc-log {
+#tlc-ttsurvey-admin form.new-survey span.error {
+  color:#800;
+}
+
+#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
+  position:absolute;
+  right:15px;
+}
+
+
+/**
+ * Content Tab
+ */
+
+#tlc-ttsurvey-admin div.log {
   margin-left:15px;
   margin-top:15px;
   border-width:1px;
@@ -329,50 +331,40 @@ div.tlc-log {
   height:500px;
 }
 
-div.tlc-log table {
+#tlc-ttsurvey-admin div.log table {
   table-layout: auto;
   width:100%;
 }
 
-div.tlc-log tr.warning td {
+#tlc-ttsurvey-admin div.log tr.warning td {
   color:#e88010;
 }
 
-div.tlc-log tr.error td {
+#tlc-ttsurvey-admin div.log tr.error td {
   color:#a00000;
 }
 
-div.tlc-log tr.info td {
+#tlc-ttsurvey-admin div.log tr.info td {
   color:#0000a0;
 }
 
-div.tlc-log td.date {
+#tlc-ttsurvey-admin div.log td.date {
   white-space:nowrap;
 }
 
-div.tlc-log td.message {
+#tlc-ttsurvey-admin div.log td.message {
   padding-left:5px;
   font-weight:600;
   width:100%;
 }
 
-div.tlc-log tr:nth-child(odd) {
+#tlc-ttsurvey-admin div.log tr:nth-child(odd) {
   background: white;
 }
 
-div.tlc-log tr:nth-child(even) {
+#tlc-ttsurvey-admin div.log tr:nth-child(even) {
   background: #e0e0e0;
 }
 
-
-noscript.warning p {
-  font-weight:bold;
-  font-size:large;
-  color:#c00000;
-}
-
-.requires-javascript {
-  display:none;
-}
 
 
