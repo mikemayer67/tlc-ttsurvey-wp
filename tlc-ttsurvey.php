@@ -61,8 +61,6 @@ function plugin_admin_can($cap) {
   return plugin_admin_access()[$cap] ?? false;
 }
 
-
-
 /**
  * plugin activation hooks
  */
@@ -113,8 +111,16 @@ function handle_uninstall()
 
 add_action('wp_ajax_nopriv_tlc_ttsurvey', ns('ajax_wrapper'));
 add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
+add_filter('heartbeat_received',ns('heartbeat_wrapper'),10,3);
 
-function ajax_wrapper() { require plugin_path('ajax.php'); }
+function ajax_wrapper() {
+  require plugin_path('ajax.php');
+}
+
+function heartbeat_wrapper($response,$data,$screen_id) {
+  require plugin_path('ajax/heartbeat.php');
+  return handle_heartbeat($response,$data,$screen_id);
+}
 
 /**
  * Import admin/shortcode specific functions

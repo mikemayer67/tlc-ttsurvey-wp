@@ -126,6 +126,22 @@ div.tlc-ttsurvey-content div.info {
   margin-left:1.5em;
 }
 
+div.tlc-ttsurvey-content div.info.lock {
+  margin:3px 1.5em;
+  padding:3px 15px;
+  background:#fd8;
+  border:solid;
+  border-width:1px;
+}
+
+div.tlc-ttsurvey-content div.info.unlocked {
+  margin:3px 1.5em;
+  padding:3px 15px;
+  background:#cfc;
+  border:solid;
+  border-width:1px;
+}
+
 div.tlc-ttsurvey-content div.content-block {
   margin-left:1.5em;
 }

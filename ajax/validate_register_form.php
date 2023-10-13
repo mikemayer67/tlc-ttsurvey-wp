@@ -6,8 +6,6 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
-log_dev("ajax_validate_register POST: ".print_r($_POST,true));
-
 $response = array();
 $keys = array("userid","password","email");
 foreach( $keys as $key )
