@@ -8,7 +8,7 @@ require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
 
-echo "<div class=tlc-overview>";
+echo "<div class=overview>";
 echo "<h2>Survey Settings</h2>";
 add_tlc_settings_overview();
 add_tlc_survey_usage();
@@ -17,7 +17,7 @@ echo "</div>";
 function add_tlc_settings_overview()
 {
   $current = current_survey();
-  echo "<table class='tlc-overview'>";
+  echo "<table>";
   add_current_survey_overview($current);
   add_past_survey_overview($current);
   add_admins_overview();
@@ -37,12 +37,12 @@ function add_current_survey_overview($current)
   }
 
   echo "<tr>";
-  echo "  <td class=label>Current Survey</td>";
-  echo "  <td class=value>";
-  echo "    <table class=names>";
+  echo "  <td class='label'>Current Survey</td>";
+  echo "  <td class='value'>";
+  echo "    <table>";
   echo "      <tr>";
-  echo "        <td class=name>$name</td>";
-  echo "        <td class=status>$status</td>";
+  echo "        <td class='name'>$name</td>";
+  echo "        <td class='value'>$status</td>";
   echo "      </tr>";
   echo "    </table>";
   echo "  </td>";
@@ -52,9 +52,9 @@ function add_current_survey_overview($current)
 function add_past_survey_overview($current)
 {
   echo "<tr>";
-  echo "  <td class=label>Past Surveys</td>";
-  echo "  <td class=value>";
-  echo "    <table class=names>";
+  echo "  <td class='label'>Past Surveys</td>";
+  echo "  <td class='value'>";
+  echo "    <table>";
 
   $catalog = survey_catalog();
   if($catalog) {
@@ -68,11 +68,11 @@ function add_past_survey_overview($current)
     krsort($others);
 
     foreach($others as $name=>$status) {
-      echo "<tr><td class=name>$name</td><td class=status>$status</td></tr>";
+      echo "<tr><td class='name'>$name</td><td class='value'>$status</td></tr>";
     }
 
   } else {
-    echo "<tr><td class=name>n/a</td></tr>";
+    echo "<tr><td class='name'>n/a</td></tr>";
   }
 
   echo "    </table>";
@@ -83,9 +83,9 @@ function add_past_survey_overview($current)
 function add_admins_overview()
 {
   echo "<tr>";
-  echo "  <td class=label>Admins</td>";
-  echo "  <td class=value>";
-  echo "    <table class=admins>";
+  echo "  <td class='label'>Admins</td>";
+  echo "  <td class='value'>";
+  echo "    <table>";
 
   $caps = survey_capabilities();
 
@@ -100,7 +100,7 @@ function add_admins_overview()
     if( $caps['responses'][$id] ) { $user_caps[] = "Responses"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
-      echo "<tr><td class=username>$name</td><td class=usercaps>$user_caps</td></tr>";
+      echo "<tr><td class='name'>$name</td><td class='value'>$user_caps</td></tr>";
     }
   }
   echo "    </table>";
@@ -112,8 +112,8 @@ function add_survey_url()
 {
   $pdf_uri = survey_pdf_uri();
   echo "<tr>";
-  echo "  <td class=label>Survey URL</td>";
-  echo "  <td class=value>$pdf_uri</td>";
+  echo "  <td class='label'>Survey URL</td>";
+  echo "  <td class='value'>$pdf_uri</td>";
   echo "</tr>";
 }
 
@@ -122,8 +122,8 @@ function add_log_level()
 {
   $log_level = survey_log_level();
   echo "<tr>";
-  echo "  <td class=label>Log Level</td>";
-  echo "  <td class=value>$log_level</td>";
+  echo "  <td class='label'>Log Level</td>";
+  echo "  <td class='value'>$log_level</td>";
   echo "</tr>";
 }
 
@@ -131,40 +131,41 @@ function add_log_level()
 function add_tlc_survey_usage() { ?>
 
 <h2>Usage</h2>
+<div class='usage'>
 
-<div class=tlc-shortcode-info>
+<div class='note'>
 Simply add the shortcode <code>[tlc-ttsurvey]</code> to your pages or posts to embed
-the Time & Talent survey
+the Time &amp; Talent survey
 </div>
 
-<div class=tlc-shortcode-note>
+<div class='qual'>
 Only the first occurance of this shortcode on any given page will be rendered.  All others will be quietly ignored.
 </div>
 
-<div class=tlc-shortcode-info>
+<div class='note'>
 The following <b>optional</b> arguments are currently recognized (<i>yes, there's only one right now</i>):
 </div>
-<div class=tlc-shortcode-note>
+<div class='qual'>
 Any unspecified argument defaults to the value defined in the plugin settings
 </div>
 
-<div class=tlc-shortcode-args>
-<div class=tlc-shortcode-arg>name</div>
-<div class=tlc-shortcode-arg-info>Must match one of the survey names.</div>
+<div class='args'>
+<div class='note'>name</div>
+<div class='qual'>Must match one of the survey names.</div>
+</div>
 
-<div class=tlc-shortcode-info>Example</div>
-<div class=tlc-shortcode-example><span>
-[tlc-ttsurvey name=2023]
-</span></div>
+<div class='note'>Example</div>
+<div class='example'><span>[tlc-ttsurvey name=2023]</span></div>
+
+</div>
 
 <h2>Theme Compatibility</h2>
-<div>
-<ul>
-  <li>The survey does not render well when its width is too narrow.  If your theme 
+<div class='info'>
+  The survey does not render well when its width is too narrow.  If your theme 
   provides wide page templates, you may want to make sure the page that contains 
   the survey uses that template.  Similarly, you probably do not want to use 
-  multi-column templates or templates with side bars for the survey page.</li>
-</ul>
+  multi-column templates or templates with side bars for the survey page.
 </div>
+
 
 <?php }

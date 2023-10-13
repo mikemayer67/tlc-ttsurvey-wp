@@ -1,132 +1,224 @@
-form.tlc {
+/** 
+ * Common to all tabs
+ **/
+
+#tlc-ttsurvey-admin form {
   margin-left: 15px;
   width: 100%;
   max-width: 750px;
 }
 
-form.tlc div.label {
+#tlc-ttsurvey-admin form div.label {
   font-weight: bold;
   font-size: larger;
   margin-top: 20px;
 }
 
-form.tlc div.info,
-form.tlc div.warning{
+#tlc-ttsurvey-admin form div.info,
+#tlc-ttsurvey-admin form div.warning{
   font-weight: 200;
   margin-left: 30px;
   margin-bottom: 5px;
 }
 
-form.tlc div.warning {
+#tlc-ttsurvey-admin form div.warning {
   color:#800;
 }
 
-form.tlc span.info {
+#tlc-ttsurvey-admin form span.info {
   font-weight: 200;
   font-size: smaller;
 }
-  
 
-form.tlc div.info ul {
+#tlc-ttsurvey-admin form div.info ul {
   margin-left: 20px;
   margin-top:5px;
 }
 
-form.tlc div.info ul li {
+#tlc-ttsurvey-admin form div.info ul li {
   margin-top:0px;
   margin-bottom:0px;
 }
 
-form.tlc div.input {
+#tlc-ttsurvey-admin form div.input {
   margin-left: 30px;
 }
 
-form.tlc input.submit {
+#tlc-ttsurvey-admin form input.submit {
   margin-top:20px;
 }
 
-form.tlc input.tls-time {
-  max-width: 4em;
-  text-align: center;
-}
-
-form.tlc span.input-label {
+#tlc-ttsurvey-admin form span.input-label {
   font-weight:bold;
 }
 
-form.tlc span.input-info {
+#tlc-ttsurvey-admin form span.input-info {
   margin-left: 5px;
   font-weight:200;
 }
 
-form.tlc.new-survey span.new-name {
+#tlc-ttsurvey-admin form.new-survey span.new-name {
   margin-left:1.5rem;
 }
 
-form.tlc.new-survey input.new-name {
+#tlc-ttsurvey-admin form.new-survey input.new-name {
   width:100px;
 }
 
-form.tlc.new-survey span.error {
+#tlc-ttsurvey-admin form.new-survey span.error {
   color:#800;
 }
 
-form.tlc.reopen-survey input[type=submit] {
+#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
   position:absolute;
   right:15px;
 }
 
-form.tlc .settings {
+#tlc-ttsurvey-admin form .settings {
   margin-left:3em;
   margin-top:10px;
 }
 
-form.tlc table {
+#tlc-ttsurvey-admin form table {
   border-collapse:collapse;
 }
 
-form.tlc table td.name {
+#tlc-ttsurvey-admin form table td.name {
   font-weight:bold;
   text-align:right;
 }
 
-form.tlc table td.cap {
+#tlc-ttsurvey-admin form table td.cap {
   font-weight:bold;
 }
 
-form.tlc table div.cap {
+#tlc-ttsurvey-admin form table div.cap {
   text-align:center;
 }
 
-form.tlc table th {
+#tlc-ttsurvey-admin form table th {
   border-bottom: 1px solid;
   padding-left:5px;
   padding-right:5px;
 }
 
-form.tlc table td {
+#tlc-ttsurvey-admin form table td {
   margin:3px;
   padding-top:10px;
 }
 
-div.tlc-survey-status div.info
+/** 
+ * Overview Tab
+ **/
+
+
+#tlc-ttsurvey-admin .overview div,
+#tlc-ttsurvey-admin .overview table
 {
-  margin-left:3em;
-}
-div.tlc-survey-status div.warning
-{
-  color:#800;
+  margin-left:15px;
 }
 
-div.tlc-ttsurvey-content {
+#tlc-ttsurvey-admin .overview table table
+{
+  margin-left:0;
+}
+
+#tlc-ttsurvey-admin .overview h1,
+#tlc-ttsurvey-admin .overview h2,
+#tlc-ttsurvey-admin .overview h3
+{
+  margin-left:0px;
+  margin-top:25px;
+  margin-bottom:8px;
+}
+
+#tlc-ttsurvey-admin .overview li
+{
+  list-style-type: initial;
+}
+
+#tlc-ttsurvey-admin .overview td.label {
+  font-weight: bold;
+  vertical-align: top;
+}
+
+#tlc-ttsurvey-admin .overview td.name {
+  font-weight: bolder;
+  text-align:right;
+}
+
+#tlc-ttsurvey-admin .overview td.value {
+  padding-left:5px;
+  font-weight:200;
+  text-align:left;
+}
+
+#tlc-ttsurvey-admin .overview .usage .note {
+  margin-top:10px;
+  font-weight:bolder;
+}
+
+#tlc-ttsurvey-admin .overview .usage .qual {
+  padding-left:15px;
+  font-weight:400;
+  font-style:italic;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args {
+  margin-left:15px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args .arg {
+  font-weight:bolder;
+  margin-top:10px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args .info {
+  margin-top:0;
+  font-weight:400;
+}
+
+#tlc-ttsurvey-admin .overview .usage .example {
+  padding-top:8px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .example span {
+  font-family: monospace;
+  font-weight: bolder;
+  font-size: medium;
+  margin-left: 15px;
+  padding: 4px;
+  color: black;
+  background: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+}
+
+#tlc-ttsurvey-admin .overview .info {
+  max-width: 80%;
+}
+
+
+/**
+ * Settings Tab
+ */
+
+
+/**
+ * Content Tab
+ */
+
+
+#tlc-ttsurvey-admin .content {
   max-width: 775px;
 }
 
-div.tlc-ttsurvey-content div.info {
+#tlc-ttsurvey-admin .content div.info {
   margin-left:1.5em;
 }
 
-div.tlc-ttsurvey-content div.info.lock {
+#tlc-ttsurvey-admin .content div.info.lock {
   margin:3px 1.5em;
   padding:3px 15px;
   background:#fd8;
@@ -134,7 +226,7 @@ div.tlc-ttsurvey-content div.info.lock {
   border-width:1px;
 }
 
-div.tlc-ttsurvey-content div.info.unlocked {
+#tlc-ttsurvey-admin .content div.info.unlocked {
   margin:3px 1.5em;
   padding:3px 15px;
   background:#cfc;
@@ -142,70 +234,70 @@ div.tlc-ttsurvey-content div.info.unlocked {
   border-width:1px;
 }
 
-div.tlc-ttsurvey-content div.content-block {
+#tlc-ttsurvey-admin .content div.content-block {
   margin-left:1.5em;
 }
 
-div.tlc-ttsurvey-content div.content-block table.info {
+#tlc-ttsurvey-admin .content div.content-block table.info {
   margin-left: 3em;
 }
 
-div.tlc-ttsurvey-content div.content-block table.info td{
+#tlc-ttsurvey-admin .content div.content-block table.info td{
   padding-left:3px;
   padding-top:0;
 }
 
-div.tlc-ttsurvey-content div.content-block table.info td:first-child {
+#tlc-ttsurvey-admin .content div.content-block table.info td:first-child {
   font-family:monospace;
   padding:0 5px 0 5px;
   background-color:#ddd;
   text-align:center;
 }
 
-div.tlc-ttsurvey-content div.content-block h2 {
+#tlc-ttsurvey-admin .content div.content-block h2 {
   margin: 20px 0 5px 0;
 }
 
-div.tlc-ttsurvey-content div.email-template {
+#tlc-ttsurvey-admin .content div.email-template {
   margin: 10px 0 0 20px;
 }
 
-div.tlc-ttsurvey-content div.email-template h3 {
+#tlc-ttsurvey-admin .content div.email-template h3 {
   margin:0;
   font-size: 1.2em;
 }
 
-div.tlc-ttsurvey-content div.content-block textarea {
+#tlc-ttsurvey-admin .content div.content-block textarea {
   width:95%;
   margin-left:15px;
 }
 
-div.tlc-ttsurvey-content div.content-block textarea {
+#tlc-ttsurvey-admin .content div.content-block textarea {
   width:95%;
   margin-left:15px;
 }
 
-div.tlc-ttsurvey-content div.content-block textarea.survey {
+#tlc-ttsurvey-admin .content div.content-block textarea.survey {
   height:10em;
 }
 
-div.tlc-ttsurvey-content div.content-block textarea {
+#tlc-ttsurvey-admin .content div.content-block textarea {
   height:5em;
 }
 
-div.tlc-ttsurvey-content div.nav-tab-wrapper.survey {
+#tlc-ttsurvey-admin .content div.nav-tab-wrapper.survey {
   margin-bottom:15px;
 }
 
-div.tlc-ttsurvey-content div.nav-tab-wrapper.survey a.nav-tab {
+#tlc-ttsurvey-admin .content div.nav-tab-wrapper.survey a.nav-tab {
   padding: 0 10px 0 10px;
 }
 
-div.tlc-ttsurvey-content div.menubar {
+#tlc-ttsurvey-admin .content div.menubar {
   margin: 1em 2em 1em 2em;
 }
 
-div.tlc-ttsurvey-content div.menubar a.nav-tab {
+#tlc-ttsurvey-admin .content div.menubar a.nav-tab {
   padding: 0 10px 0 10px;
 }
 
@@ -224,74 +316,6 @@ span.tlc-status {
 
 span.tlc-status.error {
   background:pink;
-}
-
-div.tlc-overview div,
-div.tlc-overview table
-{
-  margin-left:15px;
-}
-
-div.tlc-overview h1,
-div.tlc-overview h2,
-div.tlc-overview h3
-{
-  margin-left:0px;
-  margin-top:25px;
-  margin-bottom:8px;
-}
-
-div.tlc-overview li
-{
-  list-style-type: initial;
-}
-
-div.tlc-overview table {
-  margin-left:15px;
-}
-
-div.tlc-overview table td.label {
-  font-weight: bold;
-  vertical-align: top;
-}
-
-div.tlc-overview table td.value {
-  padding-left:15px;
-  font-weight:200;
-}
-
-div.tlc-overview table tr.heading {
-}
-
-div.tlc-overview table tr.heading td {
-  font-weight:500;
-  font-size:large;
-  padding-top:15px;
-  padding-bottom:5px;
-}
-
-div.tlc-overview table td.id {
-  padding-left:20px;
-  font-weight:500;
-}
-
-div.tlc-overview table table.admins td.username
-{
-  font-weight:bolder;
-  text-align:right;
-}
-
-div.tlc-overview table table.names td.name
-{
-  width:3em;
-  font-weight:bolder;
-  text-align:left;
-}
-
-div.tlc-overview table table.admins td.usercaps
-div.tlc-overview table table.names td.status
-{
-  padding-left:1em;
 }
 
 div.tlc-log {
@@ -340,48 +364,6 @@ div.tlc-log tr:nth-child(even) {
   background: #e0e0e0;
 }
 
-
-.tlc-shortcode-info {
-  margin-top:10px;
-  font-weight:bolder;
-}
-
-.tlc-shortcode-note {
-  margin-left:15px;
-  font-weight:400;
-  font-style:italic;
-}
-
-.tlc-shortcode-args {
-  margin-left:15px;
-}
-
-.tlc-shortcode-arg {
-  font-weight:bolder;
-  margin-top:10px;
-}
-
-.tlc-shortcode-arg-info {
-  margin-left:15px;
-  font-weight:400;
-}
-
-.tlc-shortcode-example {
-  padding-top:8px;
-}
-
-.tlc-shortcode-example span {
-  font-family: monospace;
-  font-weight: bolder;
-  font-size: medium;
-  margin-left: 15px;
-  padding: 4px;
-  color: black;
-  background: white;
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-}
 
 noscript.warning p {
   font-weight:bold;

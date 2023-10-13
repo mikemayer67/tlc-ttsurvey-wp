@@ -24,7 +24,7 @@ function add_noscript_body()
 function add_script_body()
 {
   $current = current_survey();
-  echo "<div class='tlc-ttsurvey-content requires-javascript'>";
+  echo "<div class='content requires-javascript'>";
   $active_pid = determine_content_tab($current);
   add_survey_tab_bar($active_pid,$current);
   add_survey_tab_content($active_pid,$current);

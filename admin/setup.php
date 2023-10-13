@@ -56,7 +56,7 @@ function populate_settings_page()
   if( !$has_access ) { wp_die('Unauthorized user'); }
 
   echo "<div class='wrap'>";
-  require plugin_path('admin/plugin_page.php');
+  require plugin_path('admin/navbar.php');
   echo "</div>";
 }
 
