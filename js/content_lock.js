@@ -3,8 +3,8 @@ jQuery(document).ready(
   function($) {
     var lock = $('input[name=lock]');
     var pid = $('input[name=pid]');
-    var submit = $('form.tlc.edit-survey input[type=submit]');
-    var inputs = $('form.tlc.edit-survey textarea');
+    var submit = $('form.edit-survey input[type=submit]');
+    var inputs = $('form.edit-survey textarea');
     var lock_info = $('#tlc-ttsurvey-admin .content .info.lock');
 
     if(lock.val() == 0) {

@@ -16,7 +16,7 @@ add_script_body();
 
 function add_noscript_body()
 {
-  echo "<noscript class=warning>";
+  echo "<noscript class='warning'>";
   echo "<p>Managing survey content requires that Javascript be enabled</p>";
   echo "</noscript>";
 }
@@ -145,18 +145,18 @@ function add_new_survey_content()
 
   echo "<div class=new>";
   echo "  <h2>Create a New Survey</h2>";
-  echo "  <form class='tlc new-survey' action=$action method=POST>";
+  echo "  <form class='new-survey' action='$action' method='post'>";
   wp_nonce_field(OPTIONS_NONCE);
-  echo "    <input type=hidden name=action value=new-survey>";
-  echo "    <input class=existing type=hidden value='$existing_names'>";
-  echo "    <span class=new-name>";
-  echo "      <span class=label>Survey Name</span>";
-  echo "      <input type=text class=new-name name=name value=$suggested_name>";
-  echo "      <span class=error></span>";
+  echo "    <input type='hidden' name='action' value='new-survey'>";
+  echo "    <input class='existing' type='hidden' value='$existing_names'>";
+  echo "    <span class='new-name'>";
+  echo "      <span class='label'>Survey Name</span>";
+  echo "      <input type='text' class='new-name' name='name' value='$suggested_name'>";
+  echo "      <span class='error'></span>";
   echo "    </span>";
   echo "    <div>";
-  $class = "class='submit button button-primary button-large'";
-  echo "      <input type=submit value='Create Survey' $class'>";
+  $class = 'submit button button-primary button-large';
+  echo "      <input type='submit' value='Create Survey' class='$class''>";
   echo "    </div>";
   echo "  </form>";
   echo "</div>";
@@ -164,7 +164,7 @@ function add_new_survey_content()
 
 function add_past_survey_content($pid,$current)
 {
-  echo "<div class=past>";
+  echo "<div class='past'>";
 
   $survey = survey_catalog()[$pid] ?? null;
   if(!$survey) { 
@@ -174,16 +174,16 @@ function add_past_survey_content($pid,$current)
 
   if(!$current) {
     $action = $_SERVER['REQUEST_URI'];
-    echo "<form class='tlc reopen-survey' action=$action method=POST>";
+    echo "<form class='reopen-survey' action='$action' method='post'>";
     wp_nonce_field(OPTIONS_NONCE);
-    echo "<input type=hidden name=action value=reopen-survey>";
-    echo "<input type=hidden name=pid value=$pid>";
-    echo "<input type=submit value='Reopen survey'>";
+    echo "<input type='hidden' name='action' value='reopen-survey'>";
+    echo "<input type='hidden' name=pid value='$pid'>";
+    echo "<input type='submit' value='Reopen survey'>";
     echo "</form>";
   }
 
   $name = $survey['name'];
-  echo "<div class=info>";
+  echo "<div class='info'>";
   echo "<div> The $name Time and Talent Survey is currently closed. ";
   echo "</div><div>";
   echo "No changes can be made to its content.";
@@ -196,12 +196,12 @@ function add_past_survey_content($pid,$current)
 
 function add_current_survey_content($current)
 {
-  echo "<div class=current>";
+  echo "<div class='current'>";
 
   $name = $current['name'];
   $status = $current['status'];
   if($status == SURVEY_IS_ACTIVE) {
-    echo "<div class=info>";
+    echo "<div class='info'>";
     echo "<div> The $name Time and Talent Survey is currently open. ";
     echo "</div><div>";
     echo "No changes can be made to its content without moving it back ";
@@ -210,7 +210,7 @@ function add_current_survey_content($current)
     add_survey_content($current);
   }
   elseif($status == SURVEY_IS_DRAFT) {
-    echo "<div class=info>";
+    echo "<div class='info'>";
     echo "<div>The $name Time and Talent Survey is currently in draft mode.";
     echo "</div><div>";
     echo "To lock in its structure and open it for participation, switch its status";
@@ -231,8 +231,8 @@ function add_mutable_survey_content($survey)
   // check to see if there is currently a lock on the content
   // lock will be set to 0 if we're acquiring the lock
   $lock = wp_check_post_lock($pid) ?? 0;
-  echo "<input type=hidden name=pid value=$pid>";
-  echo "<input type=hidden name=lock value=$lock>";
+  echo "<input type='hidden' name='pid' value='$pid'>";
+  echo "<input type='hidden' name='lock' value='$lock'>";
   if($lock) {
     // someone else has a lock, post a warning about this
     // the actual disabling/enabling of the form is handled by javascript
@@ -261,14 +261,15 @@ function add_mutable_survey_content($survey)
   wp_enqueue_script('tlc_content_lock_scripts');
 
   // wrap the content in a form
-  echo "<form class='tlc edit-survey' action=$action method=POST>"; 
+  echo "<form class='edit-survey' action='$action' method='post'>"; 
   wp_nonce_field(OPTIONS_NONCE);
-  echo "<input type=hidden name=action value=update-survey>";
+  echo "<input type='hidden' name='action' value='update-survey'>";
 
   add_survey_content($survey,true);
 
   // note that the submit button is disabled until javascript checks the lock status
-  echo "<input type='submit' value='Save' class='submit button button-primary button-large' disabled>";
+  $class = 'submit button button-primary button-large';
+  echo "<input type='submit' value='Save' class='$class' disabled>";
   echo "</form>";
 }
 
@@ -292,18 +293,18 @@ function add_survey_content($survey)
 
   $data = $content['survey'] ?? '';
   echo "<h2>Survey Form</h2>";
-  echo "<div class=info>";
+  echo "<div class='info'>";
   echo "Instructions go here.";
-  echo "<textarea class='survey' name=survey readonly>$data</textarea>";
+  echo "<textarea class='survey' name='survey' readonly>$data</textarea>";
   echo "</div>";
 
   echo "<h2>Email Templates</h2>";
-  echo "<div class=info>";
+  echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
-  echo "the <a href='https://www.markdownguide.org/basic-syntax' target=_blank>";
+  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
   echo "Markdown Guid</a>.";
   echo "</div>";
-  echo "<div class=info>";
+  echo "<div class='info'>";
   echo "In addition, the following placeholders may be used to customize the message.";
   echo "</div>";
   echo "<table class=info>";
@@ -313,10 +314,10 @@ function add_survey_content($survey)
   echo "</table>";
 
   $welcome = $content['welcome'];
-  echo "<div class=email-template>";
+  echo "<div class='email-template'>";
   echo "<h3>Welcome</h3>";
-  echo "<div class=info>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='welcome' name=welcome readonly>$welcome</textarea>";
+  echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
+  echo "<textarea class='welcome' name='welcome' readonly>$welcome</textarea>";
   echo "</div>";
 
   echo "</div>";

@@ -282,11 +282,11 @@
   height:5em;
 }
 
-#tlc-ttsurvey-admin .content div.nav-tab-wrapper.survey {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey {
   margin-bottom:15px;
 }
 
-#tlc-ttsurvey-admin .content div.nav-tab-wrapper.survey a.nav-tab {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab {
   padding: 0 10px 0 10px;
 }
 
