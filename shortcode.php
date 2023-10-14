@@ -119,7 +119,7 @@ function add_noscript()
 ?>
   <noscript>
   <div class='noscript'>This survey works best with Javascript enabled</div>
-  <p>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
+  <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
 }
