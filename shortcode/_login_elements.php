@@ -11,7 +11,8 @@ function start_login_form($header,$name)
 {
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-  echo "<div class='login_form $name w3-container w3-card-4 w3-border w3-border-blue-gray'>";
+  $w3_card = 'w3-container w3-card-4 w3-border w3-border-blue-gray';
+  echo "<div class='login_form $name $w3_card'>";
   echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
   echo "<form class='login w3-container' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
