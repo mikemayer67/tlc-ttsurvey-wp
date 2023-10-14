@@ -13,7 +13,7 @@
   padding: 5px 10px;
 }
 
-#tlc-ttsurvey .noscript p {
+#tlc-ttsurvey p.noscript {
   color: brown;
   margin-top:0;
   margin-left:1em;

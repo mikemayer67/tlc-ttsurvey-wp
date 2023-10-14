@@ -192,7 +192,7 @@ function handle_login_register()
   else
   {
     set_status_warning($error);
-    current_shortcode_page('register');
+    shortcode_page('register');
   }
 }
 
@@ -211,7 +211,7 @@ function handle_send_userid()
     set_status_info("Sent userid/password to $email");
   } else {
     set_status_warning("Unrecognized email address");
-    current_shortcode_page("senduserid");
+    shortcode_page("senduserid");
   }
 }
 

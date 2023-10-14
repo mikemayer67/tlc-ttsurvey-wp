@@ -64,27 +64,11 @@ function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
 function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
 
 
-function current_shortcode_page($page=null)
+function shortcode_page($page=null)
 {
-  static $_shortcut_page = null;
-  if($page) 
-  { 
-    // if a page was specified, this function is a setter
-    $_shortcut_page = $page; 
-  }
-  else
-  {
-    // no page was specified, this function is a getter
-    if($shortcuct_page) {
-      // page was explicitly set via the setter, return that page
-      $page = $_shortcut_page;
-    } else {
-      // if page specified via the URL, return that page
-      // otherwise, return null
-      $page = $_GET{'tlcpage'} ?? null;
-    }
-  }
-  return $page;
+  static $shortcut_page = null;
+  if($page) { $shortcut_page = $page; }
+  return $shortcut_page;
 }
 
 
@@ -119,7 +103,7 @@ function add_noscript()
 ?>
   <noscript>
   <div class='noscript'>This survey works best with Javascript enabled</div>
-  <p>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
+  <p class='noscript'>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
 }
@@ -129,25 +113,25 @@ function add_status_message()
   $status = status_message();
   if(is_null($status)) { return ; }
 
-  $class = 'status w3-panel w3-card w3-border w3-leftbar';
+  $classes = 'status w3-panel w3-card w3-border w3-leftbar';
 
   [$level,$msg] = $status;
   switch($level)
   {
   case INFO_STATUS:
-    $class .= 'w3-pale-green w3-border-green';
+    $classes .= 'w3-pale-green w3-border-green';
     break;
   case WARNING_STATUS:
-    $class .= 'w3-pale-yellow w3-border-orange';
+    $classes .= 'w3-pale-yellow w3-border-orange';
     break;
   case ERROR_STATUS:
-    $class .= 'w3-pale-red w3-border-red';
+    $classes .= 'w3-pale-red w3-border-red';
     break;
   default:
     log_error("Unexpected survey status level encountered: $level");
     return;
   }
-  echo "<div class='$class'>$msg</div>";
+  echo "<div class='$classes'>$msg</div>";
 }
 
 function add_shortcode_content()
@@ -158,9 +142,14 @@ function add_shortcode_content()
     return;
   }
 
-  $page = current_shortcode_page();
-  if($page) 
-  {
+  $page = shortcode_page();
+  if($page) {
+    require plugin_path("shortcode/$page.php");
+    return;
+  }
+
+  if(key_exists('tlcpage',$_GET)) {
+    $page = $_GET['tlcpage'];
     if(in_array($page,['register','login','page','senduserid']))
     {
       enqueue_login_ajax_scripts();
