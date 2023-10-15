@@ -4,7 +4,7 @@ jQuery(document).ready(
     $('.requires-javascript').show();
 
     // new survey form
-    var ns_form = $('form.tlc.new-survey');
+    var ns_form = $('form.new-survey');
     var ns_new_name = ns_form.find('input.new-name'); 
     var ns_error = ns_form.find('span.error');
     var ns_submit = ns_form.find('input.submit');

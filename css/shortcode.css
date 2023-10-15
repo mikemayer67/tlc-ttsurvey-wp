@@ -1,0 +1,72 @@
+#tlc-ttsurvey {
+  background-color:white;
+  color:black;
+}
+
+#tlc-ttsurvey div.noscript {
+  font-family: sans-serif;
+  width: 100%;
+  font-size: larger;
+  font-weight: bold;
+  color: white;
+  background-color: brown;
+  padding: 5px 10px;
+}
+
+#tlc-ttsurvey p.noscript {
+  color: brown;
+  margin-top:0;
+  margin-left:1em;
+}
+
+#tlc-ttsurvey div.status {
+  width: fit-content;
+}
+
+#tlc-ttsurvey div.instruction
+{
+  padding:8px 0 0 0;
+  color:gray;
+}
+
+#tlc-ttsurvey div.info
+{
+  background-color:#fff;
+
+  margin:5px 0 0 0;
+  padding:8px;
+  width:100%;
+}
+@media (min-width:480px)
+{
+  #tlc-ttsurvey div.info
+  {
+    margin:5px 0 0 25px;
+    padding:8px;
+    width:80%;
+  }
+}
+
+#tlc-ttsurvey form .info p
+{
+  margin:0 0 5px 0;
+  font-size:small;
+  line-height: 1rem;
+}
+
+#tlc-ttsurvey form .info .info-list
+{
+  margin-left:10px;
+  margin-bottom:0;
+}
+
+#tlc-ttsurvey form .info .info-list::before
+{
+  content:"> ";
+  color:gray;
+}
+
+#tlc-ttsurvey form .info-trigger {
+  display:none;
+  margin-left:10px;
+}

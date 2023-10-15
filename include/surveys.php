@@ -16,7 +16,7 @@ if( ! defined('WPINC') ) { die; }
  * The post content contains a json encoded array containing all of the 
  * survey content
  *
- * NOTE... while the intent of the name is to indicate the year the
+ * NOTE... while the intent of the name/title is to indicate the year the
  *   survey is conducted, it can actually be any valid string.  This
  *   means that it can be more flexible, e.g there could be both a
  *   "2023" and "2023b" survey or even something like "2022-2023" 
@@ -221,9 +221,9 @@ function create_new_survey($name)
     $name = $current['name'];
     $status = $current['status'];
     if($status == SURVEY_IS_ACTIVE) {
-      log_error("Attempted to reopen survey when $name is already open");
+      log_error("Attempted to create survey when $name is already open");
     } else {
-      log_error("Attempted to reopen survey when draft $name exists");
+      log_error("Attempted to create survey when draft $name exists");
     }
     return null;
   }

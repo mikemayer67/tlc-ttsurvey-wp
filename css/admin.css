@@ -1,0 +1,370 @@
+/** 
+ * Common to all tabs
+ **/
+
+#tlc-ttsurvey-admin form {
+  margin-left: 15px;
+  width: 100%;
+  max-width: 750px;
+}
+
+#tlc-ttsurvey-admin form div.label {
+  font-weight: bold;
+  font-size: larger;
+  margin-top: 20px;
+}
+
+#tlc-ttsurvey-admin form div.info,
+#tlc-ttsurvey-admin form div.warning{
+  font-weight: 200;
+  margin-left: 30px;
+  margin-bottom: 5px;
+}
+
+#tlc-ttsurvey-admin form div.warning {
+  color:#800;
+}
+
+#tlc-ttsurvey-admin form span.info {
+  font-weight: 200;
+  font-size: smaller;
+}
+
+#tlc-ttsurvey-admin form div.input {
+  margin-left: 30px;
+}
+
+#tlc-ttsurvey-admin form input.submit {
+  margin-top:20px;
+}
+
+#tlc-ttsurvey-admin form .input-label {
+  font-weight:bold;
+}
+
+#tlc-ttsurvey-admin form .input-info {
+  margin-left: 5px;
+  font-weight:200;
+}
+
+#tlc-ttsurvey-admin form table {
+  border-collapse:collapse;
+}
+
+#tlc-ttsurvey-admin form th {
+  border-bottom: 1px solid;
+  padding-left:5px;
+  padding-right:5px;
+}
+
+#tlc-ttsurvey-admin form td {
+  margin:3px;
+  padding-top:10px;
+}
+
+#tlc-ttsurvey-admin form td.name {
+  font-weight:bold;
+  text-align:right;
+}
+
+#tlc-ttsurvey-admin .tlc-status {
+  font-size:smaller;
+  font-weight:200;
+  margin-left:20px;
+  padding-left:10px;
+  padding-right:10px;
+  background:yellow;
+  color:black;
+  border:solid;
+  border-width:1px;
+  border-color:lightgray;
+}
+
+#tlc-ttsurvey-admin .tlc-status.error {
+  background:pink;
+}
+
+#tlc-ttsurvey-admin noscript.warning p {
+  font-weight:bold;
+  font-size:large;
+  color:#c00000;
+}
+
+#tlc-ttsurvey-admin .requires-javascript {
+  display:none;
+}
+
+
+/** 
+ * Overview Tab
+ **/
+
+
+#tlc-ttsurvey-admin .overview div,
+#tlc-ttsurvey-admin .overview table
+{
+  margin-left:15px;
+}
+
+#tlc-ttsurvey-admin .overview table table
+{
+  margin-left:0;
+}
+
+#tlc-ttsurvey-admin .overview h1,
+#tlc-ttsurvey-admin .overview h2,
+#tlc-ttsurvey-admin .overview h3
+{
+  margin-left:0px;
+  margin-top:25px;
+  margin-bottom:8px;
+}
+
+#tlc-ttsurvey-admin .overview li
+{
+  list-style-type: initial;
+}
+
+#tlc-ttsurvey-admin .overview td.label {
+  font-weight: bold;
+  vertical-align: top;
+}
+
+#tlc-ttsurvey-admin .overview td.name {
+  font-weight: bolder;
+  text-align:right;
+}
+
+#tlc-ttsurvey-admin .overview td.value {
+  padding-left:5px;
+  font-weight:200;
+  text-align:left;
+}
+
+#tlc-ttsurvey-admin .overview .usage .note {
+  margin-top:10px;
+  font-weight:bolder;
+}
+
+#tlc-ttsurvey-admin .overview .usage .qual {
+  padding-left:15px;
+  font-weight:400;
+  font-style:italic;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args {
+  margin-left:15px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args .arg {
+  font-weight:bolder;
+  margin-top:10px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .args .info {
+  margin-top:0;
+  font-weight:400;
+}
+
+#tlc-ttsurvey-admin .overview .usage .example {
+  padding-top:8px;
+}
+
+#tlc-ttsurvey-admin .overview .usage .example span {
+  font-family: monospace;
+  font-weight: bolder;
+  font-size: medium;
+  margin-left: 15px;
+  padding: 4px;
+  color: black;
+  background: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+}
+
+#tlc-ttsurvey-admin .overview .info {
+  max-width: 80%;
+}
+
+
+/**
+ * Settings Tab
+ */
+
+#tlc-ttsurvey-admin form .settings,
+#tlc-ttsurvey-admin .settings form table {
+  margin-left:3em;
+  margin-top:10px;
+}
+
+#tlc-ttsurvey-admin .settings table.caps td div {
+  text-align:center;
+}
+
+
+/**
+ * Content Tab
+ */
+
+#tlc-ttsurvey-admin .content {
+  max-width: 775px;
+}
+
+#tlc-ttsurvey-admin .content div.info {
+  margin-left:1.5em;
+}
+
+#tlc-ttsurvey-admin .content div.info.lock {
+  margin:3px 1.5em;
+  padding:3px 15px;
+  background:#fd8;
+  border:solid;
+  border-width:1px;
+}
+
+#tlc-ttsurvey-admin .content div.info.unlocked {
+  margin:3px 1.5em;
+  padding:3px 15px;
+  background:#cfc;
+  border:solid;
+  border-width:1px;
+}
+
+#tlc-ttsurvey-admin .content div.content-block {
+  margin-left:1.5em;
+}
+
+#tlc-ttsurvey-admin .content div.content-block table.info {
+  margin-left: 3em;
+}
+
+#tlc-ttsurvey-admin .content div.content-block table.info td{
+  padding-left:3px;
+  padding-top:0;
+}
+
+#tlc-ttsurvey-admin .content div.content-block table.info td:first-child {
+  font-family:monospace;
+  padding:0 5px 0 5px;
+  background-color:#ddd;
+  text-align:center;
+}
+
+#tlc-ttsurvey-admin .content div.content-block h2 {
+  margin: 20px 0 5px 0;
+}
+
+#tlc-ttsurvey-admin .content div.email-template {
+  margin: 10px 0 0 20px;
+}
+
+#tlc-ttsurvey-admin .content div.email-template h3 {
+  margin:0;
+  font-size: 1.2em;
+}
+
+#tlc-ttsurvey-admin .content div.content-block textarea {
+  width:95%;
+  margin-left:15px;
+}
+
+#tlc-ttsurvey-admin .content div.content-block textarea {
+  width:95%;
+  margin-left:15px;
+}
+
+#tlc-ttsurvey-admin .content div.content-block textarea.survey {
+  height:10em;
+}
+
+#tlc-ttsurvey-admin .content div.content-block textarea {
+  height:5em;
+}
+
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey {
+  margin-bottom:15px;
+}
+
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab {
+  padding: 0 10px 0 10px;
+}
+
+#tlc-ttsurvey-admin .content div.menubar {
+  margin: 1em 2em 1em 2em;
+}
+
+#tlc-ttsurvey-admin .content div.menubar a.nav-tab {
+  padding: 0 10px 0 10px;
+}
+
+#tlc-ttsurvey-admin form.new-survey span.new-name {
+  margin-left:1.5rem;
+}
+
+#tlc-ttsurvey-admin form.new-survey input.new-name {
+  width:100px;
+}
+
+#tlc-ttsurvey-admin form.new-survey span.error {
+  color:#800;
+}
+
+#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
+  position:absolute;
+  right:15px;
+}
+
+
+/**
+ * Content Tab
+ */
+
+#tlc-ttsurvey-admin div.log {
+  margin-left:15px;
+  margin-top:15px;
+  border-width:1px;
+  border-color:black;
+  border-style:solid;
+  overflow-y:scroll;
+  width:95%;
+  height:500px;
+}
+
+#tlc-ttsurvey-admin div.log table {
+  table-layout: auto;
+  width:100%;
+}
+
+#tlc-ttsurvey-admin div.log tr.warning td {
+  color:#e88010;
+}
+
+#tlc-ttsurvey-admin div.log tr.error td {
+  color:#a00000;
+}
+
+#tlc-ttsurvey-admin div.log tr.info td {
+  color:#0000a0;
+}
+
+#tlc-ttsurvey-admin div.log td.date {
+  white-space:nowrap;
+}
+
+#tlc-ttsurvey-admin div.log td.message {
+  padding-left:5px;
+  font-weight:600;
+  width:100%;
+}
+
+#tlc-ttsurvey-admin div.log tr:nth-child(odd) {
+  background: white;
+}
+
+#tlc-ttsurvey-admin div.log tr:nth-child(even) {
+  background: #e0e0e0;
+}
+
+
+

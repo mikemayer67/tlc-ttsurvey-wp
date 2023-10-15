@@ -40,6 +40,7 @@ if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   }
 }
 
+echo "<div id='tlc-ttsurvey-admin'>";
 echo "<h1>$title$status</h1>";
 echo "<div class='nav-tab-wrapper'>";
 
@@ -60,18 +61,19 @@ parse_str(parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY),$query_args);
 if($cur_tab != 'content') {
   unset($query_args['sid']);
 }
-foreach($tabs as $tab) {
+foreach($tabs as [$tab,$label]) {
   $class = 'nav-tab';
-  $tab_label = $tab[1];
-  if($cur_tab == $tab[0]) {
+  if($cur_tab == $tab) {
     $class .= ' nav-tab-active';
   }
-  $query_args['tab'] = $tab[0];
+  $query_args['tab'] = $tab;
   $uri = $uri_path . '?' .http_build_query($query_args);
-  echo "<a class='$class' href='$uri'>$tab_label</a>";
+  echo "<a class='$class' href='$uri'>$label</a>";
 }
 
-echo "</div>";
+echo "</div>"; // nav-tab-wrapper
 
 require plugin_path("admin/survey_${cur_tab}.php");
+
+echo "</div>"; // tlc-ttsurvey-admin
 

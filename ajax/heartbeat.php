@@ -17,11 +17,9 @@ function handle_heartbeat($response, $data, $screen_id)
         // it is still locked
         //   return the lock status and name of person who has the lock
         $user = get_userdata($locked_by);
-        $firstname = $user->first_name;
-        $lastname = $user->last_name;
         $response['tlc_ttsurvey_lock'] = array(
           'has_lock'=>0, 
-          'locked_by'=>"$firstname $lastname",
+          'locked_by'=>$user->display_name,
         );
       }
       else

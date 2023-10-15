@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const LOGIN_FORM_NONCE = 'tlc-ttsurver-login';
+const LOGIN_FORM_NONCE = 'tlc-ttsurvey-login';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
@@ -64,11 +64,27 @@ function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
 function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
 
 
-function shortcode_page($page=null)
+function current_shortcode_page($page=null)
 {
-  static $shortcut_page = null;
-  if($page) { $shortcut_page = $page; }
-  return $shortcut_page;
+  static $_shortcut_page = null;
+  if($page) 
+  { 
+    // if a page was specified, this function is a setter
+    $_shortcut_page = $page; 
+  }
+  else
+  {
+    // no page was specified, this function is a getter
+    if($shortcuct_page) {
+      // page was explicitly set via the setter, return that page
+      $page = $_shortcut_page;
+    } else {
+      // if page specified via the URL, return that page
+      // otherwise, return null
+      $page = $_GET{'tlcpage'} ?? null;
+    }
+  }
+  return $page;
 }
 
 
@@ -81,7 +97,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
 
   ob_start();
 
-  echo "<div id=tlc-ttsurvey>";
+  echo "<div id='tlc-ttsurvey'>";
   add_noscript();
   add_status_message();
   add_shortcode_content();
@@ -102,7 +118,7 @@ function add_noscript()
   }
 ?>
   <noscript>
-  <div class=noscript>This survey works best with Javascript enabled</div>
+  <div class='noscript'>This survey works best with Javascript enabled</div>
   <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
   </noscript>
 <?php
@@ -113,30 +129,25 @@ function add_status_message()
   $status = status_message();
   if(is_null($status)) { return ; }
 
-  $classes = explode(' ','status w3-panel w3-card w3-border w3-leftbar');
+  $class = 'status w3-panel w3-card w3-border w3-leftbar';
 
   [$level,$msg] = $status;
   switch($level)
   {
   case INFO_STATUS:
-    $classes[] = 'w3-pale-green';
-    $classes[] = 'w3-border-green';
+    $class .= 'w3-pale-green w3-border-green';
     break;
   case WARNING_STATUS:
-    $classes[] = 'w3-pale-yellow';
-    $classes[] = 'w3-border-orange';
+    $class .= 'w3-pale-yellow w3-border-orange';
     break;
   case ERROR_STATUS:
-    $classes[] = 'w3-pale-red';
-    $classes[] = 'w3-border-red';
+    $class .= 'w3-pale-red w3-border-red';
     break;
   default:
     log_error("Unexpected survey status level encountered: $level");
     return;
   }
-
-  $classes = implode(' ',$classes);
-  echo "<div class='$classes'>$msg</div>";
+  echo "<div class='$class'>$msg</div>";
 }
 
 function add_shortcode_content()
@@ -147,14 +158,9 @@ function add_shortcode_content()
     return;
   }
 
-  $page = shortcode_page();
-  if($page) {
-    require plugin_path("shortcode/$page.php");
-    return;
-  }
-
-  if(key_exists('tlcpage',$_GET)) {
-    $page = $_GET['tlcpage'];
+  $page = current_shortcode_page();
+  if($page) 
+  {
     if(in_array($page,['register','login','page','senduserid']))
     {
       enqueue_login_ajax_scripts();
@@ -230,7 +236,7 @@ function enqueue_login_ajax_scripts()
   wp_enqueue_script('tlc_ttsurvey_login_ajax');
 }
 
-wp_enqueue_style('tlc-ttsurvey', plugin_url('css/tlc-ttsurvey.css'));
+wp_enqueue_style('tlc-ttsurvey', plugin_url('css/shortcode.css'));
 wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
