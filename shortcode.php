@@ -64,29 +64,36 @@ function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
 function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
 
 
-function current_shortcode_page($page=null)
+function _shortcode_page($action,$page=null)
 {
   static $_shortcut_page = null;
-  if($page) 
-  { 
-    // if a page was specified, this function is a setter
-    $_shortcut_page = $page; 
+  if($action == '_get') {
+    return $_shortcode_page;
+  } elseif($action == '_set') {
+    $_shortcode_page = $page;
+  } elseif($action == '_clear') {
+    $_shortcode_page = null;
   }
-  else
-  {
-    // no page was specified, this function is a getter
-    if($shortcuct_page) {
-      // page was explicitly set via the setter, return that page
-      $page = $_shortcut_page;
-    } else {
-      // if page specified via the URL, return that page
-      // otherwise, return null
-      $page = $_GET{'tlcpage'} ?? null;
-    }
-  }
-  return $page;
 }
 
+function current_shortcode_page()
+{
+  // returns first hit of:
+  // - page explicitly set with set_current_shortcode_page
+  // - page extracted from the URL query (tlcpage)
+  // - null
+  return _shortcode_page('_get') ?? $_GET['tlcpage'] ?? null;
+}
+
+function set_current_shortcode_page($page)
+{
+  _shortcode_page('_set',$page);
+}
+
+function clear_current_shortcode_page()
+{
+  _shortcode_page('_clear');
+}
 
 
 function handle_shortcode($attr,$content=null,$tag=null)
@@ -188,6 +195,8 @@ function add_shortcode_content()
     enqueue_login_ajax_scripts();
     require plugin_path('shortcode/login.php');
   }
+
+  return;
 }
 
 /**
