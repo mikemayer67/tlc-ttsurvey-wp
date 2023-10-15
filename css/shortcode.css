@@ -27,6 +27,11 @@
  *******************************************************************************
  **
  ** Login Forms
+ **  prefixing #tlc-ttsurvey-login with div was necessary to bump the
+ **  specificity match for a number of the selectors.  Rather than having
+ **  a mashup of selectors with and without the div prefix (and having to
+ **  spend the time to figure out which do and which don't need it), it
+ **  is simply added to all of the #tlc-ttsurvey-login selectors.
  **
  *******************************************************************************
  *******************************************************************************/
@@ -35,82 +40,126 @@
  * div containing a login form (class = login_form)
  **/
 
-#tlc-ttsurvey div.login_form
+div#tlc-ttsurvey-login.card
 {
-  width:min(100%,400px);
+  width:min(100%,480px);
   margin:0;
   padding:0;
 }
 @media (min-width:480px)
 {
-  #tlc-ttsurvey div.login_form
+  div#tlc-ttsurvey-login.card
   { 
+    width:min(100%,600px);
     margin:0 auto;
   }
 }
 
-#tlc-ttsurvey div.login_form form
+div#tlc-ttsurvey-login form
 {
   background-color:#e8e8e8;
 }
-
-
 
 /**
  * Form elements
  **/
 
-#tlc-ttsurvey div.login_form form div.input {
+div#tlc-ttsurvey-login form div.input {
   margin-top:16px;
 }
 
-#tlc-ttsurvey div.login_form form div.input div.label {
+div#tlc-ttsurvey-login form div.input div.label {
   padding:0;
 }
 
-#tlc-ttsurvey div.login_form form input.invalid {
+div#tlc-ttsurvey-login form input.invalid {
   background-color:#ffdddd;
 }
 
-#tlc-ttsurvey div.login_form form input.empty {
+div#tlc-ttsurvey-login form input.empty {
   background-color:#ffffcc;
 }
 
-#tlc-ttsurvey div.login_form form input.w3-input 
-{ 
-  width:100%; 
-}
-/*
-@media (min-width:480px)
-{
-  #tlc-ttsurvey div.login_form form input.w3-input 
-  { 
-    width:90%; 
-  }
-}
-*/
-
-#tlc-ttsurvey .login_form form .error {
+div#tlc-ttsurvey-login form .error {
   color:#c00000;
   font-size:x-small;
   display:none;
 }
 
-#tlc-ttsurvey .login_form button {
+div#tlc-ttsurvey-login button {
   box-sizing: border-box;
 }
+
+div#tlc-ttsurvey-login form input.w3-input
+{
+  width:100%;
+  border-left:none;
+  border-right:none;
+  border-top:none;
+}
+
+/**
+ * Register Form
+ **/
+
+/**
+ * Senduserid Form
+ **/
+
+div#tlc-ttsurvey-login.senduserid div.input {
+  margin-top:0;
+}
+
+div#tlc-ttsurvey-login.senduserid input.w3-input
+{
+  width:100%;
+}
+
+/**
+ * Resume Form
+ **/
+
+divdiv#tlc-ttsurvey-login.resume-login form li {
+  list-style-type: none;
+  border-bottom: 1px solid #d5d5d5;
+  border-radius: 10px;
+  box-shadow: 0 2px 2px rgba(0,0,0,.3);
+  width: 300px;
+  height:60px;
+  margin-top:3px;
+}
+
+div#tlc-ttsurvey-login.resume form li button {
+  background:#f8f8f8;
+  color:black;
+  width:100%;
+  height:100%;
+  font-weight:bold;
+  margin:0;
+  padding:0;
+}
+
+div#tlc-ttsurvey-login.resume form li button:hover {
+  background:#e0ffe0;
+}
+
+div#tlc-ttsurvey-login.resume form li button:active {
+  background:#a0ffa0;
+  transform:translate(2px,2px)
+}
+
 
 /**
  * Form Instructions/Info
  **/
 
-#tlc-ttsurvey .instruction
+#tlc-ttsurvey div.instruction
 {
   padding:8px 0 0 0;
   color:gray;
 }
 
-#tlc-ttsurvey form .info
+#tlc-ttsurvey div.info
 {
   background-color:#fff;
 
@@ -120,7 +169,7 @@
 }
 @media (min-width:480px)
 {
-  #tlc-ttsurvey form .info
+  #tlc-ttsurvey div.info
   {
     margin:5px 0 0 25px;
     padding:8px;
@@ -147,75 +196,9 @@
   color:gray;
 }
 
-#tlc-ttsurvey div.login_form form .info-trigger {
-  display:none;
-  margin-left:10px;
-}
-
-#tlc-ttsurvey div.login_form form .info-test {
+#tlc-ttsurvey form .info-trigger {
   display:none;
   margin-left:10px;
 }
 
 
-/**
- * Login Form
- **/
-
-#tlc-ttsurvey form.login input.w3-input
-{
-  width:90%;
-  border-left:none;
-  border-right:none;
-  border-top:none;
-}
-
-/**
- * Register Form
- **/
-
-/**
- * Senduserid Form
- **/
-
-#tlc-ttsurvey .login_form.senduserid div.input {
-  margin-top:0;
-}
-
-#tlc-ttsurvey .login_form.senduserid input.w3-input
-{
-  width:100%;
-}
-
-/**
- * Resume Form
- **/
-
-#tlc-ttsurvey form.resume li {
-  list-style-type: none;
-  border-bottom: 1px solid #d5d5d5;
-  border-radius: 10px;
-  box-shadow: 0 2px 2px rgba(0,0,0,.3);
-  width: 300px;
-  height:60px;
-  margin-top:3px;
-}
-
-#tlc-ttsurvey form.resume li button {
-  background:#f8f8f8;
-  color:black;
-  width:100%;
-  height:100%;
-  font-weight:bold;
-  margin:0;
-  padding:0;
-}
-
-#tlc-ttsurvey form.resume li button:hover {
-  background:#e0ffe0;
-}
-
-#tlc-ttsurvey form.resume li button:active {
-  background:#a0ffa0;
-  transform:translate(2px,2px)
-}
