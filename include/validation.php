@@ -92,3 +92,10 @@ function validate_login_input($key,$value,&$error=null)
 
   return strlen($error) == 0;
 }
+
+
+function validate_survey_content($key,$value,&$error=null)
+{
+  $error = "Invalid $key";
+  return false;
+}

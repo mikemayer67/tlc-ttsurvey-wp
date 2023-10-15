@@ -298,26 +298,20 @@
   padding: 0 10px 0 10px;
 }
 
-#tlc-ttsurvey-admin form.new-survey span.new-name {
-  margin-left:1.5rem;
+#tlc-ttsurvey-admin .content div.invalid {
+  color:#b00;
+  margin-right:2em;
+  text-align:end;
+  font-weight:bolder;
+  display:none;
 }
 
-#tlc-ttsurvey-admin form.new-survey input.new-name {
-  width:100px;
+#tlc-ttsurvey-admin .content textarea.invalid {
+  border-color:#b00;
 }
-
-#tlc-ttsurvey-admin form.new-survey span.error {
-  color:#800;
-}
-
-#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
-  position:absolute;
-  right:15px;
-}
-
 
 /**
- * Content Tab
+ * Log Tab
  */
 
 #tlc-ttsurvey-admin div.log {
@@ -366,5 +360,24 @@
   background: #e0e0e0;
 }
 
+/**
+ * Other stuff
+ **/
 
+#tlc-ttsurvey-admin form.new-survey span.new-name {
+  margin-left:1.5rem;
+}
+
+#tlc-ttsurvey-admin form.new-survey input.new-name {
+  width:100px;
+}
+
+#tlc-ttsurvey-admin form.new-survey span.error {
+  color:#800;
+}
+
+#tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
+  position:absolute;
+  right:15px;
+}
 

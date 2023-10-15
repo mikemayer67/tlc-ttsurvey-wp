@@ -8,7 +8,6 @@ jQuery(document).ready(
     var lock_info = $('#tlc-ttsurvey-admin .content .info.lock');
 
     if(lock.val() == 0) {
-      submit.prop('disabled',false);
       inputs.prop('readonly',false);
     }
 
@@ -20,7 +19,6 @@ jQuery(document).ready(
       var rc = data.tlc_ttsurvey_lock;
       if(rc.has_lock) {
         lock.val(0);
-        submit.prop('disabled',false);
         inputs.prop('readonly',false);
         lock_info.removeClass('lock').addClass('unlocked');
         lock_info.html("You may now edit the survey content.");

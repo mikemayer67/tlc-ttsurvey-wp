@@ -252,13 +252,36 @@ function add_mutable_survey_content($survey)
   //   if we have the lock, renew it
   //   if we don't have the lock, watch for it to become available
   wp_register_script(
-    'tlc_content_lock_scripts',
+    'tlc_ttsurvey_content_lock',
     plugin_url('js/content_lock.js'),
     array('jquery'),
     '1.0.3',
     true
   );
-  wp_enqueue_script('tlc_content_lock_scripts');
+  wp_enqueue_script('tlc_ttsurvey_content_lock');
+
+  // add script to manage the state of the submit button
+  //   on change in any of the inputs, use ajax to validate all inputs
+  //   enable submit only if all are valid
+  //   add error info for any bad inputs
+  wp_register_script(
+    'tlc_ttsurvey_content_edit',
+    plugin_url('js/content_edit.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  $key = 'content_edit';
+  wp_localize_script(
+    'tlc_ttsurvey_content_edit',
+    'edit_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array($key,wp_create_nonce($key)),
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_content_edit');
+
 
   // wrap the content in a form
   echo "<form class='edit-survey' action='$action' method='post'>"; 
@@ -296,6 +319,7 @@ function add_survey_content($survey)
   echo "<div class='info'>";
   echo "Instructions go here.";
   echo "<textarea class='survey' name='survey' readonly>$data</textarea>";
+  echo "<div class='invalid survey'>Stuff</div>";
   echo "</div>";
 
   echo "<h2>Email Templates</h2>";
@@ -321,6 +345,7 @@ function add_survey_content($survey)
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
   echo "<textarea class='welcome' name='welcome' readonly>$welcome</textarea>";
+  echo "<div class='invalid welcome'>Stuff</div>";
   echo "</div>";
 
   echo "</div>";
