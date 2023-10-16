@@ -302,3 +302,14 @@ function update_survey_content_from_post()
 
   return $rval;
 }
+
+
+/**
+ * parse survey yaml into json
+ **/
+
+function parse_survey_yaml($yaml, &$error=null)
+{
+  return "Need to implement this";
+}
+

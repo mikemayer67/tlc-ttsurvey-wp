@@ -27,7 +27,9 @@ function handle_heartbeat($response, $data, $screen_id)
         // no longer locked
         //   acquire the lock and return the new lock status
         wp_set_post_lock($pid);
+        // add the current content values to the response
         $response['tlc_ttsurvey_lock'] = array('has_lock'=>1);
+        $response['content'] = "@@@ need to set this";
       }
     }
     else 

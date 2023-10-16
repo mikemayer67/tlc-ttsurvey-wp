@@ -22,6 +22,9 @@ jQuery(document).ready(
         inputs.prop('readonly',false);
         lock_info.removeClass('lock').addClass('unlocked');
         lock_info.html("You may now edit the survey content.");
+        if('content' in data) {
+          alert('add code to populate content values: ' + data.content);
+        }
       }
     });
   }

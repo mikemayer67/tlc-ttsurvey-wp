@@ -241,7 +241,7 @@ function add_mutable_survey_content($survey)
     echo "<div class='info lock'>";
     echo "<div>The survey is currently being edited by $locked_by.</div>";
     echo "<div>You cannot make any changes until they have completed their edits.</div>";
-    echo "<div>You can stay on this page and wait... we'll watch for you.</div>";
+    echo "<div>You can stay on this page and wait...</div>";
     echo "</div>";
   } else {
     // nobody else has a lock, acquire it now
@@ -319,17 +319,21 @@ function add_survey_content($survey)
   echo "<div class='info'>";
   echo "Instructions go here.";
   echo "<textarea class='survey' name='survey' readonly>$data</textarea>";
-  echo "<div class='invalid survey'>Stuff</div>";
+  echo "<div class='invalid survey'></div>";
   echo "</div>";
 
   echo "<h2>Email Templates</h2>";
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
-#  I liked this one better, but the site was apparently hijacked
-#  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
-#  echo "Markdown Guid</a>.";
-  echo "this <a href='https://commonmark.org/help' target='_blank'>";
-  echo "Markdown Cheatsheet</a>.";
+  if(true) {
+    #  I like this one better, but the site has been hacked.  To use the backup,
+    #  you can use the backup site by changing the "if(true)" above to "if(false)"
+    echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
+    echo "Markdown Guide</a>.";
+  } else {
+    echo "this <a href='https://commonmark.org/help' target='_blank'>";
+    echo "Markdown Cheatsheet</a>.";
+  }
   echo "</div>";
   echo "<div class='info'>";
   echo "In addition, the following placeholders may be used to customize the message.";
@@ -345,7 +349,6 @@ function add_survey_content($survey)
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
   echo "<textarea class='welcome' name='welcome' readonly>$welcome</textarea>";
-  echo "<div class='invalid welcome'>Stuff</div>";
   echo "</div>";
 
   echo "</div>";
