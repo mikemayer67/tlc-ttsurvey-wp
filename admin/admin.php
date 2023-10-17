@@ -16,7 +16,7 @@ require_once plugin_path('include/settings.php');
 
 function handle_admin_init()
 {
-  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('css/admin.css'));
+  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('admin/css/admin.css'));
 
   #add_javascript goes here
 }
@@ -62,7 +62,7 @@ function populate_settings_page()
 
 wp_register_script(
   'tlc_admin_scripts',
-  plugin_url('js/admin.js'),
+  plugin_url('admin/js/admin.js'),
   array('jquery'),
   '1.0.3',
   true

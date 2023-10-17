@@ -194,4 +194,4 @@ function add_login_links($links)
   echo "</div>";
 }
 
-wp_enqueue_style('tlc-ttsurvey-login', plugin_url('css/login.css'));
+wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));
