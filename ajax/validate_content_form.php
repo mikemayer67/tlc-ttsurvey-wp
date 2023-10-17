@@ -29,8 +29,9 @@ if(!$survey) {
 }
 
 $rval = json_encode($response);
-echo($rval);
 log_dev(print_r($rval,true));
+
+echo($rval);
 wp_die();
 
 
