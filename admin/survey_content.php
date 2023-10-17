@@ -160,6 +160,8 @@ function add_new_survey_content()
   echo "    </div>";
   echo "  </form>";
   echo "</div>";
+
+  enqueue_new_survey_javascript();
 }
 
 function add_past_survey_content($pid,$current)
@@ -322,10 +324,16 @@ function add_survey_content($survey,$editable=false,$lock=null)
   //
   // enqueue the javascript
   //
+  if($editable) {
+    enqueue_content_javascript();
+  }
+}
 
+function enqueue_content_javascript()
+{
   wp_register_script(
     'tlc_ttsurvey_content_form',
-    plugin_url('js/content_form.js'),
+    plugin_url('admin/js/content_form.js'),
     array('jquery'),
     '1.0.3',
     true
@@ -339,4 +347,16 @@ function add_survey_content($survey,$editable=false,$lock=null)
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
+}
+
+function enqueue_new_survey_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_new_survey_form',
+    plugin_url('admin/js/new_survey_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_enqueue_script('tlc_ttsurvey_new_survey_form');
 }

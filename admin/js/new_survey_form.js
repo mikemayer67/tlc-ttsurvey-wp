@@ -1,13 +1,11 @@
 
 jQuery(document).ready(
   function($) {
-    $('.requires-javascript').show();
+    const ns_form = $('form.new-survey');
+    const ns_new_name = ns_form.find('input.new-name'); 
+    const ns_error = ns_form.find('span.error');
+    const ns_submit = ns_form.find('input.submit');
 
-    // new survey form
-    var ns_form = $('form.new-survey');
-    var ns_new_name = ns_form.find('input.new-name'); 
-    var ns_error = ns_form.find('span.error');
-    var ns_submit = ns_form.find('input.submit');
     ns_new_name.on('keyup',function() {
       ns_existing_names = ns_form.find('input.existing')[0].value;
       ns_existing_names = JSON.parse(ns_existing_names);

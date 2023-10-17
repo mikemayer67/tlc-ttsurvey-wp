@@ -207,7 +207,7 @@ function register_shortcode_scripts()
 {
   wp_register_script(
     'tlc_ttsurvey_shortcode',
-    plugin_url('js/shortcode.js'),
+    plugin_url('shortcode/js/shortcode.js'),
     array('jquery'),
     '1.0.3',
     true
@@ -226,7 +226,7 @@ function enqueue_login_ajax_scripts()
 {
   wp_register_script(
     'tlc_ttsurvey_login_ajax',
-    plugin_url('js/login_ajax.js'),
+    plugin_url('shortcode/js/login_ajax.js'),
     array('jquery'),
     '1.0.3',
     true
@@ -245,7 +245,7 @@ function enqueue_login_ajax_scripts()
   wp_enqueue_script('tlc_ttsurvey_login_ajax');
 }
 
-wp_enqueue_style('tlc-ttsurvey', plugin_url('css/shortcode.css'));
-wp_enqueue_style('wp-w3-css',plugin_url('css/tlc-w3.css'));
+wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
+wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));
