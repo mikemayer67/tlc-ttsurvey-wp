@@ -1,4 +1,8 @@
 
+var valid_survey = null;
+var dirty = false;
+
+
 function update_content_form(pid)
 {
   alert("update_content_form: " + pid);
@@ -16,15 +20,16 @@ function validate_survey_input(survey,error,submit)
     },
     function(response) {
       if(response.ok) {
+        valid_survey = true;
         submit.prop('disabled',false);
         survey.removeClass('invalid');
         error.hide();
       } else {
+        valid_survey = false;
         submit.prop('disabled',true);
         survey.addClass('invalid');
         error.html(response.error).show();
       }
-      return response.ok;
     },
     'json',
   );
@@ -107,8 +112,7 @@ jQuery(document).ready(
      **/
 
      var keyup_timer = null;
-     var dirty = false;
-     var valid_survey = validate_survey_input(survey,error,submit);
+     validate_survey_input(survey,error,submit);
 
      survey.on('keyup', function() {
        dirty = true;
@@ -116,14 +120,14 @@ jQuery(document).ready(
        if(keyup_timer) { clearTimeout(keyup_timer); }
        keyup_timer = setTimeout( function() {
            keyup_timer = null;
-           valid_survey = validate_survey_input(survey,error,submit);
+           validate_survey_input(survey,error,submit);
          },
          500,
        );
      });
 
      survey.on('change', function() {
-       valid_survey = validate_survey_input(survey,error,submit);
+       validate_survey_input(survey,error,submit);
      });
 
      /**
