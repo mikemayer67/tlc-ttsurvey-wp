@@ -39,11 +39,13 @@ function validate_survey_input(survey,error,submit)
 jQuery(document).ready(
   function($) {
     const form = $('#tlc-ttsurvey-admin form.content');
+    const status = $('#tlc-ttsurvey-admin .tlc-status');
     const inputs = form.find('textarea');
 
     const pid = form.find('input[name=pid]').eq(0).val();
-
     const editable = form.hasClass('edit');
+
+    status.hide()
 
     /**
      * We're updating the form content here rather than in php to avoid
@@ -113,6 +115,7 @@ jQuery(document).ready(
      survey.on('keyup', function() {
        dirty = true;
        submit.prop('disabled',true);
+       status.hide();
        if(keyup_timer) { clearTimeout(keyup_timer); }
        keyup_timer = setTimeout( function() {
            keyup_timer = null;
@@ -123,6 +126,7 @@ jQuery(document).ready(
      });
 
      survey.on('change', function() {
+       status.hide();
        validate_survey_input(survey,error,submit);
      });
 
@@ -133,11 +137,13 @@ jQuery(document).ready(
       sendmail.on('keyup',function() {
         dirty = true;
         submit.prop('disabled',!valid_survey);
+        status.hide()
       });
 
       sendmail.on('change',function() {
         dirty = true;
         submit.prop('disabled',!valid_survey);
+        status.hide()
       });
 
      /**
@@ -162,7 +168,9 @@ jQuery(document).ready(
           data,
           function(response) {
             if(response.ok) {
-              alert("content saved");
+              status.html('updated').addClass('info').show();
+              submit.prop('disabled',true);
+              dirty = false;
             } else {
               alert("failed to save content: " + response.error);
             }

@@ -73,11 +73,18 @@
   margin-left:20px;
   padding-left:10px;
   padding-right:10px;
-  background:yellow;
   color:black;
+}
+
+#tlc-ttsurvey-admin .tlc-status.info,
+#tlc-ttsurvey-admin .tlc-status.error {
   border:solid;
   border-width:1px;
   border-color:lightgray;
+}
+
+#tlc-ttsurvey-admin .tlc-status.info {
+  background:yellow;
 }
 
 #tlc-ttsurvey-admin .tlc-status.error {

@@ -4,19 +4,19 @@ namespace TLC\TTSurvey;
 if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
 $title = esc_html(get_admin_page_title());
-$status = "";
 
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
+$status = "<span class='tlc-status' style='display:none;'></span>";
 if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   $action = $_POST['action'] ?? null;
   if($action == "update") 
   {
     update_options_from_post();
     update_survey_status_from_post();
-    $status = "<span class='tlc-status'>updated</span>";
+    $status = "<span class='tlc-status info'>updated</span>";
   }
   elseif($action == "clear-log") 
   {
@@ -33,7 +33,7 @@ if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   elseif($action == 'update-survey')
   {
     if(update_survey_content_from_post()) {
-      $status = "<span class='tlc-status'>updated</span>";
+      $status = "<span class='tlc-statusinfo '>updated</span>";
     } else {
       $status = "<span class='tlc-status error'>failed to update</span>";
     }
