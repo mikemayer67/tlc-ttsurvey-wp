@@ -5,7 +5,7 @@ var dirty = false;
 
 function update_content_form(pid)
 {
-  alert("update_content_form: " + pid);
+  alert("update_content_form[" + pid + "]");
 }
 
 function validate_survey_input(survey,error,submit)
@@ -35,10 +35,6 @@ function validate_survey_input(survey,error,submit)
   );
 }
 
-function submit_survey_edits()
-{
-  alert("submit_survey_edits");
-}
 
 jQuery(document).ready(
   function($) {
@@ -149,8 +145,30 @@ jQuery(document).ready(
       **/
 
      form.on('submit', function(event) {
-       submit_survey_edits();
        event.preventDefault();
+        data = {
+          'action':'tlc_ttsurvey',
+          'nonce':form_vars['nonce'],
+          'query':'submit_content_form',
+          'pid':pid,
+          'content':{},
+        };
+        inputs.each(function() {
+          data.content[this.name] = this.value;
+        });
+        console.log(data);
+        $.post(
+          form_vars['ajaxurl'],
+          data,
+          function(response) {
+            if(response.ok) {
+              alert("content saved");
+            } else {
+              alert("failed to save content: " + response.error);
+            }
+          },
+          'json',
+        );
      });
   }
 );
