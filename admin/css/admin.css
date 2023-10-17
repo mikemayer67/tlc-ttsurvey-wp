@@ -211,6 +211,10 @@
   max-width: 775px;
 }
 
+#tlc-ttsurvey-admin .content .past {
+  position:relative;
+}
+
 #tlc-ttsurvey-admin .content div.info {
   margin-left:1.5em;
 }
@@ -378,6 +382,6 @@
 
 #tlc-ttsurvey-admin form.reopen-survey input[type=submit] {
   position:absolute;
-  right:15px;
+  right:0;
 }
 
