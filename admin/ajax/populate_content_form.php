@@ -5,8 +5,6 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 
-log_dev("populate_content_form");
-
 $pid = $_POST['pid'] ?? null;
 if(!$pid)
 {
@@ -24,7 +22,6 @@ $rval = json_encode(array(
   'content'=>$content,
 ));
 
-log_dev("response: $rval");
 echo $rval;
 wp_die();
 
