@@ -51,14 +51,12 @@ function update_content_form(pid)
     },
     function(response) {
       if(response.ok) {
-        content = response.content
-        for(const key in content) {
-          ta = form.find('textarea.'+key);
-          ta.html(content[key]);
+        form.find('textarea.survey').html(response.survey);
+
+        for(const key in response.sendmail) {
+          form.find('textarea.'+key).html(response.sendmail[key].md);
+          form.find('.sendmail.preview.'+key+' .body').html(response.sendmail[key].html);
         }
-        sendmail.each(function() {
-          refresh_sendmail_preview(this.name);
-        });
       }
       validate_survey_input(pid);
     },
@@ -95,8 +93,23 @@ function validate_survey_input(pid)
 function refresh_sendmail_preview(template)
 {
   const preview = form.find('.sendmail.preview.' + template + ' div.body');
-  var markdown = form.find('textarea.' + template).val();
-  preview.html(markdown);
+  const markdown = form.find('textarea.' + template).val();
+
+  jQuery.post(
+    form_vars['ajaxurl'],
+    {
+      'action':'tlc_ttsurvey',
+      'nonce':form_vars['nonce'],
+      'query':'render_sendmail_template',
+      'markdown':markdown,
+    },
+    function(response) {
+      if(response.ok) {
+        preview.html(response.rendered);
+      }
+    },
+    'json',
+  );
 }
 
 

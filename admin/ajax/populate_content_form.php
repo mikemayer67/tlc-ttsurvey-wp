@@ -4,6 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
+require_once plugin_path('include/markdown.php');
 
 $pid = $_POST['pid'] ?? null;
 if(!$pid)
@@ -17,10 +18,22 @@ if(!$pid)
 $post = get_post($pid);
 $content = json_decode($post->post_content,true);
 
-$rval = json_encode(array(
+$response = array(
   'ok'=>true,
-  'content'=>$content,
-));
+  'survey'=>$content['survey'],
+  'sendmail'=>array(),
+);
+
+foreach ($content as $key=>$md) {
+  if($key != 'survey') {
+    $response['sendmail'][$key] = array(
+      'md'=>$md, 
+      'html'=>render_sendmail_markdown($md),
+    );
+  }
+}
+
+$rval = json_encode($response);
 
 echo $rval;
 wp_die();
