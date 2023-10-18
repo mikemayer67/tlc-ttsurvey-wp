@@ -306,7 +306,10 @@ function add_survey_content($survey,$editable=false,$lock=null)
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
   echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
-  echo "</div>";
+  echo "<div class='sendmail preview welcome'>";
+  echo "<div class='body'>stuff</div>";
+  echo "<div class='hint'>preview</div>";
+  echo "</div>"; 
 
   echo "</div>"; // content-block
 

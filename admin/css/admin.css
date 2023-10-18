@@ -276,12 +276,7 @@
 }
 
 #tlc-ttsurvey-admin .content div.content-block textarea {
-  width:95%;
-  margin-left:15px;
-}
-
-#tlc-ttsurvey-admin .content div.content-block textarea {
-  width:95%;
+  width:calc(100% - 15px);
   margin-left:15px;
 }
 
@@ -319,6 +314,24 @@
 
 #tlc-ttsurvey-admin .content textarea.invalid {
   border-color:#b00;
+}
+
+#tlc-ttsurvey-admin div.sendmail.preview {
+  margin:8px 0 0 15px;
+  padding:15px;
+  border-style:groove;
+  border-width:thin;
+  float:none;
+  position:relative;
+}
+
+#tlc-ttsurvey-admin .sendmail.preview div.hint {
+  position:absolute;
+  top:-10px;
+  right:5px;
+}
+
+#tlc-ttsurvey-admin .sendmail.preview div.body {
 }
 
 /**
