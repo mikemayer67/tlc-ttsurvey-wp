@@ -336,8 +336,10 @@ function add_survey_content($survey,$editable=false,$lock=null)
   //   add submit button if editable
   //
   if($editable) {
-    $class = 'submit button button-primary button-large';
-    echo "<input type='submit' value='Save' class='$class' disabled>";
+    echo "<div class='button-box'>";
+    echo "<input type='submit' class='submit button button-primary button-large' value='Save' disabled>";
+    echo "<button class='revert button button-secondary button-large' name='revert' disabled>revert all updates</button>";
+    echo "</div>";
   }
 
   echo "</form>";

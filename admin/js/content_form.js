@@ -12,6 +12,7 @@ var sendmail = null;
 var survey = null;
 var error = null;
 var submit = null;
+var revert = null;
 
 function prep_for_change()
 {
@@ -25,6 +26,7 @@ function update_state()
 {
   can_submit = has_lock && valid_survey && dirty;
   submit.prop('disabled', !can_submit);
+  revert.prop('disabled', !can_submit);
 
   if(valid_survey) {
     survey.removeClass('invalid');
@@ -123,7 +125,8 @@ jQuery(document).ready(
     survey = form.find('textarea.survey').eq(0);
     sendmail = form.find('textarea.sendmail');
     error = form.find('div.invalid.survey').eq(0);
-    submit = form.find('input[type=submit]').eq(0);
+    submit = form.find('input.submit').eq(0);
+    revert = form.find('button.revert').eq(0);
 
     const pid = form.find('input[name=pid]').eq(0).val();
     const editable = form_vars['editable'];
@@ -258,6 +261,37 @@ jQuery(document).ready(
         'json',
       );
     });
+
+    revert.on('click',function(event) {
+      event.preventDefault();
+
+      jQuery.post(
+        form_vars['ajaxurl'],
+        {
+          'action':'tlc_ttsurvey',
+          'nonce':form_vars['nonce'],
+          'query':'populate_content_form',
+          'pid':pid,
+        },
+        function(response) {
+          if(response.ok) {
+            dirty = false;
+            form_status.html('reverted').addClass('info').show();
+            form.find('textarea.survey').html(response.survey);
+
+            for(const key in response.sendmail) {
+              var md = response.sendmail[key].md;
+              var html = response.sendmail[key].html;
+              form.find('textarea.'+key).val(md);
+              form.find('.sendmail.preview.'+key).html(html);
+            }
+          }
+          validate_survey_input(pid);
+        },
+        'json',
+      );
+    });
+
   }
 );
 

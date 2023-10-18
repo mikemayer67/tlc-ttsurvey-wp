@@ -34,8 +34,12 @@
   margin-left: 30px;
 }
 
-#tlc-ttsurvey-admin form input.submit {
+#tlc-ttsurvey-admin form div.button-box {
   margin-top:20px;
+}
+
+#tlc-ttsurvey-admin form div.button-box .revert {
+  float:right;
 }
 
 #tlc-ttsurvey-admin form .input-label {
