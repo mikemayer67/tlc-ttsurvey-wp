@@ -324,12 +324,10 @@ function add_survey_content($survey,$editable=false,$lock=null)
   //
   // enqueue the javascript
   //
-  if($editable) {
-    enqueue_content_javascript();
-  }
+  enqueue_content_javascript($editable);
 }
 
-function enqueue_content_javascript()
+function enqueue_content_javascript($editable)
 {
   wp_register_script(
     'tlc_ttsurvey_content_form',
@@ -344,6 +342,7 @@ function enqueue_content_javascript()
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
+      'editable' => $editable,
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');

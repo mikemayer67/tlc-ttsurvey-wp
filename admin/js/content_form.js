@@ -3,13 +3,48 @@ var valid_survey = null;
 var dirty = false;
 
 
-function update_content_form(pid)
+function update_content_form(pid,form)
 {
-  alert("update_content_form[" + pid + "]");
+  const submit = form.find('input[type=submit]').eq(0);
+  const survey = form.find('textarea.survey').eq(0);
+  const error = form.find('div.invalid.survey').eq(0);
+
+  jQuery.post(
+    form_vars['ajaxurl'],
+    {
+      'action':'tlc_ttsurvey',
+      'nonce':form_vars['nonce'],
+      'query':'populate_content_form',
+      'pid':pid,
+    },
+    function(response) {
+      if(response.ok) {
+        valid_survey = true;
+        dirty = false;
+        submit.prop('disabled',true);
+        survey.removeClass('invalid');
+        error.hide();
+
+        content = response.content
+        for(const key in content) {
+          ta = form.find('textarea.'+key);
+          ta.html(content[key]);
+        }
+      }
+      validate_survey_input(pid,form);
+    },
+    'json',
+  );
 }
 
-function validate_survey_input(survey,error,submit)
+function validate_survey_input(pid,form)
 {
+  if(!form_vars['editable']) { return; }
+
+  const submit = form.find('input[type=submit]').eq(0);
+  const survey = form.find('textarea.survey').eq(0);
+  const error = form.find('div.invalid.survey').eq(0);
+
   jQuery.post(
     form_vars['ajaxurl'],
     {
@@ -43,7 +78,7 @@ jQuery(document).ready(
     const inputs = form.find('textarea');
 
     const pid = form.find('input[name=pid]').eq(0).val();
-    const editable = form.hasClass('edit');
+    const editable = form_vars['editable'];
 
     status.hide()
 
@@ -52,7 +87,7 @@ jQuery(document).ready(
      * dual maintenance and possible inconsistency that could result from that
      **/
 
-    update_content_form(pid);
+    update_content_form(pid,form);
 
     if(!editable) {
       inputs.prop('readonly',true);
@@ -101,7 +136,7 @@ jQuery(document).ready(
       lock_info.html("You may now edit the survey content.");
       lock_info.removeClass('lock').addClass('unlocked');
 
-      update_content_form(pid);
+      update_content_form(pid,form);
       inputs.prop('readonly',false);
     });
 
@@ -110,7 +145,7 @@ jQuery(document).ready(
      **/
 
      var keyup_timer = null;
-     validate_survey_input(survey,error,submit);
+     validate_survey_input(pid,form);
 
      survey.on('keyup', function() {
        dirty = true;
@@ -119,7 +154,7 @@ jQuery(document).ready(
        if(keyup_timer) { clearTimeout(keyup_timer); }
        keyup_timer = setTimeout( function() {
            keyup_timer = null;
-           validate_survey_input(survey,error,submit);
+           validate_survey_input(pid,form);
          },
          500,
        );
@@ -127,7 +162,7 @@ jQuery(document).ready(
 
      survey.on('change', function() {
        status.hide();
-       validate_survey_input(survey,error,submit);
+       validate_survey_input(pid,form);
      });
 
      /**
@@ -162,7 +197,6 @@ jQuery(document).ready(
         inputs.each(function() {
           data.content[this.name] = this.value;
         });
-        console.log(data);
         $.post(
           form_vars['ajaxurl'],
           data,
