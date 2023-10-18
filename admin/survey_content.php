@@ -276,9 +276,9 @@ function add_survey_content($survey,$editable=false,$lock=null)
   echo "<h2>Survey Form</h2>";
   echo "<div class='info'>";
   echo "Instructions go here.";
+  echo "</div>";
   echo "<textarea class='survey' name='survey' readonly></textarea>";
   echo "<div class='invalid survey'></div>";
-  echo "</div>";
 
   // email templates
 

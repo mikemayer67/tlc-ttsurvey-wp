@@ -24,7 +24,6 @@ function handle_edit_lock_ajax($response,$data)
     // see who has the lock
     $locked_by = wp_check_post_lock($pid);
     if($locked_by) {
-      log_info("content form is locked by: $locked_by");
       // it is still locked
       //   return the lock status and name of person who has the lock
       $user = get_userdata($locked_by);
@@ -36,7 +35,6 @@ function handle_edit_lock_ajax($response,$data)
     }
     else
     {
-      log_info("content form is no longer locked");
       // no longer locked
       //   acquire the lock and return the new lock status
       wp_set_post_lock($pid);

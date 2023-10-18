@@ -1,13 +1,45 @@
 
-var valid_survey = null;
+var has_lock = false;
+var valid_survey = true;
+var survey_error = '';
 var dirty = false;
 
+var form = null;
+var form_status = null;
+var lock_info = null;
+var inputs = null;
+var sendmail = null;
+var survey = null;
+var error = null;
+var submit = null;
 
-function update_content_form(pid,form)
+function prep_for_change()
 {
-  const submit = form.find('input[type=submit]').eq(0);
-  const survey = form.find('textarea.survey').eq(0);
-  const error = form.find('div.invalid.survey').eq(0);
+  dirty = true;
+  submit.prop('disabled',true);
+  form_status.hide();
+  update_state();
+}
+
+function update_state()
+{
+  can_submit = has_lock && valid_survey && dirty;
+  submit.prop('disabled', !can_submit);
+
+  if(valid_survey) {
+    survey.removeClass('invalid');
+    error.hide();
+  } else {
+    survey.addClass('invalid');
+    error.html(survey_error).show();
+  }
+}
+
+function update_content_form(pid)
+{
+  dirty = false;
+  form_status.hide();
+  update_state();
 
   jQuery.post(
     form_vars['ajaxurl'],
@@ -19,31 +51,21 @@ function update_content_form(pid,form)
     },
     function(response) {
       if(response.ok) {
-        valid_survey = true;
-        dirty = false;
-        submit.prop('disabled',true);
-        survey.removeClass('invalid');
-        error.hide();
-
         content = response.content
         for(const key in content) {
           ta = form.find('textarea.'+key);
           ta.html(content[key]);
         }
       }
-      validate_survey_input(pid,form);
+      validate_survey_input(pid);
     },
     'json',
   );
 }
 
-function validate_survey_input(pid,form)
+function validate_survey_input(pid)
 {
   if(!form_vars['editable']) { return; }
-
-  const submit = form.find('input[type=submit]').eq(0);
-  const survey = form.find('textarea.survey').eq(0);
-  const error = form.find('div.invalid.survey').eq(0);
 
   jQuery.post(
     form_vars['ajaxurl'],
@@ -56,15 +78,12 @@ function validate_survey_input(pid,form)
     function(response) {
       if(response.ok) {
         valid_survey = true;
-        submit.prop('disabled',false);
-        survey.removeClass('invalid');
-        error.hide();
+        survey_error = '';
       } else {
         valid_survey = false;
-        submit.prop('disabled',true);
-        survey.addClass('invalid');
-        error.html(response.error).show();
+        survey_error = response.error;
       }
+      update_state();
     },
     'json',
   );
@@ -73,21 +92,27 @@ function validate_survey_input(pid,form)
 
 jQuery(document).ready(
   function($) {
-    const form = $('#tlc-ttsurvey-admin form.content');
-    const status = $('#tlc-ttsurvey-admin .tlc-status');
-    const inputs = form.find('textarea');
+    form = $('#tlc-ttsurvey-admin form.content');
+    form_status = $('#tlc-ttsurvey-admin .tlc-status');
+    lock_info = $('.content .info.lock').eq(0);
+
+    inputs = form.find('textarea');
+    survey = form.find('textarea.survey').eq(0);
+    sendmail = form.find('textarea.sendmail');
+    error = form.find('div.invalid.survey').eq(0);
+    submit = form.find('input[type=submit]').eq(0);
 
     const pid = form.find('input[name=pid]').eq(0).val();
     const editable = form_vars['editable'];
 
-    status.hide()
+    form_status.hide();
 
     /**
      * We're updating the form content here rather than in php to avoid
      * dual maintenance and possible inconsistency that could result from that
      **/
 
-    update_content_form(pid,form);
+    update_content_form(pid);
 
     if(!editable) {
       inputs.prop('readonly',true);
@@ -98,13 +123,7 @@ jQuery(document).ready(
      * The rest of the setup only applies if the form is editable
      **/
 
-    const lock_info = $('.content .info.lock').eq(0);
-    const submit = form.find('input[type=submit]').eq(0);
-    const survey = form.find('textarea.survey').eq(0);
-    const sendmail = form.find('textarea.sendmail');
-    const error = form.find('div.invalid.survey').eq(0);
-
-    var has_lock = form.find('input[name=lock]').eq(0).val() == 0;
+    has_lock = form.find('input[name=lock]').eq(0).val() == 0;
     inputs.prop('readonly',!has_lock);
 
     $(document).on( 'heartbeat-send', function(event,data) {
@@ -136,7 +155,7 @@ jQuery(document).ready(
       lock_info.html("You may now edit the survey content.");
       lock_info.removeClass('lock').addClass('unlocked');
 
-      update_content_form(pid,form);
+      update_content_form(pid);
       inputs.prop('readonly',false);
     });
 
@@ -145,72 +164,66 @@ jQuery(document).ready(
      **/
 
      var keyup_timer = null;
-     validate_survey_input(pid,form);
 
      survey.on('keyup', function() {
-       dirty = true;
-       submit.prop('disabled',true);
-       status.hide();
+       prep_for_change();
        if(keyup_timer) { clearTimeout(keyup_timer); }
        keyup_timer = setTimeout( function() {
            keyup_timer = null;
-           validate_survey_input(pid,form);
+           validate_survey_input(pid);
          },
          500,
        );
      });
 
      survey.on('change', function() {
-       status.hide();
-       validate_survey_input(pid,form);
+       prep_for_change();
+       validate_survey_input(pid);
      });
 
      /**
       * dirty tracking
       **/
 
-      sendmail.on('keyup',function() {
-        dirty = true;
-        submit.prop('disabled',!valid_survey);
-        status.hide()
-      });
+     sendmail.on('keyup',function() {
+       prep_for_change();
+     });
 
-      sendmail.on('change',function() {
-        dirty = true;
-        submit.prop('disabled',!valid_survey);
-        status.hide()
-      });
+     sendmail.on('change',function() {
+       prep_for_change();
+     });
 
      /**
       * form submission
       **/
 
      form.on('submit', function(event) {
+       prep_for_change();
        event.preventDefault();
-        data = {
-          'action':'tlc_ttsurvey',
-          'nonce':form_vars['nonce'],
-          'query':'submit_content_form',
-          'pid':pid,
-          'content':{},
-        };
-        inputs.each(function() {
-          data.content[this.name] = this.value;
-        });
-        $.post(
-          form_vars['ajaxurl'],
-          data,
-          function(response) {
-            if(response.ok) {
-              status.html('updated').addClass('info').show();
-              submit.prop('disabled',true);
-              dirty = false;
-            } else {
-              alert("failed to save content: " + response.error);
-            }
-          },
-          'json',
-        );
+       data = {
+         'action':'tlc_ttsurvey',
+         'nonce':form_vars['nonce'],
+         'query':'submit_content_form',
+         'pid':pid,
+         'content':{},
+       };
+       inputs.each(function() {
+         data.content[this.name] = this.value;
+       });
+       $.post(
+         form_vars['ajaxurl'],
+         data,
+         function(response) {
+           if(response.ok) {
+             form_status.html('updated').addClass('info').show();
+             dirty = false;
+           } else {
+             alert("failed to save content: " + response.error);
+           }
+           update_state();
+         },
+         'json',
+       );
      });
   }
 );
