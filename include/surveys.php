@@ -268,6 +268,7 @@ function update_survey_status_from_post()
 
 function update_survey_content_from_post()
 {
+  log_dev("update_survey_content_from_post(): POST=".print_r($_POST,true));
   $current = current_survey();
   if(!$current) { 
     log_warning("Attempted to update survey with no current survey");
@@ -276,6 +277,8 @@ function update_survey_content_from_post()
 
   $pid = $_POST['pid'] ?? '';
   $cur_pid = $current['post_id'];
+
+  log_dev("pid:$pid, cur_pid:$cur_pid");
 
   if(strcmp($pid,$cur_pid)!=0) {
     log_warning("Attempted to update survey $pid, current is $cur_pid");
@@ -288,10 +291,14 @@ function update_survey_content_from_post()
     $data[$key] = $_POST[$key] ?? '';
   }
 
+  log_dev("data: ".print_r($data,true));
+
   $rval = wp_update_post(array(
     'ID' => $pid,
     'post_content' => wp_slash(json_encode($data)),
   ));
+
+  log_dev("rval: $rval");
 
   if($rval) {
     $name = $current['name'];
@@ -302,3 +309,14 @@ function update_survey_content_from_post()
 
   return $rval;
 }
+
+
+/**
+ * parse survey yaml into json
+ **/
+
+function parse_survey_yaml($yaml, &$error=null)
+{
+  return "Need to implement this";
+}
+

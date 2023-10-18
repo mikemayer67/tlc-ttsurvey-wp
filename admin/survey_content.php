@@ -160,6 +160,8 @@ function add_new_survey_content()
   echo "    </div>";
   echo "  </form>";
   echo "</div>";
+
+  enqueue_new_survey_javascript();
 }
 
 function add_past_survey_content($pid,$current)
@@ -194,12 +196,12 @@ function add_past_survey_content($pid,$current)
   echo "</div>";
 }
 
-function add_current_survey_content($current)
+function add_current_survey_content($survey)
 {
   echo "<div class='current'>";
 
-  $name = $current['name'];
-  $status = $current['status'];
+  $name = $survey['name'];
+  $status = $survey['status'];
   if($status == SURVEY_IS_ACTIVE) {
     echo "<div class='info'>";
     echo "<div> The $name Time and Talent Survey is currently open. ";
@@ -207,7 +209,7 @@ function add_current_survey_content($current)
     echo "No changes can be made to its content without moving it back ";
     echo "to Draft status on the Settings tab.";
     echo "</div></div>";
-    add_survey_content($current);
+    add_survey_content($survey);
   }
   elseif($status == SURVEY_IS_DRAFT) {
     echo "<div class='info'>";
@@ -216,121 +218,79 @@ function add_current_survey_content($current)
     echo "To lock in its structure and open it for participation, switch its status";
     echo " to Active on the Settings tab.";
     echo "</div></div>";
-    add_mutable_survey_content($current);
+    $lock = add_lock_content($survey);
+    add_survey_content($survey,true,$lock);
   }
 
   echo "</div>";
 }
 
-
-function add_mutable_survey_content($survey)
+function add_lock_content($survey)
 {
-  $action = $_SERVER['REQUEST_URI'];
   $pid = $survey['post_id'];
 
   // check to see if there is currently a lock on the content
   // lock will be set to 0 if we're acquiring the lock
   $lock = wp_check_post_lock($pid) ?? 0;
-  echo "<input type='hidden' name='pid' value='$pid'>";
-  echo "<input type='hidden' name='lock' value='$lock'>";
   if($lock) {
     // someone else has a lock, post a warning about this
     // the actual disabling/enabling of the form is handled by javascript
-    $locked_by = get_userdata($lock);
-    $locked_by = implode(" ",array($locked_by->first_name,$locked_by->last_name));
+    $locked_by = get_userdata($lock)->display_name;
     echo "<div class='info lock'>";
     echo "<div>The survey is currently being edited by $locked_by.</div>";
     echo "<div>You cannot make any changes until they have completed their edits.</div>";
-    echo "<div>You can stay on this page and wait... we'll watch for you.</div>";
+    echo "<div>You can stay on this page and wait...</div>";
     echo "</div>";
   } else {
     // nobody else has a lock, acquire it now
     wp_set_post_lock($pid);
   }
-
-  // add heartbeat to keep tabs on lock status
-  //   if we have the lock, renew it
-  //   if we don't have the lock, watch for it to become available
-  wp_register_script(
-    'tlc_ttsurvey_content_lock',
-    plugin_url('js/content_lock.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-  wp_enqueue_script('tlc_ttsurvey_content_lock');
-
-  // add script to manage the state of the submit button
-  //   on change in any of the inputs, use ajax to validate all inputs
-  //   enable submit only if all are valid
-  //   add error info for any bad inputs
-  wp_register_script(
-    'tlc_ttsurvey_content_edit',
-    plugin_url('js/content_edit.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-  $key = 'content_edit';
-  wp_localize_script(
-    'tlc_ttsurvey_content_edit',
-    'edit_vars',
-    array(
-      'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => array($key,wp_create_nonce($key)),
-    ),
-  );
-  wp_enqueue_script('tlc_ttsurvey_content_edit');
-
-
-  // wrap the content in a form
-  echo "<form class='edit-survey' action='$action' method='post'>"; 
-  wp_nonce_field(OPTIONS_NONCE);
-  echo "<input type='hidden' name='action' value='update-survey'>";
-
-  add_survey_content($survey,true);
-
-  // note that the submit button is disabled until javascript checks the lock status
-  $class = 'submit button button-primary button-large';
-  echo "<input type='submit' value='Save' class='$class' disabled>";
-  echo "</form>";
+  return $lock;
 }
 
 
-function add_survey_content($survey)
+function add_survey_content($survey,$editable=false,$lock=null)
 {
   $name = $survey['name'];
-
   $pid = $survey['post_id'];
 
-  $post = get_post($pid);
-  if(!$post) {
-    log_warning("Attempted to add survey content for invalid post_id=$pid");
-    return null;
+  // wrap the content in a form
+  //   no action/method as submision will be handled by javascript
+  if($editable)
+  {
+    echo "<form class='content edit'>";
+    echo "<input type='hidden' name='pid' value='$pid'>";
+    echo "<input type='hidden' name='lock' value=$lock>";
+  } else {
+    echo "<form class='content no-edit'>";
+    echo "<input type='hidden' name='pid' value='$pid'>";
   }
 
-  $content = $post->post_content;
-  $content = json_decode($content,true);
-
+  // 
+  // Add actual form content
+  //
   echo "<div class=content-block>";
 
-  $data = $content['survey'] ?? '';
+  // survey 
+
   echo "<h2>Survey Form</h2>";
   echo "<div class='info'>";
   echo "Instructions go here.";
-  echo "<textarea class='survey' name='survey' readonly>$data</textarea>";
-  echo "<div class='invalid survey'>Stuff</div>";
   echo "</div>";
+  echo "<textarea class='survey' name='survey' readonly></textarea>";
+  echo "<div class='invalid survey'></div>";
+
+  // email templates
 
   echo "<h2>Email Templates</h2>";
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
-#  I liked this one better, but the site was apparently hijacked
-#  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
-#  echo "Markdown Guid</a>.";
-  echo "this <a href='https://commonmark.org/help' target='_blank'>";
-  echo "Markdown Cheatsheet</a>.";
+  echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
+  echo "Markdown Guide</a>.";
+  // echo "this <a href='https://commonmark.org/help' target='_blank'>";
+  // echo "Markdown Cheatsheet</a>.";
   echo "</div>";
+
   echo "<div class='info'>";
   echo "In addition, the following placeholders may be used to customize the message.";
   echo "</div>";
@@ -340,13 +300,62 @@ function add_survey_content($survey)
   echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
   echo "</table>";
 
-  $welcome = $content['welcome'];
+  // welcome
+
   echo "<div class='email-template'>";
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='welcome' name='welcome' readonly>$welcome</textarea>";
-  echo "<div class='invalid welcome'>Stuff</div>";
+  echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
   echo "</div>";
 
-  echo "</div>";
+  echo "</div>"; // content-block
+
+  //
+  // close out the form
+  //   add submit button if editable
+  //
+  if($editable) {
+    $class = 'submit button button-primary button-large';
+    echo "<input type='submit' value='Save' class='$class' disabled>";
+  }
+
+  echo "</form>";
+
+  //
+  // enqueue the javascript
+  //
+  enqueue_content_javascript($editable);
+}
+
+function enqueue_content_javascript($editable)
+{
+  wp_register_script(
+    'tlc_ttsurvey_content_form',
+    plugin_url('admin/js/content_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_content_form',
+    'form_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('content_form',wp_create_nonce('content_form')),
+      'editable' => $editable,
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_content_form');
+}
+
+function enqueue_new_survey_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_new_survey_form',
+    plugin_url('admin/js/new_survey_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_enqueue_script('tlc_ttsurvey_new_survey_form');
 }

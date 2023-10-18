@@ -105,22 +105,12 @@ function handle_uninstall()
 
 /**
  * Ajax support
- *   This is just a shallow wrapper that will pull in the 
- *   ajax specific code only if needed.
+ *   Note this does not include heartbeat ajax (see below)
  **/
 
+require_once plugin_path('ajax.php');
 add_action('wp_ajax_nopriv_tlc_ttsurvey', ns('ajax_wrapper'));
 add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
-add_filter('heartbeat_received',ns('heartbeat_wrapper'),10,3);
-
-function ajax_wrapper() {
-  require plugin_path('ajax/wrapper.php');
-}
-
-function heartbeat_wrapper($response,$data,$screen_id) {
-  require plugin_path('ajax/heartbeat.php');
-  return handle_heartbeat($response,$data,$screen_id);
-}
 
 /**
  * Import admin/shortcode specific functions
@@ -128,12 +118,15 @@ function heartbeat_wrapper($response,$data,$screen_id) {
 
 if( is_admin() ) /* Admin setup */
 {
-  require_once plugin_path('admin/setup.php');
+  require_once plugin_path('admin/admin.php');
+
+  require_once plugin_path('admin/ajax/heartbeat.php');
+  add_filter('heartbeat_received',ns('handle_heartbeat'),10,3);
 }
 else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
-  require_once plugin_path('shortcode.php');
+  require_once plugin_path('shortcode/shortcode.php');
 }
 
 
