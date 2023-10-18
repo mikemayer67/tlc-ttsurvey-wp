@@ -26,7 +26,7 @@ function add_script_body()
   $current = current_survey();
   echo "<div class='content requires-javascript'>";
   $active_pid = determine_content_tab($current);
-  add_survey_tab_bar($active_pid,$current);
+  add_survey_navbar($active_pid,$current);
   add_survey_tab_content($active_pid,$current);
   echo "</div>";
 }
@@ -66,7 +66,7 @@ function determine_content_tab($current)
   return FIRST_TAB;
 }
 
-function add_survey_tab_bar($active_pid,$current)
+function add_survey_navbar($active_pid,$current)
 {
   echo "<div class='nav-tab-wrapper survey'>";
 
@@ -106,6 +106,11 @@ function add_survey_tab_bar($active_pid,$current)
 
   echo "</div>";
 }
+
+function add_block_navbar($block)
+{
+}
+
 
 function add_survey_tab_content($active_pid,$current)
 {
@@ -266,6 +271,21 @@ function add_survey_content($survey,$editable=false,$lock=null)
     echo "<input type='hidden' name='pid' value='$pid'>";
   }
 
+  //
+  // Add the block navbar
+  //
+
+  $active_block = $_GET['block'] ?? 'survey';
+  echo "<div class='nav-tab-wrapper block'>";
+  if($active_block == 'sendmail') {
+    echo "<a class='nav-tab' data-target='survey'>Survey Form</a>";
+    echo "<a class='nav-tab nav-tab-active' data-target='sendmail'>Email Templates</a>";
+  } else {
+    echo "<a class='nav-tab nav-tab-active' data-target='survey'>Survey Form</a>";
+    echo "<a class='nav-tab' data-target='sendmail'>Email Templates</a>";
+  }
+  echo "</div>"; // nav-tab-wrapper.blocks
+
   // 
   // Add actual form content
   //
@@ -306,9 +326,7 @@ function add_survey_content($survey,$editable=false,$lock=null)
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
   echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
-  echo "<div class='sendmail preview welcome'>";
-  echo "<div class='body'>stuff</div>";
-  echo "<div class='hint'>preview</div>";
+  echo "<div class='sendmail preview welcome'>stuff</div>";
   echo "</div>"; 
 
   echo "</div>"; // content-block

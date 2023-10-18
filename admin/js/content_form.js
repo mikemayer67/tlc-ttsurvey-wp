@@ -55,7 +55,7 @@ function update_content_form(pid)
 
         for(const key in response.sendmail) {
           form.find('textarea.'+key).html(response.sendmail[key].md);
-          form.find('.sendmail.preview.'+key+' .body').html(response.sendmail[key].html);
+          form.find('.sendmail.preview.'+key).html(response.sendmail[key].html);
         }
       }
       validate_survey_input(pid);
@@ -92,7 +92,7 @@ function validate_survey_input(pid)
 
 function refresh_sendmail_preview(template)
 {
-  const preview = form.find('.sendmail.preview.' + template + ' div.body');
+  const preview = form.find('.sendmail.preview.' + template);
   const markdown = form.find('textarea.' + template).val();
 
   jQuery.post(
