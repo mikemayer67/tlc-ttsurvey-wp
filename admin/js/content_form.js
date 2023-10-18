@@ -56,6 +56,9 @@ function update_content_form(pid)
           ta = form.find('textarea.'+key);
           ta.html(content[key]);
         }
+        sendmail.each(function() {
+          refresh_sendmail_preview(this.name);
+        });
       }
       validate_survey_input(pid);
     },
@@ -89,6 +92,13 @@ function validate_survey_input(pid)
   );
 }
 
+function refresh_sendmail_preview(template)
+{
+  const preview = form.find('.sendmail.preview.' + template + ' div.body');
+  var markdown = form.find('textarea.' + template).val();
+  preview.html(markdown);
+}
+
 
 jQuery(document).ready(
   function($) {
@@ -107,10 +117,10 @@ jQuery(document).ready(
 
     form_status.hide();
 
-    /**
-     * We're updating the form content here rather than in php to avoid
-     * dual maintenance and possible inconsistency that could result from that
-     **/
+    //------------------------------------------------------------
+    // We're updating the form content here rather than in php to avoid
+    // dual maintenance and possible inconsistency that could result from that
+    //------------------------------------------------------------
 
     update_content_form(pid);
 
@@ -119,9 +129,9 @@ jQuery(document).ready(
       return;
     }
 
-    /**
-     * The rest of the setup only applies if the form is editable
-     **/
+    //------------------------------------------------------------
+    // The rest of the setup only applies if the form is editable
+    //------------------------------------------------------------
 
     has_lock = form.find('input[name=lock]').eq(0).val() == 0;
     inputs.prop('readonly',!has_lock);
@@ -159,72 +169,82 @@ jQuery(document).ready(
       inputs.prop('readonly',false);
     });
 
-    /**
-     * content validation setup
-     **/
+    //------------------------------------------------------------
+    // content validation setup
+    //------------------------------------------------------------
 
-     var keyup_timer = null;
+    var keyup_timer = null;
 
-     survey.on('keyup', function() {
-       prep_for_change();
-       if(keyup_timer) { clearTimeout(keyup_timer); }
-       keyup_timer = setTimeout( function() {
-           keyup_timer = null;
-           validate_survey_input(pid);
-         },
-         500,
-       );
-     });
+    survey.on('keyup', function() {
+      prep_for_change();
+      if(keyup_timer) { clearTimeout(keyup_timer); }
+      keyup_timer = setTimeout( function() {
+          keyup_timer = null;
+          validate_survey_input(pid);
+        },
+        500,
+      );
+    });
 
-     survey.on('change', function() {
-       prep_for_change();
-       validate_survey_input(pid);
-     });
+    survey.on('change', function() {
+      prep_for_change();
+      validate_survey_input(pid);
+    });
 
-     /**
-      * dirty tracking
-      **/
+    //------------------------------------------------------------
+    // sendmail template tracking
+    //------------------------------------------------------------
 
-     sendmail.on('keyup',function() {
-       prep_for_change();
-     });
+    sendmail.on('keyup',function() {
+      prep_for_change();
+      template = this.name;
+      if(keyup_timer) { clearTimeout(keyup_timer); }
+      keyup_timer = setTimeout( function() {
+          keyup_timer = null;
+          refresh_sendmail_preview(template);
+          validate_survey_input(pid);
+        },
+        500,
+      );
+    });
 
-     sendmail.on('change',function() {
-       prep_for_change();
-     });
+    sendmail.on('change',function() {
+      prep_for_change();
+      refresh_sendmail_preview(this.name);
+    });
 
-     /**
-      * form submission
-      **/
+    //------------------------------------------------------------
+    // form submission
+    //------------------------------------------------------------
 
-     form.on('submit', function(event) {
-       prep_for_change();
-       event.preventDefault();
-       data = {
-         'action':'tlc_ttsurvey',
-         'nonce':form_vars['nonce'],
-         'query':'submit_content_form',
-         'pid':pid,
-         'content':{},
-       };
-       inputs.each(function() {
-         data.content[this.name] = this.value;
-       });
-       $.post(
-         form_vars['ajaxurl'],
-         data,
-         function(response) {
-           if(response.ok) {
-             form_status.html('updated').addClass('info').show();
-             dirty = false;
-           } else {
-             alert("failed to save content: " + response.error);
-           }
-           update_state();
-         },
-         'json',
-       );
-     });
+    form.on('submit', function(event) {
+      prep_for_change();
+      event.preventDefault();
+      data = {
+        'action':'tlc_ttsurvey',
+        'nonce':form_vars['nonce'],
+        'query':'submit_content_form',
+        'pid':pid,
+        'content':{},
+      };
+      inputs.each(function() {
+        data.content[this.name] = this.value;
+      });
+      $.post(
+        form_vars['ajaxurl'],
+        data,
+        function(response) {
+          if(response.ok) {
+            form_status.html('updated').addClass('info').show();
+            dirty = false;
+          } else {
+            alert("failed to save content: " + response.error);
+          }
+          update_state();
+        },
+        'json',
+      );
+    });
   }
 );
 
