@@ -43,7 +43,6 @@ function update_content_form()
 
 function reset_queue()
 {
-  console.log("reset_queue");
   queue.length=0
   if(queue_timer) {
     clearTimeout(queue_timer);
@@ -52,87 +51,53 @@ function reset_queue()
   ajax_lock=false;
 }
 
-function add_change_event_to_queue()
+function add_input_event_to_queue()
 {
-  event = {input:this.name, type:'change'};
-  console.log("add_change_event_to_queue: event="+JSON.stringify(event)+" ajax_lock="+ajax_lock+" queue:"+JSON.stringify(queue));
+  ce.submit.prop('disabled', true);
+  ce.revert.prop('disabled', true);
 
-  // fire immediately if all queues are empty and no ajax lock
-  if( queue.length == 0 && !ajax_lock ) {
-    queue.push(event);
-    run_queue_task();
-    return;
-  }
-
-  // we're done if there's already an event on the queue for the current input
-  if( queue.filter( e => e.input == event.input).length ) { return; }
-
-  // add the event to the queue
-  queue.push(event);
-
-  // start the timer if it's not already running
-  if(!queue_timer) {
-    queue_timer = setTimeout(run_queue_task,2500);
-  }
-}
-
-function add_keyup_event_to_queue()
-{
-  event = {input:this.name, type:'keyup'};
-  console.log("add_change_event_to_queue: event="+JSON.stringify(event)+" ajax_lock="+ajax_lock+" queue:"+JSON.stringify(queue));
-
-  // get events on the queue for the current input (count should be 0 or 1)
-  input_queue = queue.filter( e => e.input == event.input );
-
-  // we're done if there is already a change event on queue for current event
-  if( input_queue.filter( e => e.type == 'change' ).length ) { 
-    return; 
-  }
-
-  // replace any (keyup) event on queue for current input
-  queue = queue.filter( e => e.input != event.input ) 
-  queue.push(event);
+  // remove entries (should only be 0 or 1) from queue for the current input
+  // and add input to the end of the queue
+  queue = queue.filter( input => input != this.name );
+  queue.push(this.name);
 
  // start the timer if it's not already running
  if(!queue_timer) {
-   queue_timer = setTimeout(run_queue_task,500);
+   queue_timer = setTimeout(watch_queue,500);
  }
 }
 
-function run_queue_task()
+function watch_queue()
 {
-  console.log("run_queue_task: queue="+JSON.stringify(queue)+" timer="+queue_timer+" ajax_lock="+ajax_lock);
-  // clear the queue timer if it is running
-  if( queue_timer ) {
+  if(ajax_lock) { 
+    //waiting on ajax job to complete restart the timer and return
+    queue_timer = setTimeout( watch_queue, 500 );
+    return;
+  }
+
+  if(queue.length==0) {
+    // nothing else on queue, quite timer, update state, and return
     clearTimeout(queue_timer);
     queue_timer = null;
+    update_state();
+    return;
   }
 
-  if(!ajax_lock) {
-    // pick the event to run off of the queue
-    event = queue.shift();
-    if(!event) { return; }
+  // handle next queued event and restart the timer
+  ajax_lock = true;
 
-    // take the appropriate action based on event input
-    //   the action will include an ajax call
-    //   the ajax lock must be cleared in the action response handler
-    ajax_lock = true;
-    if( event.input == "survey" ) {
-      validate_survey_input();
-    } else {
-      refresh_sendmail_preview(event.input);
-    }
+  input = queue.shift();
+  if( input == "survey" ) {
+    validate_survey_input();
+  } else {
+    refresh_sendmail_preview(input);
   }
 
-  // restrt the queue timer
-  if(queue.length) {
-    queue_timer = setTimeout( run_queue_task, 2500 );
-  }
+  queue_timer = setTimeout( watch_queue, 500 );
 }
 
 function validate_survey_input()
 {
-  console.log("validate_survey_input");
   jQuery.post(
     form_vars['ajaxurl'],
     {
@@ -142,10 +107,8 @@ function validate_survey_input()
       'survey':ce.survey.eq(0).val(),
     },
     function(response) {
-      console.log("validate_survey_input response="+JSON.stringify(response));
       survey_error = response.ok ? null : response.error;
       ajax_lock = false;
-      update_state();
     },
     'json',
   );
@@ -153,7 +116,6 @@ function validate_survey_input()
 
 function refresh_sendmail_preview(template)
 {
-  console.log("refresh_sendmail_preview");
   const preview = ce.form.find('.sendmail.preview.' + template);
   const markdown = ce.form.find('textarea.' + template).val();
 
@@ -166,11 +128,9 @@ function refresh_sendmail_preview(template)
       'markdown':markdown,
     },
     function(response) {
-      console.log("refressh_sendmail_preview response="+JSON.stringify(response));
       if(response.ok) {
         preview.html(response.rendered);
         ajax_lock = false;
-        update_state();
       }
     },
     'json',
@@ -232,7 +192,6 @@ function content_has_changed()
 
 function update_state()
 {
-  console.log("update_state: queue="+JSON.stringify(queue)+" ajax_lock="+ajax_lock);
   const has_change = content_has_changed();
 
   ce.submit.prop('disabled', !(has_edit_lock && has_change) || survey_error );
@@ -250,7 +209,6 @@ function update_state()
 
 function handle_form_submit(event)
 {
-  console.log("handle_form_submit");
   event.preventDefault();
 
   data = {
@@ -269,7 +227,6 @@ function handle_form_submit(event)
     form_vars['ajaxurl'],
     data,
     function(response) {
-      console.log("handle_form_submit response="+JSON.stringify(response));
       if(response.ok) {
         ce.form_status.html('updated').addClass('info').show();
         current_content = jQuery(true,{},data.content);
@@ -284,7 +241,6 @@ function handle_form_submit(event)
 
 function handle_form_revert(event)
 {
-  console.log("handle_form_revert");
   event.preventDefault();
 
   ce.survey.val(current_content.survey);
@@ -292,8 +248,11 @@ function handle_form_revert(event)
     ce.form.find('textarea.'+key).val(current_content.sendmail[key].md);
     ce.form.find('.sendmail.preview.'+key).html(current_content.sendmail[key].html);
   }
-  update_state();
+  // assume that the current_content has been validated already
+  survey_error = false
+
   reset_queue();
+  update_state();
 }
 
 
@@ -339,8 +298,7 @@ jQuery(document).ready(
     // content validation setup
     //------------------------------------------------------------
 
-    ce.inputs.on('keyup', add_keyup_event_to_queue );
-    ce.inputs.on('change', add_change_event_to_queue );
+    ce.inputs.on('input', add_input_event_to_queue );
 
     //------------------------------------------------------------
     // form submission

@@ -31,7 +31,6 @@ if(!$survey) {
 $rval = json_encode($response);
 log_dev(print_r($rval,true));
 
-sleep(15);
 echo($rval);
 wp_die();
 

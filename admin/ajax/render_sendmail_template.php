@@ -13,6 +13,5 @@ $html = render_sendmail_markdown($md);
 
 $response = array( 'ok'=>true, 'rendered'=>$html );
 $rval = json_encode($response);
-sleep(15);
 echo $rval;
 wp_die();
