@@ -11,18 +11,18 @@ if(!plugin_admin_can('manage')) {
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 
-$action = implode('?', array(
-  parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
-  http_build_query( array(
-    'page'=>SETTINGS_PAGE_SLUG,
-    'tab'=>'overview',
-  ))
-));
-
 add_settings_form();
 
 function add_settings_form()
 {
+  $action = implode('?', array(
+    parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
+    http_build_query( array(
+      'page'=>SETTINGS_PAGE_SLUG,
+      'tab'=>'overview',
+    ))
+  ));
+
   echo "<div class='settings'>";
   echo "<form action='$action' method='POST'>";
   echo "  <input type='hidden' name='action' value='update'>";

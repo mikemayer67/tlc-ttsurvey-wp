@@ -26,7 +26,7 @@ function add_script_body()
   $current = current_survey();
   echo "<div class='content requires-javascript'>";
   $active_pid = determine_content_tab($current);
-  add_survey_tab_bar($active_pid,$current);
+  add_survey_navbar($active_pid,$current);
   add_survey_tab_content($active_pid,$current);
   echo "</div>";
 }
@@ -66,7 +66,7 @@ function determine_content_tab($current)
   return FIRST_TAB;
 }
 
-function add_survey_tab_bar($active_pid,$current)
+function add_survey_navbar($active_pid,$current)
 {
   echo "<div class='nav-tab-wrapper survey'>";
 
@@ -266,6 +266,20 @@ function add_survey_content($survey,$editable=false,$lock=null)
     echo "<input type='hidden' name='pid' value='$pid'>";
   }
 
+  //
+  // Add the block navbar
+  //
+
+  $active_block = $_GET['block'] ?? 'survey';
+  echo "<div class='nav-tab-wrapper block'>";
+  $blocks = [['survey','Survey Form'],['sendmail','Email Templates']];
+  foreach( $blocks as [$key,$label] ) {
+    $class = 'block nav-tab';
+    if($key == $active_block) { $class = "$class nav-tab-active"; }
+    echo "<a class='$class' data-target='$key'>$label</a>";
+  }
+  echo "</div>"; // nav-tab-wrapper.blocks
+
   // 
   // Add actual form content
   //
@@ -273,16 +287,17 @@ function add_survey_content($survey,$editable=false,$lock=null)
 
   // survey 
 
-  echo "<h2>Survey Form</h2>";
+  echo "<div class='block survey'>";
   echo "<div class='info'>";
   echo "Instructions go here.";
   echo "</div>";
   echo "<textarea class='survey' name='survey' readonly></textarea>";
   echo "<div class='invalid survey'></div>";
+  echo "</div>";
 
   // email templates
 
-  echo "<h2>Email Templates</h2>";
+  echo "<div class='block sendmail'>";
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
   echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
@@ -306,11 +321,10 @@ function add_survey_content($survey,$editable=false,$lock=null)
   echo "<h3>Welcome</h3>";
   echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
   echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
-  echo "<div class='sendmail preview welcome'>";
-  echo "<div class='body'>stuff</div>";
-  echo "<div class='hint'>preview</div>";
+  echo "<div class='sendmail preview welcome'>stuff</div>";
   echo "</div>"; 
 
+  echo "</div>"; // sendmail block
   echo "</div>"; // content-block
 
   //
@@ -318,8 +332,10 @@ function add_survey_content($survey,$editable=false,$lock=null)
   //   add submit button if editable
   //
   if($editable) {
-    $class = 'submit button button-primary button-large';
-    echo "<input type='submit' value='Save' class='$class' disabled>";
+    echo "<div class='button-box'>";
+    echo "<input type='submit' class='submit button button-primary button-large' value='Save' disabled>";
+    echo "<button class='revert button button-secondary button-large' name='revert' disabled>revert all updates</button>";
+    echo "</div>";
   }
 
   echo "</form>";
@@ -346,6 +362,7 @@ function enqueue_content_javascript($editable)
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
+      'active_block' => $_GET['block'] ?? 'survey',
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');

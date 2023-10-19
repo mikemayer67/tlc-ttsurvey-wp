@@ -34,8 +34,12 @@
   margin-left: 30px;
 }
 
-#tlc-ttsurvey-admin form input.submit {
+#tlc-ttsurvey-admin form div.button-box {
   margin-top:20px;
+}
+
+#tlc-ttsurvey-admin form div.button-box .revert {
+  float:right;
 }
 
 #tlc-ttsurvey-admin form .input-label {
@@ -292,7 +296,12 @@
   margin-bottom:15px;
 }
 
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.block {
+  margin-bottom:15px;
+}
+
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.block a.nav-tab {
   padding: 0 10px 0 10px;
 }
 
@@ -316,23 +325,28 @@
   border-color:#b00;
 }
 
-#tlc-ttsurvey-admin div.sendmail.preview {
+#tlc-ttsurvey-admin .sendmail.preview {
   margin:8px 0 0 15px;
   padding:15px;
-  border-style:groove;
-  border-width:thin;
+  border-style:double;
+  border-width:medium;
   float:none;
   position:relative;
+  background:#f8f8f8;
 }
 
-#tlc-ttsurvey-admin .sendmail.preview div.hint {
-  position:absolute;
-  top:-10px;
-  right:5px;
+#tlc-ttsurvey-admin .sendmail.preview p {
+  margin:5px 0;
 }
 
-#tlc-ttsurvey-admin .sendmail.preview div.body {
+#tlc-ttsurvey-admin div.sendmail.preview h1,
+#tlc-ttsurvey-admin div.sendmail.preview h2,
+#tlc-ttsurvey-admin div.sendmail.preview h3,
+#tlc-ttsurvey-admin div.sendmail.preview h4
+{
+  margin:5px 0;
 }
+
 
 /**
  * Log Tab
