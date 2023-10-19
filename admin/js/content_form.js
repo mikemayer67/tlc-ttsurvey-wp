@@ -41,6 +41,22 @@ function update_content_form()
   );
 }
 
+function handle_block_nav()
+{
+  const target = this.dataset.target;
+  const nav_tabs = ce.form.find('a.block.nav-tab');
+  const active_nav_tab = nav_tabs.filter("[data-target='"+target+"']");
+
+  const blocks = ce.form.find('.content-block .block');
+  const active_block = blocks.filter('.'+target);
+
+  nav_tabs.removeClass('nav-tab-active');
+  active_nav_tab.addClass('nav-tab-active');
+
+  blocks.hide();
+  active_block.show();
+}
+
 function reset_queue()
 {
   queue.length=0
@@ -271,6 +287,11 @@ jQuery(document).ready(
     pid = ce.form.find('input[name=pid]').eq(0).val();
 
     ce.form_status.hide();
+
+    const active_block = form_vars['active_block'];
+    ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
+    ce.form.find('.content-block div.block').hide();
+    ce.form.find(`.content-block div.block.${active_block}`).show();
 
     //------------------------------------------------------------
     // We're updating the form content here rather than in php to avoid

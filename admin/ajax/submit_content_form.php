@@ -3,9 +3,6 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-log_dev("submit_content_form: ".print_r($_POST,true));
-
-
 require_once plugin_path('include/logger.php');
 
 $pid = $_POST['pid'] ?? null;
@@ -28,13 +25,10 @@ if(!$content)
 
 // Writing the content data to the wordpress database is a bit of a PITA.
 //   The content array that comes in the POST from javascript is only
-//   partially escaped.  It escapes quiotes and backslashes, but not 
-//   newlines.  Preparing the content for export requires:
-//   1) Remove the current escaping from each value in the context array
-//   2) Convert th context array to JSON
-//   3) Fully escape the JSON for insertion into the wordpress database
-//
-// 
+//   partially escaped.  It escapes quotes and backslashes, but not newlines.
+//   - Remove the current escaping from each value in the context array
+//   - Convert the context array to JSON
+//   - Fully escape the JSON for insertion into the wordpress database
 $content = addslashes(json_encode(array_map('stripslashes',$content)));
 $post_data = array( 'ID'=>$pid, 'post_content'=>$content);
 $rc = wp_update_post($post_data, true);

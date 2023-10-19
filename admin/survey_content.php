@@ -107,11 +107,6 @@ function add_survey_navbar($active_pid,$current)
   echo "</div>";
 }
 
-function add_block_navbar($block)
-{
-}
-
-
 function add_survey_tab_content($active_pid,$current)
 {
   $current_pid = $current['post_id'] ?? '';
@@ -277,12 +272,11 @@ function add_survey_content($survey,$editable=false,$lock=null)
 
   $active_block = $_GET['block'] ?? 'survey';
   echo "<div class='nav-tab-wrapper block'>";
-  if($active_block == 'sendmail') {
-    echo "<a class='nav-tab' data-target='survey'>Survey Form</a>";
-    echo "<a class='nav-tab nav-tab-active' data-target='sendmail'>Email Templates</a>";
-  } else {
-    echo "<a class='nav-tab nav-tab-active' data-target='survey'>Survey Form</a>";
-    echo "<a class='nav-tab' data-target='sendmail'>Email Templates</a>";
+  $blocks = [['survey','Survey Form'],['sendmail','Email Templates']];
+  foreach( $blocks as [$key,$label] ) {
+    $class = 'block nav-tab';
+    if($key == $active_block) { $class = "$class nav-tab-active"; }
+    echo "<a class='$class' data-target='$key'>$label</a>";
   }
   echo "</div>"; // nav-tab-wrapper.blocks
 
@@ -293,16 +287,17 @@ function add_survey_content($survey,$editable=false,$lock=null)
 
   // survey 
 
-  echo "<h2>Survey Form</h2>";
+  echo "<div class='block survey'>";
   echo "<div class='info'>";
   echo "Instructions go here.";
   echo "</div>";
   echo "<textarea class='survey' name='survey' readonly></textarea>";
   echo "<div class='invalid survey'></div>";
+  echo "</div>";
 
   // email templates
 
-  echo "<h2>Email Templates</h2>";
+  echo "<div class='block sendmail'>";
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
   echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
@@ -329,6 +324,7 @@ function add_survey_content($survey,$editable=false,$lock=null)
   echo "<div class='sendmail preview welcome'>stuff</div>";
   echo "</div>"; 
 
+  echo "</div>"; // sendmail block
   echo "</div>"; // content-block
 
   //
@@ -366,6 +362,7 @@ function enqueue_content_javascript($editable)
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
+      'active_block' => $_GET['block'] ?? 'survey',
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
