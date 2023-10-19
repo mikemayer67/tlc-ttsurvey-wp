@@ -3,6 +3,9 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+log_dev("submit_content_form: ".print_r($_POST,true));
+
+
 require_once plugin_path('include/logger.php');
 
 $pid = $_POST['pid'] ?? null;

@@ -8,7 +8,7 @@ require_once plugin_path('include/surveys.php');
 
 $response = array('ok'=>true,);
 
-log_dev("validate_content_form POST: ".print_r($_POST,true));
+log_dev("validate_content_form: ".print_r($_POST,true));
 
 // validate the survey itelf:
 //   for now, simply valid yaml... eventually recognized survey structure
@@ -31,6 +31,7 @@ if(!$survey) {
 $rval = json_encode($response);
 log_dev(print_r($rval,true));
 
+sleep(15);
 echo($rval);
 wp_die();
 
