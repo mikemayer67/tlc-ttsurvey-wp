@@ -230,6 +230,10 @@
   margin-left:1.5em;
 }
 
+#tlc-ttsurvey-admin .content div.revisions {
+  margin-top: 8px;
+}
+
 #tlc-ttsurvey-admin .content div.info.lock {
   margin:3px 1.5em;
   padding:3px 15px;
@@ -419,3 +423,11 @@
   right:0;
 }
 
+p.tlc-post-warning {
+  font-size:larger;
+  font-weight:bold;
+  color:#800;
+}
+p.tlc-post-info {
+  font-size:larger;
+}

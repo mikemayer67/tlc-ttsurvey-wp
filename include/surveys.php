@@ -61,7 +61,6 @@ function register_survey_post_type()
     break;
   default:
     $show_in_menu = false;
-    $meta_b = null;
     break;
   }
   register_post_type( SURVEY_POST_TYPE,
@@ -80,7 +79,7 @@ function register_survey_post_type()
         'not_found_in_trash' => 'No Surveys found in Trash',
       ),
       'has_archive' => false,
-      'supports' => array('title','editor','reviesions'),
+      'supports' => array('title','editor','revisions'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
@@ -107,7 +106,26 @@ function surveys_deactivate()
   unregister_post_type(SURVEY_POST_TYPE);
 }
 
+function survey_edit_form_top($post)
+{
+  $type = $post->post_type;
+  if($post->post_type == SURVEY_POST_TYPE) {
+    $content_url = admin_url() . "admin.php?page=" . SETTINGS_PAGE_SLUG;
+    echo "<p class='tlc-post-warning'>";
+    echo "Be very careful editing this data.<br>";
+    echo "The JSON formatting must be preserved to avoid breaking the survey form.";
+    echo "</p>";
+    echo "<p class='tlc-post-info'>";
+    echo "This post editor is provided to manage revisions and to make <b>very</b> minor edits to the form.<br>";
+    echo "The form content should be modified in the Content tab of the ";
+    echo "<a href='$content_url'>Time andd Talent admin page</a>.";
+    echo "</p>";
+  }
+}
+
 add_action('init',ns('surveys_init'));
+add_action('edit_form_top',ns('survey_edit_form_top'));
+
 
 /**
  * Survey lookup functions
@@ -320,6 +338,8 @@ function update_survey_content_from_post()
     'ID' => $pid,
     'post_content' => wp_slash(json_encode($data)),
   ));
+
+  wp_save_post_revision($pid);
 
   log_dev("rval: $rval");
 

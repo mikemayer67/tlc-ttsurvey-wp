@@ -196,6 +196,16 @@ function add_past_survey_content($pid,$current)
   echo "</div>";
 }
 
+function add_revisions_content($survey)
+{
+  $pid = $survey['post_id'];
+  //http://localhost/wp_sandbox/wp-admin/edit.php?post_type=tlc-ttsurvey-form
+  $url = admin_url() . "post.php?post=$pid&action=edit";
+  echo "<div class='info revisions'`>";
+  echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
+  echo "</div>";
+}
+
 function add_current_survey_content($survey)
 {
   echo "<div class='current'>";
@@ -209,6 +219,7 @@ function add_current_survey_content($survey)
     echo "No changes can be made to its content without moving it back ";
     echo "to Draft status on the Settings tab.";
     echo "</div></div>";
+    add_revisions_content($survey);
     add_survey_content($survey);
   }
   elseif($status == SURVEY_IS_DRAFT) {
@@ -218,6 +229,7 @@ function add_current_survey_content($survey)
     echo "To lock in its structure and open it for participation, switch its status";
     echo " to Active on the Settings tab.";
     echo "</div></div>";
+    add_revisions_content($survey);
     $lock = add_lock_content($survey);
     add_survey_content($survey,true,$lock);
   }
