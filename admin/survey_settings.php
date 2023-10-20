@@ -25,16 +25,18 @@ function add_settings_form()
 
   echo "<div class='settings'>";
   echo "<form action='$action' method='POST'>";
-  echo "  <input type='hidden' name='action' value='update'>";
+  echo "<input type='hidden' name='action' value='update'>";
 
   wp_nonce_field(OPTIONS_NONCE);
   add_settings_status();
   add_admin_settings();
   add_pdf_uri_setting();
-  add_log_level_setting();
+  add_advanced_settings();
 
-  $class = 'submit button button-primary button-large';
-  echo "  <input type='submit' class='$class' value='Save'>";
+  echo "<div class='button-box'>";
+  echo "<input type='submit' class= 'submit button button-primary button-large' value='Save'>";
+  echo "</div>";
+
   echo "</form></div>";
 }
 
@@ -128,15 +130,30 @@ function add_pdf_uri_setting()
   echo "</div>";
 }
 
-function add_log_level_setting()
+function add_advanced_settings()
 {
+  echo "<div class='label'>Advanced Settings</div>";
+  echo "<table class='settings'>";
+
   $cur_level = survey_log_level();
-  echo "<div class='label'>Log Level</div>";
-  echo "<div class='settings'>";
-  echo "<select name='log_level'>";
-  foreach(array("DEV","INFO","WARNING","ERROR") as $log_level) {
+  echo "<tr>";
+  echo "<td class='input-label'>Logging</td>";
+  echo "<td class='input-value'><select name='log_level'>";
+  foreach(LOGGER_ as $log_level => $label) {
     $selected = ($log_level == $cur_level) ? "selected" : "";
-    echo "<option value='$log_level' $selected>$log_level</option>";
+    echo "<option value='$log_level' $selected>$label</option>";
   }
-  echo "</select></div>";
+  echo "</select></td></tr>";
+
+  $cur_post_ui = survey_post_ui();
+  echo "<tr>";
+  echo "<td class='input-label'>Post UI</td>";
+  echo "<td class='input-value'><select name='post_ui'>";
+  foreach(POST_UI_ as $post_ui => $label) {
+    $selected = ($post_ui == $cur_post_ui) ? "selected" : "";
+    echo "<option value='$post_ui' $selected>$label</option>";
+  }
+  echo "</select></td></tr>";
+
+  echo "</table>";
 }

@@ -34,6 +34,17 @@ const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
+const POST_UI_NONE = 'NONE';
+const POST_UI_MENU = 'MENU';
+const POST_UI_REST = 'REST';
+const POST_UI_BOTH = 'BOTH';
+const POST_UI_ = array(
+  'NONE' => "Not allowed",
+  'MENU' => "In Tools menu",
+  'REST' => "Via post URL",
+  'BOTH' => "Tools menu & post URL",
+);
+
 /**
  * Register the custom post type
  **/
