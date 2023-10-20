@@ -61,6 +61,7 @@ function register_survey_post_type()
     break;
   default:
     $show_in_menu = false;
+    $meta_b = null;
     break;
   }
   register_post_type( SURVEY_POST_TYPE,
@@ -79,6 +80,7 @@ function register_survey_post_type()
         'not_found_in_trash' => 'No Surveys found in Trash',
       ),
       'has_archive' => false,
+      'supports' => array('title','editor','reviesions'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
@@ -275,7 +277,6 @@ function create_new_survey($name)
 
 function update_survey_status_from_post()
 {
-  log_dev("update_survey_status_from_post: ".print_r($_POST,true));
   $current = current_survey();
   if(!$current) { return null; }
 
