@@ -9,7 +9,13 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');
 
-$status = "<span class='tlc-status' style='display:none;'></span>";
+$status = $_GET['status'] ?? null;
+if($status) {
+  $status = "<span class='tlc-status info'>$status</span>";
+} else {
+  $status = "<span class='tlc-status' style='display:none;'></span>";
+}
+ 
 if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   $action = $_POST['action'] ?? null;
   if($action == "update") 
@@ -40,6 +46,7 @@ if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   }
 }
 
+
 echo "<div id='tlc-ttsurvey-admin'>";
 echo "<h1>$title$status</h1>";
 echo "<div class='nav-tab-wrapper'>";
@@ -67,6 +74,7 @@ foreach($tabs as [$tab,$label]) {
     $class .= ' nav-tab-active';
   }
   $query_args['tab'] = $tab;
+  unset($query_args['status']);
   $uri = $uri_path . '?' .http_build_query($query_args);
   echo "<a class='$class' href='$uri'>$label</a>";
 }

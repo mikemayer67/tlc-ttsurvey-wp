@@ -35,14 +35,12 @@ const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
 const POST_UI_NONE = 'NONE';
-const POST_UI_MENU = 'MENU';
-const POST_UI_REST = 'REST';
-const POST_UI_BOTH = 'BOTH';
+const POST_UI_POSTS = 'POSTS';
+const POST_UI_TOOLS = 'TOOLS';
 const POST_UI_ = array(
-  'NONE' => "Not allowed",
-  'MENU' => "In Tools menu",
-  'REST' => "Via post URL",
-  'BOTH' => "Tools menu & post URL",
+  'NONE' => "Disabled",
+  'POSTS' => "Posts menu",
+  'TOOLS' => "Tools menu",
 );
 
 /**
@@ -53,25 +51,38 @@ const SURVEY_POST_TYPE = 'tlc-ttsurvey-form';
 
 function register_survey_post_type()
 {
+  switch( survey_post_ui() )
+  {
+  case POST_UI_POSTS:
+    $show_in_menu = 'edit.php';
+    break;
+  case POST_UI_TOOLS:
+    $show_in_menu = 'tools.php';
+    break;
+  default:
+    $show_in_menu = false;
+    break;
+  }
   register_post_type( SURVEY_POST_TYPE,
     array(
       'labels' => array(
-        'name' => 'TLC TTSurvey Forms',
-        'singular_name' => 'Form',
-        'add_new' => 'New Form',
-        'add_new_item' => 'Add New Form',
-        'edit_item' => 'Edit Form',
-        'new_item' => 'New Form',
-        'view_item' => 'View Form',
-        'search_items' => 'Search Forms',
-        'not_found' =>  'No Forms Found',
-        'not_found_in_trash' => 'No Forms found in Trash',
+        'name' => 'Surveys',
+        'menu_name' => "Time & Talent Surveys",
+        'singular_name' => 'Survey',
+        'add_new' => 'New Survey',
+        'add_new_item' => 'Add New Survey',
+        'edit_item' => 'Edit Survey',
+        'new_item' => 'New Survey',
+        'view_item' => 'View Survey',
+        'search_items' => 'Search Surveys',
+        'not_found' =>  'No Surveys Found',
+        'not_found_in_trash' => 'No Surveys found in Trash',
       ),
       'has_archive' => false,
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
-      'show_in_menu' => false,
+      'show_in_menu' => $show_in_menu,
     ),
   );
 }
@@ -264,6 +275,7 @@ function create_new_survey($name)
 
 function update_survey_status_from_post()
 {
+  log_dev("update_survey_status_from_post: ".print_r($_POST,true));
   $current = current_survey();
   if(!$current) { return null; }
 
@@ -279,7 +291,6 @@ function update_survey_status_from_post()
 
 function update_survey_content_from_post()
 {
-  log_dev("update_survey_content_from_post(): POST=".print_r($_POST,true));
   $current = current_survey();
   if(!$current) { 
     log_warning("Attempted to update survey with no current survey");

@@ -82,7 +82,7 @@ function survey_log_level() {
 
 /**
  * get survey post UI
- * @return POST_UI_NONE, POST_UI_MENU, POST_UI_REST, POST_UI_BOTH
+ * @return POST_UI_NONE, POST_UI_POSTS, POST_UI_TOOLS,
  */
 function survey_post_ui() {
   return get_survey_option(POST_UI_KEY);
@@ -161,6 +161,9 @@ function update_options_from_post()
     }
   }
   update_option(OPTIONS_KEY,$options);
+
+  require_once plugin_path('include/surveys.php');
+  register_survey_post_type();
 }
 
 

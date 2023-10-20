@@ -15,17 +15,8 @@ add_settings_form();
 
 function add_settings_form()
 {
-  $action = implode('?', array(
-    parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
-    http_build_query( array(
-      'page'=>SETTINGS_PAGE_SLUG,
-      'tab'=>'overview',
-    ))
-  ));
-
   echo "<div class='settings'>";
-  echo "<form action='$action' method='POST'>";
-  echo "<input type='hidden' name='action' value='update'>";
+  echo "<form class='settings'>";
 
   wp_nonce_field(OPTIONS_NONCE);
   add_settings_status();
@@ -38,6 +29,8 @@ function add_settings_form()
   echo "</div>";
 
   echo "</form></div>";
+
+  enqueue_settings_javascript();
 }
 
 function add_settings_status()
@@ -156,4 +149,34 @@ function add_advanced_settings()
   echo "</select></td></tr>";
 
   echo "</table>";
+}
+
+function enqueue_settings_javascript()
+{
+  $overview_url = implode('?', array(
+    parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
+    http_build_query( array(
+      'page'=>SETTINGS_PAGE_SLUG,
+      'tab'=>'overview',
+      'status'=>'updated',
+    ))
+  ));
+
+  wp_register_script(
+    'tlc_ttsurvey_settings_form',
+    plugin_url('admin/js/settings_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_settings_form',
+    'form_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('settings_form',wp_create_nonce('settings_form')),
+      'overview' => $overview_url,
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_settings_form');
 }
