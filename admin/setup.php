@@ -23,13 +23,13 @@ function handle_admin_init()
 
 function handle_admin_menu()
 {
-  add_submenu_page(
-    'tools.php',
+  add_menu_page(
     'Time & Talent Survey', // page title
     'Time & Talent Survey', // menu title
     'tlc-ttsurvey-view', // required capability
     SETTINGS_PAGE_SLUG, // settings page slug
     ns('populate_settings_page'), // callback to populate settingsn page
+    plugin_icon(),
   );
 }
 

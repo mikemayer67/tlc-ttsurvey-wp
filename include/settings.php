@@ -16,11 +16,13 @@ const OPTIONS_KEY = 'tlc_ttsurvey_options';
 const CAPS_KEY = 'caps';
 const PDF_URI_KEY = 'pdf_href';
 const LOG_LEVEL_KEY = 'log_level';
+const POST_UI_KEY = 'post_ui';
 
 $option_defaults = array(
   CAPS_KEY => [],
   PDF_URI_KEY => '',
   LOG_LEVEL_KEY => 'INFO',
+  POST_UI_KEY => 'NONE',
 );
 
 /**
@@ -72,10 +74,18 @@ function survey_capabilities() {
 
 /**
  * get survey log level
- * @return DEV, INFO, WARNING, or ERROR
+ * @return LOGGER_DEV, LOGGER_INFO, LOGGER_WARNING, or LOGGER_ERROR
  */
 function survey_log_level() {
   return get_survey_option(LOG_LEVEL_KEY);
+}
+
+/**
+ * get survey post UI
+ * @return POST_UI_NONE, POST_UI_POSTS, POST_UI_TOOLS,
+ */
+function survey_post_ui() {
+  return get_survey_option(POST_UI_KEY);
 }
 
 /**
@@ -95,7 +105,7 @@ function reset_survey_option($key)
 }
 
 /**
- * reset all sruvey options
+ * reset all survey options
  *
  * Can only be used as admin
  **/
@@ -125,6 +135,7 @@ function update_options_from_post()
   $options[CAPS_KEY] = $new_caps;
 
   $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
+  $options[POST_UI_KEY] = strtoupper($_POST['post_ui']);
 
   $options[PDF_URI_KEY] = sanitize_url(
     $_POST['pdf_uri'],
@@ -150,6 +161,9 @@ function update_options_from_post()
     }
   }
   update_option(OPTIONS_KEY,$options);
+
+  require_once plugin_path('include/surveys.php');
+  register_survey_post_type();
 }
 
 

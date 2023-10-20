@@ -4,6 +4,16 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 const PLUGIN_LOG_FILE = 'plugin.log';
+const LOGGER_DEV = "DEV";
+const LOGGER_INFO = "INFO";
+const LOGGER_WARN = "WARNING";
+const LOGGER_ERR = "ERROR";
+const LOGGER_ = array(
+  "DEV" => "Development",
+  "INFO" => "Information",
+  "WARNING" => "Warnings/Errors",
+  "ERROR" => "Errors only",
+);
 
 $_logger_fp = null;
 

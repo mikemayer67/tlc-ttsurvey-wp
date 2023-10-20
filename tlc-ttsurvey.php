@@ -40,6 +40,18 @@ function plugin_path($path) { return plugin_dir() . '/' . $path; }
 function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
 
 /**
+ * returns base64 encoded svg icon
+ */
+function plugin_icon() {
+  static $icon = null;
+  if(!$icon) {
+    $svg = file_get_contents(plugin_path('img/trinity_logo.svg'));
+    $icon = 'data:image/svg+xml;base64,' . base64_encode($svg);
+  }
+  return $icon;
+}
+
+/**
  * Determine level of admin access
  *   returns associative array of accesses
  **/
@@ -118,7 +130,7 @@ add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 
 if( is_admin() ) /* Admin setup */
 {
-  require_once plugin_path('admin/admin.php');
+  require_once plugin_path('admin/setup.php');
 
   require_once plugin_path('admin/ajax/heartbeat.php');
   add_filter('heartbeat_received',ns('handle_heartbeat'),10,3);

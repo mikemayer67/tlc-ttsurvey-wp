@@ -34,6 +34,15 @@ const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
+const POST_UI_NONE = 'NONE';
+const POST_UI_POSTS = 'POSTS';
+const POST_UI_TOOLS = 'TOOLS';
+const POST_UI_ = array(
+  'NONE' => "Disabled",
+  'POSTS' => "Posts menu",
+  'TOOLS' => "Tools menu",
+);
+
 /**
  * Register the custom post type
  **/
@@ -42,25 +51,39 @@ const SURVEY_POST_TYPE = 'tlc-ttsurvey-form';
 
 function register_survey_post_type()
 {
+  switch( survey_post_ui() )
+  {
+  case POST_UI_POSTS:
+    $show_in_menu = 'edit.php';
+    break;
+  case POST_UI_TOOLS:
+    $show_in_menu = 'tools.php';
+    break;
+  default:
+    $show_in_menu = false;
+    break;
+  }
   register_post_type( SURVEY_POST_TYPE,
     array(
       'labels' => array(
-        'name' => 'TLC TTSurvey Forms',
-        'singular_name' => 'Form',
-        'add_new' => 'New Form',
-        'add_new_item' => 'Add New Form',
-        'edit_item' => 'Edit Form',
-        'new_item' => 'New Form',
-        'view_item' => 'View Form',
-        'search_items' => 'Search Forms',
-        'not_found' =>  'No Forms Found',
-        'not_found_in_trash' => 'No Forms found in Trash',
+        'name' => 'Surveys',
+        'menu_name' => "Time & Talent Surveys",
+        'singular_name' => 'Survey',
+        'add_new' => 'New Survey',
+        'add_new_item' => 'Add New Survey',
+        'edit_item' => 'Edit Survey',
+        'new_item' => 'New Survey',
+        'view_item' => 'View Survey',
+        'search_items' => 'Search Surveys',
+        'not_found' =>  'No Surveys Found',
+        'not_found_in_trash' => 'No Surveys found in Trash',
       ),
       'has_archive' => false,
+      'supports' => array('title','editor','revisions'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
-      'show_in_menu' => false,
+      'show_in_menu' => $show_in_menu,
     ),
   );
 }
@@ -83,7 +106,26 @@ function surveys_deactivate()
   unregister_post_type(SURVEY_POST_TYPE);
 }
 
+function survey_edit_form_top($post)
+{
+  $type = $post->post_type;
+  if($post->post_type == SURVEY_POST_TYPE) {
+    $content_url = admin_url() . "admin.php?page=" . SETTINGS_PAGE_SLUG;
+    echo "<p class='tlc-post-warning'>";
+    echo "Be very careful editing this data.<br>";
+    echo "The JSON formatting must be preserved to avoid breaking the survey form.";
+    echo "</p>";
+    echo "<p class='tlc-post-info'>";
+    echo "This post editor is provided to manage revisions and to make <b>very</b> minor edits to the form.<br>";
+    echo "The form content should be modified in the Content tab of the ";
+    echo "<a href='$content_url'>Time andd Talent admin page</a>.";
+    echo "</p>";
+  }
+}
+
 add_action('init',ns('surveys_init'));
+add_action('edit_form_top',ns('survey_edit_form_top'));
+
 
 /**
  * Survey lookup functions
@@ -268,7 +310,6 @@ function update_survey_status_from_post()
 
 function update_survey_content_from_post()
 {
-  log_dev("update_survey_content_from_post(): POST=".print_r($_POST,true));
   $current = current_survey();
   if(!$current) { 
     log_warning("Attempted to update survey with no current survey");
@@ -297,6 +338,8 @@ function update_survey_content_from_post()
     'ID' => $pid,
     'post_content' => wp_slash(json_encode($data)),
   ));
+
+  wp_save_post_revision($pid);
 
   log_dev("rval: $rval");
 

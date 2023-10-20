@@ -22,7 +22,7 @@ function add_tlc_settings_overview()
   add_past_survey_overview($current);
   add_admins_overview();
   add_survey_url();
-  add_log_level();
+  add_advanced();
   echo "</table>";
 }
 
@@ -118,12 +118,16 @@ function add_survey_url()
 }
 
 
-function add_log_level()
+function add_advanced()
 {
-  $log_level = survey_log_level();
+  $log_level = LOGGER_[survey_log_level()];
+  $post_ui = POST_UI_[survey_post_ui()];
   echo "<tr>";
   echo "  <td class='label'>Log Level</td>";
   echo "  <td class='value'>$log_level</td>";
+  echo "</tr><tr>";
+  echo "  <td class='label'>Post UI</td>";
+  echo "  <td class='value'>$post_ui</td>";
   echo "</tr>";
 }
 
