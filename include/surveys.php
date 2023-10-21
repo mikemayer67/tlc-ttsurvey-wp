@@ -123,9 +123,15 @@ function survey_edit_form_top($post)
   }
 }
 
+function survey_revisions_to_keep($num)
+{
+  return 15;
+}
+
 add_action('init',ns('surveys_init'));
 add_action('edit_form_top',ns('survey_edit_form_top'));
-
+log_dev('hook: wp_'.SURVEY_POST_TYPE.'_revision_to_keep');
+add_action('wp_'.SURVEY_POST_TYPE.'_revisions_to_keep',ns('survey_revisions_to_keep'));
 
 /**
  * Survey lookup functions
