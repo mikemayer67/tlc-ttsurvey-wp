@@ -265,18 +265,19 @@ function add_survey_content($survey,$editable=false,$lock=null)
 {
   $name = $survey['name'];
   $pid = $survey['post_id'];
+  $last_saved = $survey['last_saved'];
 
   // wrap the content in a form
   //   no action/method as submision will be handled by javascript
   if($editable)
   {
     echo "<form class='content edit'>";
-    echo "<input type='hidden' name='pid' value='$pid'>";
     echo "<input type='hidden' name='lock' value=$lock>";
   } else {
     echo "<form class='content no-edit'>";
-    echo "<input type='hidden' name='pid' value='$pid'>";
   }
+  echo "<input type='hidden' name='pid' value='$pid'>";
+  echo "<input type='hidden' name='last-saved' value='$last_saved'>";
 
   //
   // Add the block navbar

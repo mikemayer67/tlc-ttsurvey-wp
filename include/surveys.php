@@ -193,7 +193,12 @@ function survey_catalog()
       }
       $status = $status[0];
     }
-    $rval[$post_id] = array('post_id'=>$post_id, 'name'=>$name, 'status'=>$status);
+    $rval[$post_id] = array(
+      'post_id'=>$post_id, 
+      'name'=>$name, 
+      'status'=>$status,
+      'last_saved'=>$post->post_modified_gmt,
+    );
   }
 
   return $rval;

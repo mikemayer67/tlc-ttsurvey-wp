@@ -245,7 +245,14 @@ function handle_form_submit(event)
     function(response) {
       if(response.ok) {
         ce.form_status.html('updated').addClass('info').show();
-        current_content = jQuery(true,{},data.content);
+        ce.last_saved.val(response.last_modified);
+        current_content.survey = ce.survey.val();
+        for(const key in current_content.sendmail) {
+          current_content.sendmail[key].md = ce.form.find('textarea.'+key).val();
+          current_content.sendmail[key].html = ce.form.find('sendmail.preview.'+key).html();
+        }
+        localStorage.removeItem('autosave');
+        update_state();
         reset_queue();
       } else {
         alert("failed to save content: " + response.error);
@@ -271,12 +278,29 @@ function handle_form_revert(event)
   update_state();
 }
 
+function do_autosave()
+{
+  if( content_has_changed() ) {
+    var autosave_data = {
+      survey: ce.survey.val(),
+      last_saved: ce.last_saved.val(),
+    };
+    ce.sendmail.each( function() {
+      autosave_data[this.name] = this.value;
+    });
+    localStorage.autosave = JSON.stringify(autosave_data);
+  } else {
+    localStorage.removeItem('autosave');
+  }
+}
+
 
 jQuery(document).ready(
   function($) {
     ce.form = $('#tlc-ttsurvey-admin form.content');
     ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
     ce.lock_info = $('.content .info.lock').eq(0);
+    ce.last_saved = ce.form.find('input[name=last-saved]').eq(0);
     ce.inputs = ce.form.find('textarea');
     ce.survey = ce.form.find('textarea.survey').eq(0);
     ce.error = ce.form.find('div.invalid.survey').eq(0);
@@ -314,6 +338,8 @@ jQuery(document).ready(
 
     $(document).on( 'heartbeat-send', handle_heartbeat_send );
     $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
+
+    setInterval(do_autosave,60000);
 
     //------------------------------------------------------------
     // content validation setup
