@@ -35,7 +35,11 @@ $rc = wp_update_post($post_data, true);
 
 if( $rc == $pid )
 {
-  $response = array('ok'=>true,);
+  $post = get_post($pid);
+  $response = array(
+    'ok'=>true,
+    'last_modified'=>get_post_modified_time('U',true,$post),
+  );
 } else {
   $response = array('ok'=>false, $rc->get_error_message(), );
 }

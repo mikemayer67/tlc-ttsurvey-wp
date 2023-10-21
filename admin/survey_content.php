@@ -196,16 +196,6 @@ function add_past_survey_content($pid,$current)
   echo "</div>";
 }
 
-function add_revisions_content($survey)
-{
-  $pid = $survey['post_id'];
-  //http://localhost/wp_sandbox/wp-admin/edit.php?post_type=tlc-ttsurvey-form
-  $url = admin_url() . "post.php?post=$pid&action=edit";
-  echo "<div class='info revisions'`>";
-  echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
-  echo "</div>";
-}
-
 function add_current_survey_content($survey)
 {
   echo "<div class='current'>";
@@ -219,8 +209,8 @@ function add_current_survey_content($survey)
     echo "No changes can be made to its content without moving it back ";
     echo "to Draft status on the Settings tab.";
     echo "</div></div>";
-    add_revisions_content($survey);
-    add_survey_content($survey);
+    $editable = false;
+    $lock = null;
   }
   elseif($status == SURVEY_IS_DRAFT) {
     echo "<div class='info'>";
@@ -229,10 +219,16 @@ function add_current_survey_content($survey)
     echo "To lock in its structure and open it for participation, switch its status";
     echo " to Active on the Settings tab.";
     echo "</div></div>";
-    add_revisions_content($survey);
+    $editable = true;
     $lock = add_lock_content($survey);
-    add_survey_content($survey,true,$lock);
   }
+  else {
+    log_error("Attempting to add closed survey as current");
+    wp_die("Internal error, contact Time & Talent plugin author if this persists");
+  }
+
+  add_revisions_content($survey);
+  add_survey_content($survey,$editable,$lock);
 
   echo "</div>";
 }
@@ -260,23 +256,35 @@ function add_lock_content($survey)
   return $lock;
 }
 
+function add_revisions_content($survey)
+{
+  $pid = $survey['post_id'];
+  //http://localhost/wp_sandbox/wp-admin/edit.php?post_type=tlc-ttsurvey-form
+  $url = admin_url() . "post.php?post=$pid&action=edit";
+  echo "<div class='info revisions'`>";
+  echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
+  echo "</div>";
+}
+
 
 function add_survey_content($survey,$editable=false,$lock=null)
 {
   $name = $survey['name'];
   $pid = $survey['post_id'];
+  $last_modified = $survey['last_modified'];
 
   // wrap the content in a form
   //   no action/method as submision will be handled by javascript
   if($editable)
   {
     echo "<form class='content edit'>";
-    echo "<input type='hidden' name='pid' value='$pid'>";
     echo "<input type='hidden' name='lock' value=$lock>";
   } else {
     echo "<form class='content no-edit'>";
-    echo "<input type='hidden' name='pid' value='$pid'>";
   }
+  echo "<input type='hidden' name='pid' value='$pid'>";
+  // last modified will be filled in by javascript
+  echo "<input type='hidden' name='last-modified' value=0>";
 
   //
   // Add the block navbar
