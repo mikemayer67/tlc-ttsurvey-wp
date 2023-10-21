@@ -20,6 +20,8 @@ $content = json_decode($post->post_content,true);
 
 $response = array(
   'ok'=>true,
+  'pid'=>$pid,
+  'last_modified'=>get_post_modified_time('U',true,$post),
   'survey'=>$content['survey'],
   'sendmail'=>array(),
 );

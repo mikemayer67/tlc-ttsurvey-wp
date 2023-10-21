@@ -1,6 +1,6 @@
 var has_edit_lock = false;
 var survey_error = null;
-var current_content = null;
+var saved_content = null;
 
 var ajax_lock = false;
 var queue_timer = null;
@@ -24,17 +24,37 @@ function update_content_form()
     },
     function(response) {
       if(response.ok) {
-        ce.survey.val(response.survey);
+        ce.last_modified.val(response.last_modified);
 
-        for(const key in response.sendmail) {
-          ce.form.find('textarea.'+key).val(response.sendmail[key].md);
-          ce.form.find('.sendmail.preview.'+key).html(response.sendmail[key].html);
-        }
-
-        current_content = {
+        saved_content = {
           survey: response.survey,
           sendmail: response.sendmail,
         };
+
+        update_state_needed = false;
+        current_content = saved_content;
+
+        if(localStorage.autosave) {
+          autosave = JSON.parse(localStorage.autosave);
+          // equality means that the autosave is for the current revision
+          //   earlier means that autosave is no longer applicable
+          //   later means what?  the post was somehow rolled back?
+          //   either way, only want to use the autosave on equality
+          if(autosave.last_modified == response.last_modified) {
+            update_state_needed = true;
+            current_content = autosave;
+            ce.form_status.html('recovered autosave').addClass('info').show();
+          }
+        } 
+
+        ce.survey.val(current_content.survey);
+
+        for(const key in saved_content.sendmail) {
+          ce.sendmail.filter('.'+key).val(current_content.sendmail[key].md);
+          ce.preview.filter('.'+key).html(current_content.sendmail[key].html);
+        }
+
+        if(update_state_needed) { update_state() }
       }
     },
     'json',
@@ -67,8 +87,9 @@ function reset_queue()
   ajax_lock=false;
 }
 
-function add_input_event_to_queue()
+function handle_input_event()
 {
+  ce.form_status.hide();
   ce.submit.prop('disabled', true);
   ce.revert.prop('disabled', true);
 
@@ -132,20 +153,17 @@ function validate_survey_input()
 
 function refresh_sendmail_preview(template)
 {
-  const preview = ce.form.find('.sendmail.preview.' + template);
-  const markdown = ce.form.find('textarea.' + template).val();
-
   jQuery.post(
     form_vars['ajaxurl'],
     {
       'action':'tlc_ttsurvey',
       'nonce':form_vars['nonce'],
       'query':'render_sendmail_template',
-      'markdown':markdown,
+      'markdown':ce.sendmail.filter('.'+template).val(),
     },
     function(response) {
       if(response.ok) {
-        preview.html(response.rendered);
+        ce.preview.filter('.'+template).html(response.rendered);
         ajax_lock = false;
       }
     },
@@ -193,11 +211,11 @@ function handle_heartbeat_tick(event,data)
 function content_has_changed()
 {
   var rval = false;
-  if(current_content) {
-    if(current_content.survey != ce.survey.val()) {
+  if(saved_content) {
+    if(saved_content.survey != ce.survey.val()) {
       rval = true;
     } else {
-      const sendmail = current_content.sendmail;
+      const sendmail = saved_content.sendmail;
       ce.sendmail.each(function() {
         if( this.value != sendmail[this.name].md ) { rval = true; }
       });
@@ -225,6 +243,7 @@ function update_state()
 
 function handle_form_submit(event)
 {
+  ce.form_status.hide();
   event.preventDefault();
 
   data = {
@@ -245,11 +264,11 @@ function handle_form_submit(event)
     function(response) {
       if(response.ok) {
         ce.form_status.html('updated').addClass('info').show();
-        ce.last_saved.val(response.last_modified);
-        current_content.survey = ce.survey.val();
-        for(const key in current_content.sendmail) {
-          current_content.sendmail[key].md = ce.form.find('textarea.'+key).val();
-          current_content.sendmail[key].html = ce.form.find('sendmail.preview.'+key).html();
+        ce.last_modified.val(response.last_modified);
+        saved_content.survey = ce.survey.val();
+        for(const key in saved_content.sendmail) {
+          saved_content.sendmail[key].md = ce.sendmail.filter('.'+key).val();
+          saved_content.sendmail[key].html = ce.preview.filter('.'+key).html();
         }
         localStorage.removeItem('autosave');
         update_state();
@@ -264,14 +283,15 @@ function handle_form_submit(event)
 
 function handle_form_revert(event)
 {
+  ce.form_status.hide();
   event.preventDefault();
 
-  ce.survey.val(current_content.survey);
-  for(const key in current_content.sendmail) {
-    ce.form.find('textarea.'+key).val(current_content.sendmail[key].md);
-    ce.form.find('.sendmail.preview.'+key).html(current_content.sendmail[key].html);
+  ce.survey.val(saved_content.survey);
+  for(const key in saved_content.sendmail) {
+    ce.sendmail.filter('.'+key).val(saved_content.sendmail[key].md);
+    ce.preview.filter('.'+key).html(saved_content.sendmail[key].html);
   }
-  // assume that the current_content has been validated already
+  // assume that the saved_content has been validated already
   survey_error = false
 
   reset_queue();
@@ -283,10 +303,14 @@ function do_autosave()
   if( content_has_changed() ) {
     var autosave_data = {
       survey: ce.survey.val(),
-      last_saved: ce.last_saved.val(),
+      sendmail: {},
+      last_modified: ce.last_modified.val(),
     };
     ce.sendmail.each( function() {
-      autosave_data[this.name] = this.value;
+      autosave_data.sendmail[this.name] = {
+        md:this.value,
+        html:ce.preview.filter('.'+this.name).html(),
+      }
     });
     localStorage.autosave = JSON.stringify(autosave_data);
   } else {
@@ -300,11 +324,12 @@ jQuery(document).ready(
     ce.form = $('#tlc-ttsurvey-admin form.content');
     ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
     ce.lock_info = $('.content .info.lock').eq(0);
-    ce.last_saved = ce.form.find('input[name=last-saved]').eq(0);
+    ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
     ce.inputs = ce.form.find('textarea');
     ce.survey = ce.form.find('textarea.survey').eq(0);
     ce.error = ce.form.find('div.invalid.survey').eq(0);
     ce.sendmail = ce.form.find('textarea.sendmail');
+    ce.preview = ce.form.find('.sendmail.preview');
     ce.submit = ce.form.find('input.submit').eq(0);
     ce.revert = ce.form.find('button.revert').eq(0);
 
@@ -345,7 +370,7 @@ jQuery(document).ready(
     // content validation setup
     //------------------------------------------------------------
 
-    ce.inputs.on('input', add_input_event_to_queue );
+    ce.inputs.on('input', handle_input_event );
 
     //------------------------------------------------------------
     // form submission

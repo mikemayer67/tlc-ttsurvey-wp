@@ -38,7 +38,7 @@ if( $rc == $pid )
   $post = get_post($pid);
   $response = array(
     'ok'=>true,
-    'last_modified'=>$post->post_modified_gmt,
+    'last_modified'=>get_post_modified_time('U',true,$post),
   );
 } else {
   $response = array('ok'=>false, $rc->get_error_message(), );
