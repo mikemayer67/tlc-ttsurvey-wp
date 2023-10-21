@@ -43,7 +43,7 @@ function update_content_form()
           if(autosave.last_modified == response.last_modified) {
             update_state_needed = true;
             current_content = autosave;
-            ce.form_status.html('recovered autosave').addClass('info').show();
+            ce.form_status.html('autosave').addClass('info').show();
           }
         } 
 
@@ -294,6 +294,7 @@ function handle_form_revert(event)
   // assume that the saved_content has been validated already
   survey_error = false
 
+  localStorage.removeItem('autosave');
   reset_queue();
   update_state();
 }
@@ -364,13 +365,12 @@ jQuery(document).ready(
     $(document).on( 'heartbeat-send', handle_heartbeat_send );
     $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
 
-    setInterval(do_autosave,60000);
-
     //------------------------------------------------------------
     // content validation setup
     //------------------------------------------------------------
 
     ce.inputs.on('input', handle_input_event );
+    ce.inputs.on('input', do_autosave );
 
     //------------------------------------------------------------
     // form submission
