@@ -1,6 +1,8 @@
 <?php
 namespace TLC\TTSurvey;
 
+if(!defined('WPINC')) { die; }
+
 if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
 if( !plugin_admin_can('responses') ) { 

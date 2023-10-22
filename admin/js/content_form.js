@@ -320,63 +320,61 @@ function do_autosave()
 }
 
 
-jQuery(document).ready(
-  function($) {
-    ce.form = $('#tlc-ttsurvey-admin form.content');
-    ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
-    ce.lock_info = $('.content .info.lock').eq(0);
-    ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
-    ce.inputs = ce.form.find('textarea');
-    ce.survey = ce.form.find('textarea.survey').eq(0);
-    ce.error = ce.form.find('div.invalid.survey').eq(0);
-    ce.sendmail = ce.form.find('textarea.sendmail');
-    ce.preview = ce.form.find('.sendmail.preview');
-    ce.submit = ce.form.find('input.submit').eq(0);
-    ce.revert = ce.form.find('button.revert').eq(0);
+jQuery(document).ready( function($) {
+  ce.form = $('#tlc-ttsurvey-admin form.content');
+  ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
+  ce.lock_info = $('.content .info.lock').eq(0);
+  ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
+  ce.inputs = ce.form.find('textarea');
+  ce.survey = ce.form.find('textarea.survey').eq(0);
+  ce.error = ce.form.find('div.invalid.survey').eq(0);
+  ce.sendmail = ce.form.find('textarea.sendmail');
+  ce.preview = ce.form.find('.sendmail.preview');
+  ce.submit = ce.form.find('input.submit').eq(0);
+  ce.revert = ce.form.find('button.revert').eq(0);
 
-    pid = ce.form.find('input[name=pid]').eq(0).val();
+  pid = ce.form.find('input[name=pid]').eq(0).val();
 
-    ce.form_status.hide();
+  ce.form_status.hide();
 
-    const active_block = form_vars['active_block'];
-    ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
-    ce.form.find('.content-block div.block').hide();
-    ce.form.find(`.content-block div.block.${active_block}`).show();
+  const active_block = form_vars['active_block'];
+  ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
+  ce.form.find('.content-block div.block').hide();
+  ce.form.find(`.content-block div.block.${active_block}`).show();
 
-    //------------------------------------------------------------
-    // We're updating the form content here rather than in php to avoid
-    // dual maintenance and possible inconsistency that could result from that
-    //------------------------------------------------------------
+  //------------------------------------------------------------
+  // We're updating the form content here rather than in php to avoid
+  // dual maintenance and possible inconsistency that could result from that
+  //------------------------------------------------------------
 
-    update_content_form();
+  update_content_form();
 
-    if(!form_vars['editable']) {
-      ce.inputs.prop('readonly',true);
-      return;
-    }
-
-    //------------------------------------------------------------
-    // The rest of the setup only applies if the form is editable
-    //------------------------------------------------------------
-
-    has_edit_lock = ce.form.find('input[name=lock]').eq(0).val() == 0;
-    ce.inputs.prop('readonly',!has_edit_lock);
-
-    $(document).on( 'heartbeat-send', handle_heartbeat_send );
-    $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
-
-    //------------------------------------------------------------
-    // content validation setup
-    //------------------------------------------------------------
-
-    ce.inputs.on('input', handle_input_event );
-    ce.inputs.on('input', do_autosave );
-
-    //------------------------------------------------------------
-    // form submission
-    //------------------------------------------------------------
-
-    ce.form.on('submit', handle_form_submit);
-    ce.revert.on('click', handle_form_revert);
+  if(!form_vars['editable']) {
+    ce.inputs.prop('readonly',true);
+    return;
   }
-);
+
+  //------------------------------------------------------------
+  // The rest of the setup only applies if the form is editable
+  //------------------------------------------------------------
+
+  has_edit_lock = ce.form.find('input[name=lock]').eq(0).val() == 0;
+  ce.inputs.prop('readonly',!has_edit_lock);
+
+  $(document).on( 'heartbeat-send', handle_heartbeat_send );
+  $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
+
+  //------------------------------------------------------------
+  // content validation setup
+  //------------------------------------------------------------
+
+  ce.inputs.on('input', handle_input_event );
+  ce.inputs.on('input', do_autosave );
+
+  //------------------------------------------------------------
+  // form submission
+  //------------------------------------------------------------
+
+  ce.form.on('submit', handle_form_submit);
+  ce.revert.on('click', handle_form_revert);
+});
