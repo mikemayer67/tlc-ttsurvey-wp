@@ -9,6 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/markdown.php');
 
 function sendmail_userid($email)
 {
@@ -18,25 +19,23 @@ function sendmail_userid($email)
 
 function sendmail_welcome($email, $userid, $firstname, $lastname, $token)
 {
-  # note token is passed in case we decide to include a password reset link in the email
-  
-  $year = active_survey_year();
-  $name = "$firstname $lastname";
+  log_dev("Send welcome email to $userid: $email");
+  _sendmail("welcome",$email,$userid,"$firstname $lastname",$token);
+}
 
-  ob_start();
-?>
+function _sendmail($key, $email, $userid, $username, $token)
+{
+  $survey = current_survey();
+  $pid = $survey['post_id'];
+  $name = $survey['name'];
 
-<html>
-  <h1>Welcome to the <?=$year?> Time & Talent survey</h1>
-  <p>You have successfully registered to participate in the survey as <?=$name?></p>
-  <p>Your userid (<?=$userid?>) will be needed to log back into the survey</p>
-</html>
+  $post = get_post($pid);
+  $content = $post->post_content;
+  $content = json_decode($post->post_content,true);
+  $md = $content[$key];
 
-<?php
-  $message = ob_get_contents();
-  ob_end_clean();
-
+  $message = render_sendmail_markdown($md,$username,$userid,$email,$token);
   $headers = array('Content-Type: text/html; charset=UTF-8');
 
-  wp_mail($email,"$year Time & Talent survey",$message,$headers);
+  wp_mail($email,"$name Time & Talent survey",$message,$headers);
 }

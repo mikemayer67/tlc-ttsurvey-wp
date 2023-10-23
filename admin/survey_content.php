@@ -325,7 +325,8 @@ function add_survey_content($survey,$editable=false)
   echo "</div>";
   echo "<table class=info>";
   echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipient's full name</td></tr>";
-  echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email addrress</td></tr>";
+  echo "<tr><td>&lt;&lt;userid&gt;&gt;</td><td>Recipient's login userid</td></tr>";
+  echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email address</td></tr>";
   echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
   echo "</table>";
 
