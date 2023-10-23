@@ -35,10 +35,43 @@ function plugin_dir() { return plugin_dir_path(__FILE__); }
 function plugin_path($path) { return plugin_dir() . '/' . $path; }
 
 /**
- * connvert path relative to the plugin directory to a URL
+ * convert path relative to the plugin directory to a URL
  */
 function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
 
+/**
+ * returns base64 encoded svg icon
+ */
+function plugin_icon() {
+  static $icon = null;
+  if(!$icon) {
+    $svg = file_get_contents(plugin_path('img/trinity_logo.svg'));
+    $icon = 'data:image/svg+xml;base64,' . base64_encode($svg);
+  }
+  return $icon;
+}
+
+/**
+ * Determine level of admin access
+ *   returns associative array of accesses
+ **/
+function plugin_admin_access()
+{
+  $access = array();
+  $caps = array('view','manage','content','responses');
+  foreach($caps as $cap) {
+    $access[$cap] = current_user_can("tlc-ttsurvey-$cap");
+  }
+  if(current_user_can('manage_options')) {
+    $access['view'] = 1;
+    $access['manage'] = 1;
+  }
+  return $access;
+}
+
+function plugin_admin_can($cap) { 
+  return plugin_admin_access()[$cap] ?? false;
+}
 
 /**
  * plugin activation hooks
@@ -56,6 +89,9 @@ function handle_activate()
   log_info('activate: '.__NAMESPACE__);
   users_activate();
   surveys_activate();
+
+  $admin = get_role('administrator');
+  $admin->add_cap('tlc-ttsurvey-view');
 }
 
 function handle_deactivate()
@@ -66,6 +102,9 @@ function handle_deactivate()
   log_info('deactivate: '.__NAMESPACE__);
   users_deactivate();
   surveys_deactivate();
+
+  $admin = get_role('administrator');
+  $admin->remove_cap('tlc-ttsurvey-view');
 }
 
 function handle_uninstall()
@@ -78,14 +117,11 @@ function handle_uninstall()
 
 /**
  * Ajax support
- *   This is just a shallow wrapper that will pull in the 
- *   ajax specific code only if needed.
  **/
 
+require_once plugin_path('ajax.php');
 add_action('wp_ajax_nopriv_tlc_ttsurvey', ns('ajax_wrapper'));
 add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
-
-function ajax_wrapper() { require plugin_path('ajax.php'); }
 
 /**
  * Import admin/shortcode specific functions
@@ -98,7 +134,7 @@ if( is_admin() ) /* Admin setup */
 else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
-  require_once plugin_path('shortcode.php');
+  require_once plugin_path('shortcode/shortcode.php');
 }
 
 

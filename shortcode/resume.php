@@ -12,7 +12,7 @@ require_once plugin_path('include/users.php');
 
 $tokens = cookie_tokens();
 
-$form_uri=$_SERVER['REQUEST_URI'];
+$form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 ?>
 
 <div class=resume_form>

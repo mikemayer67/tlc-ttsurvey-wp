@@ -10,26 +10,26 @@ if( ! is_admin() ) { return; }
 
 const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
-const LOG_PAGE_SLUG = 'tlc-ttsurvey-log';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 
 function handle_admin_init()
 {
-  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('css/tlc-ttsurvey-admin.css'));
+  wp_enqueue_style('tlc-ttsurvey-admin', plugin_url('admin/css/admin.css'));
 
   #add_javascript goes here
 }
 
 function handle_admin_menu()
 {
-  add_options_page(
+  add_menu_page(
     'Time & Talent Survey', // page title
     'Time & Talent Survey', // menu title
-    'manage_options', // required capability
+    'tlc-ttsurvey-view', // required capability
     SETTINGS_PAGE_SLUG, // settings page slug
     ns('populate_settings_page'), // callback to populate settingsn page
+    plugin_icon(),
   );
 }
 
@@ -47,22 +47,22 @@ function add_settings_link($links)
 $action_links = 'plugin_action_links_' . plugin_basename(plugin_file());
 
 add_action('admin_menu',  ns('handle_admin_menu'));
-#add_action('admin_init', ns('handle_admin_init'));
 add_action('init',        ns('handle_admin_init'));
 add_action($action_links, ns('add_settings_link'));
 
 function populate_settings_page()
 {
-  if( !current_user_can('manage_options') ) { wp_die('Unauthorized user'); }
+  $has_access = plugin_admin_can('view');
+  if( !$has_access ) { wp_die('Unauthorized user'); }
 
-  echo "<div class=wrap>";
-  require plugin_path('admin/plugin_page.php');
+  echo "<div class='wrap'>";
+  require plugin_path('admin/navbar.php');
   echo "</div>";
 }
 
 wp_register_script(
   'tlc_admin_scripts',
-  plugin_url('js/admin.js'),
+  plugin_url('admin/js/admin.js'),
   array('jquery'),
   '1.0.3',
   true

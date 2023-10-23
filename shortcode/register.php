@@ -7,7 +7,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('include/login_form_builder.php');
+require_once plugin_path('shortcode/_login_elements.php');
 
 start_login_form("Register for the Survey","register");
 

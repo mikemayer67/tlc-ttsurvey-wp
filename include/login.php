@@ -30,7 +30,6 @@ class CookieJar
   private function __construct()
   {
     $this->_active_userid = stripslashes($_COOKIE[ACTIVE_USER_COOKIE]??"");
-    log_dev("CookieJar() active_userid: ".$this->_active_userid);
     $this->_access_tokens = array();
     $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
 
@@ -193,7 +192,7 @@ function handle_login_register()
   else
   {
     set_status_warning($error);
-    shortcode_page('register');
+    set_current_shortcode_page('register');
   }
 }
 
@@ -212,7 +211,7 @@ function handle_send_userid()
     set_status_info("Sent userid/password to $email");
   } else {
     set_status_warning("Unrecognized email address");
-    shortcode_page("senduserid");
+    set_current_shortcode_page("senduserid");
   }
 }
 

@@ -4,6 +4,16 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 const PLUGIN_LOG_FILE = 'plugin.log';
+const LOGGER_DEV = "DEV";
+const LOGGER_INFO = "INFO";
+const LOGGER_WARN = "WARNING";
+const LOGGER_ERR = "ERROR";
+const LOGGER_ = array(
+  "DEV" => "Development",
+  "INFO" => "Information",
+  "WARNING" => "Warnings/Errors",
+  "ERROR" => "Errors only",
+);
 
 $_logger_fp = null;
 
@@ -57,46 +67,38 @@ function write_to_logger($prefix,$msg)
   fwrite(logger(), "[{$timestamp}] {$prefix} {$msg}\n");
 }
 
-function dump_log_to_html()
-{
-  $entries = array();
-  $entry_re = '/^\[(.*?)\]\s*(\w+)\s*(.*?)\s*$/';
-  foreach(file(plugin_path(PLUGIN_LOG_FILE)) as $line) {
-    $m = array();
-    if(preg_match($entry_re,$line,$m))
-    {
-      $entry = "<tr class=" . strtolower($m[2]). ">";
-      $entry .= "<td class=date>" . $m[1] . "</td>";
-      $entry .= "<td class=message>" . $m[3] . "</td>";
-      $entry .= "</tr>";
-      $entries[] = $entry;
-    }
-  }
-  echo "<table class=log-table>";
-  foreach (array_reverse($entries) as $entry) {
-    echo $entry;
-  }
-  echo "</table>";
-}
-
+/**
+ * log_dev is intended to only be useful during development debugging
+ */
 function log_dev($msg) {
   if(survey_log_level() == "DEV") {
     write_to_logger("DEV",$msg);
   }
 }
 
+/**
+ * log_info is intended to show normal flow through the plugin code
+ **/
 function log_info($msg) {
   if(in_array(survey_log_level(),array("DEV","INFO"))) {
     write_to_logger("INFO",$msg);
   }
 }
 
+/**
+ * log_warning is intended to show abnormal, but not necessarily
+ *   critical flows through the plugin code
+ */
 function log_warning($msg) {
   if(in_array(survey_log_level(),array("DEV","INFO","WARNING"))) {
     write_to_logger("WARNING",$msg);
   }
 }
 
+/**
+ * log_error is intended to show critical errors in the plugin code
+ **/
 function log_error($msg) {
   write_to_logger("ERROR",$msg);
+  error_log(plugin_name().": $msg");
 }
