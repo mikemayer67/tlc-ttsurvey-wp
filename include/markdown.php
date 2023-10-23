@@ -12,9 +12,10 @@ function render_markdown($md)
   return "<div>$html</div>";
 }
 
-function render_sendmail_markdown($md,$name="Thomas Smith",$email="t.smith@xmail.net",$token="demo_token")
+function render_sendmail_markdown($md,$name,$userid,$email,$token)
 {
   $md = str_replace('<<name>>',$name,$md);
+  $md = str_replace('<<userid>>',$userid,$md);
   $md = str_replace('<<email>>',$email,$md);
   $md = str_replace('<<token>>',$token,$md);
   return render_markdown($md);

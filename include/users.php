@@ -181,7 +181,6 @@ function get_user_post($userid)
     die;
   }
   if(!$posts) { 
-    log_info("No post found for userid $userid");
     return null;
   }
   return $posts[0];

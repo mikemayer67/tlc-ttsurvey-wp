@@ -4,7 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('include/markdown.php');
+require_once plugin_path('admin/ajax/markdown.php');
 
 $pid = $_POST['pid'] ?? null;
 if(!$pid)
@@ -30,7 +30,7 @@ foreach ($content as $key=>$md) {
   if($key != 'survey') {
     $response['sendmail'][$key] = array(
       'md'=>$md, 
-      'html'=>render_sendmail_markdown($md),
+      'html'=>demo_render_sendmail_markdown($md),
     );
   }
 }

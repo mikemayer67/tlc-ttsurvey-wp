@@ -267,6 +267,11 @@ function register_new_user(&$error=null)
 
   if($remember) { remember_user_token($userid,$token); }
 
+  if($email) { 
+    require_once plugin_path('include/sendmail.php');
+    sendmail_welcome($email, $userid, $firstname, $lastname, $token); 
+  }
+
   $error = '';
   return true;
 }
