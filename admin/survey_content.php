@@ -45,6 +45,7 @@ function add_script_body()
   echo "</div>";
 }
 
+
 function add_content_lock($lock)
 {
   $locked_by = $lock['locked_by'];
@@ -55,6 +56,7 @@ function add_content_lock($lock)
 
   enqueue_watch_lock_javascript();
 }
+
 
 function determine_content_tab($current)
 {
@@ -90,6 +92,7 @@ function determine_content_tab($current)
   //   Only option is to create a new survey (i.e. first and only tab)
   return FIRST_TAB;
 }
+
 
 function add_survey_navbar($active_pid,$current)
 {
@@ -132,19 +135,15 @@ function add_survey_navbar($active_pid,$current)
   echo "</div>";
 }
 
+
 function add_survey_tab_content($active_pid,$current)
 {
   $current_pid = $current['post_id'] ?? '';
-  if($active_pid == FIRST_TAB)
-  {
+  if($active_pid == FIRST_TAB) {
     add_new_survey_content();
-  } 
-  elseif( $active_pid == $current_pid )
-  {
+  } elseif( $active_pid == $current_pid ) {
     add_current_survey_content($current);
-  }
-  else
-  {
+  } else {
     add_past_survey_content($active_pid,$current);
   }
 }
@@ -235,7 +234,6 @@ function add_current_survey_content($survey)
     echo "to Draft status on the Settings tab.";
     echo "</div></div>";
     $editable = false;
-    $lock = null;
   }
   elseif($status == SURVEY_IS_DRAFT) {
     echo "<div class='info'>";
@@ -251,24 +249,19 @@ function add_current_survey_content($survey)
     wp_die("Internal error, contact Time & Talent plugin author if this persists");
   }
 
-  add_revisions_content($survey);
-  add_survey_content($survey,$editable,$lock);
-
-  echo "</div>";
-}
-
-function add_revisions_content($survey)
-{
-  $pid = $survey['post_id'];
-  //http://localhost/wp_sandbox/wp-admin/edit.php?post_type=tlc-ttsurvey-form
-  $url = admin_url() . "post.php?post=$pid&action=edit";
+  // revisions note
+  $url = admin_url() . "edit.php?post_type=" . SURVEY_POST_TYPE;
   echo "<div class='info revisions'`>";
   echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
   echo "</div>";
+
+  add_survey_content($survey,$editable);
+
+  echo "</div>";
 }
 
 
-function add_survey_content($survey,$editable=false,$lock=null)
+function add_survey_content($survey,$editable=false)
 {
   $name = $survey['name'];
   $pid = $survey['post_id'];
@@ -367,6 +360,7 @@ function add_survey_content($survey,$editable=false,$lock=null)
   enqueue_content_javascript($editable);
 }
 
+
 function enqueue_content_javascript($editable)
 {
   wp_register_script(
@@ -398,6 +392,14 @@ function enqueue_new_survey_javascript()
     '1.0.3',
     true
   );
+  wp_localize_script(
+    'tlc_ttsurvey_content_form',
+    'form_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('new_survey_form',wp_create_nonce('new_survey_form')),
+    ),
+  );
   wp_enqueue_script('tlc_ttsurvey_new_survey_form');
 }
 
@@ -416,7 +418,6 @@ function enqueue_watch_lock_javascript()
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('watch_lock',wp_create_nonce('watch_lock')),
-      'content_url' => $_SERVER['REQUEST_URI'],
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_watch_lock');

@@ -31,8 +31,46 @@ function obtain_content_lock()
   update_option(CONTENT_LOCK_KEY,$new_lock);
   return array(
     'has_lock' => true,
-    'until' => $lock_expires,
+    'expires_in' => LOCK_DURATION,
   );
+}
+
+function check_content_lock()
+{
+  $now = current_time('U',true);
+  $cur_uid = get_current_user_id();
+  $cur_lock = get_option(CONTENT_LOCK_KEY);
+
+  if($cur_lock) {
+    [$lock_uid,$lock_expires] = explode(':',$cur_lock);
+
+    if( $now >= $lock_expires ) {
+      return array(
+        'has_lock' => true,
+        'locked_by' => null,
+      );
+    }
+    else if( $lock_uid == $cur_uid ) {
+      return array(
+        'has_lock' => true,
+        'expires_in' => $lock_expires - $now,
+      );
+    }
+    else {
+      return array(
+        'has_lock' => false, 
+        'locked_by' => get_userdata($lock_uid)->display_name,
+        'expires_in' => $lock_expires - $now,
+      );
+    }
+  }
+  else
+  {
+    return array(
+      'has_lock' => false,
+      'locked_by' => null,
+    );
+  }
 }
 
 function release_content_lock()

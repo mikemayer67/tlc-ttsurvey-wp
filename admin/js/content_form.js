@@ -1,4 +1,3 @@
-var has_edit_lock = false;
 var survey_error = null;
 var saved_content = null;
 
@@ -172,42 +171,6 @@ function refresh_sendmail_preview(template)
 }
 
 
-function handle_heartbeat_send(event,data) 
-{
-  // send the pid and the current lock value
-  //   if we have the lock (lock==0), renew it
-  //   if we don't have the lock (lock!=0), try to obtain it
-  data.tlc_ttsurvey_lock = {
-    'pid':pid, 
-    'action': (has_edit_lock ? 'renew' : 'watch'),
-  };
-}
-
-function handle_heartbeat_tick(event,data) 
-{
-  if(has_edit_lock) {
-    // if we already have the lock, we no longer need to wait for it
-    // to become available.
-    return;
-  }
-  const rc = data.tlc_ttsurvey_lock;
-  if(!rc.got_lock) {
-    // we failed to get the lock.. keep waiting
-    return;
-  }
-
-  // we just acquired the lock
-  has_edit_lock = true;
-
-  // update the form accordingly
-  ce.lock_info.html("You may now edit the survey content.");
-  ce.lock_info.removeClass('lock').addClass('unlocked');
-
-  update_content_form();
-  ce.inputs.prop('readonly',false);
-}
-
-
 function content_has_changed()
 {
   var rval = false;
@@ -228,8 +191,8 @@ function update_state()
 {
   const has_change = content_has_changed();
 
-  ce.submit.prop('disabled', !(has_edit_lock && has_change) || survey_error );
-  ce.revert.prop('disabled', !(has_edit_lock && has_change) );
+  ce.submit.prop('disabled', !has_change || survey_error );
+  ce.revert.prop('disabled', !has_change );
 
   if(survey_error) {
     ce.survey.addClass('invalid');
@@ -319,6 +282,24 @@ function do_autosave()
   }
 }
 
+function hold_lock()
+{
+  jQuery.post(
+    form_vars.ajaxurl,
+    {
+      action:'tlc_ttsurvey',
+      nonce: form_vars.nonce,
+      query: 'obtain_content_lock',
+    },
+    function(response) {
+      if(!response.has_lock) {
+        window.location.reload(true);
+      }
+    },
+    'json',
+  );
+}
+
 
 jQuery(document).ready( function($) {
   ce.form = $('#tlc-ttsurvey-admin form.content');
@@ -342,6 +323,11 @@ jQuery(document).ready( function($) {
   ce.form.find('.content-block div.block').hide();
   ce.form.find(`.content-block div.block.${active_block}`).show();
 
+  // setup up timer to hold edit lock
+
+  hold_lock();
+  setInterval(hold_lock,15000);
+
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
   // dual maintenance and possible inconsistency that could result from that
@@ -358,11 +344,7 @@ jQuery(document).ready( function($) {
   // The rest of the setup only applies if the form is editable
   //------------------------------------------------------------
 
-  has_edit_lock = ce.form.find('input[name=lock]').eq(0).val() == 0;
-  ce.inputs.prop('readonly',!has_edit_lock);
-
-  $(document).on( 'heartbeat-send', handle_heartbeat_send );
-  $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
+  ce.inputs.prop('readonly',false);
 
   //------------------------------------------------------------
   // content validation setup

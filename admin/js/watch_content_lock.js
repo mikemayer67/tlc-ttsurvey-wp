@@ -5,11 +5,11 @@ function watch_lock()
     {
       action:'tlc_ttsurvey',
       nonce:watch_vars.nonce,
-      query:'watch_content_lock',
+      query:'obtain_content_lock',
     },
     function(response) {
       if(response.has_lock) {
-        window.location.href = watch_vars.content_url;
+        window.location.reload(true);
       }
     },
     'json',
