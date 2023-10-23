@@ -1,10 +1,33 @@
 
+
+function hold_lock()
+{
+  jQuery.post(
+    form_vars.ajaxurl,
+    {
+      action:'tlc_ttsurvey',
+      nonce: form_vars.nonce,
+      query: 'obtain_content_lock',
+    },
+    function(response) {
+      if(!response.has_lock) {
+        window.location.reload(true);
+      }
+    },
+    'json',
+  );
+}
+
+
 jQuery(document).ready(
   function($) {
     const ns_form = $('form.new-survey');
     const ns_new_name = ns_form.find('input.new-name'); 
     const ns_error = ns_form.find('span.error');
     const ns_submit = ns_form.find('input.submit');
+
+    hold_lock();
+    setInterval(hold_lock,15000);
 
     ns_new_name.on('keyup',function() {
       ns_existing_names = ns_form.find('input.existing')[0].value;

@@ -1,6 +1,8 @@
 <?php
 namespace TLC\TTSurvey;
 
+if(!defined('WPINC')) { die; }
+
 if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 if( !plugin_admin_can('content') ) { 
   echo "<h2>oops... you shouldn't be here</h2>";
@@ -10,6 +12,7 @@ if( !plugin_admin_can('content') ) {
 const FIRST_TAB = 'first';
 
 require_once plugin_path('include/surveys.php');
+require_once plugin_path('admin/content_lock.php');
 
 add_noscript_body();
 add_script_body();
@@ -23,13 +26,37 @@ function add_noscript_body()
 
 function add_script_body()
 {
+  log_dev("Add script_body");
   $current = current_survey();
   echo "<div class='content requires-javascript'>";
-  $active_pid = determine_content_tab($current);
-  add_survey_navbar($active_pid,$current);
-  add_survey_tab_content($active_pid,$current);
+
+  // check to see if we have lock
+  $lock = obtain_content_lock();
+  log_dev("Lock: ".print_r($lock,true));
+  if($lock['has_lock']) {
+    // we have the lock
+    $active_pid = determine_content_tab($current);
+    add_survey_navbar($active_pid,$current);
+    add_survey_tab_content($active_pid,$current);
+  } else {
+    // someone else has lock
+    add_content_lock($lock);
+  }
   echo "</div>";
 }
+
+
+function add_content_lock($lock)
+{
+  $locked_by = $lock['locked_by'];
+  echo "<div class='info lock'>";
+  echo "<div>The survey is currently being edited by $locked_by.</div>";
+  echo "<div>This tab will automatically refresh when the edit lock is released.</div>";
+  echo "</div>";
+
+  enqueue_watch_lock_javascript();
+}
+
 
 function determine_content_tab($current)
 {
@@ -65,6 +92,7 @@ function determine_content_tab($current)
   //   Only option is to create a new survey (i.e. first and only tab)
   return FIRST_TAB;
 }
+
 
 function add_survey_navbar($active_pid,$current)
 {
@@ -107,19 +135,15 @@ function add_survey_navbar($active_pid,$current)
   echo "</div>";
 }
 
+
 function add_survey_tab_content($active_pid,$current)
 {
   $current_pid = $current['post_id'] ?? '';
-  if($active_pid == FIRST_TAB)
-  {
+  if($active_pid == FIRST_TAB) {
     add_new_survey_content();
-  } 
-  elseif( $active_pid == $current_pid )
-  {
+  } elseif( $active_pid == $current_pid ) {
     add_current_survey_content($current);
-  }
-  else
-  {
+  } else {
     add_past_survey_content($active_pid,$current);
   }
 }
@@ -210,7 +234,6 @@ function add_current_survey_content($survey)
     echo "to Draft status on the Settings tab.";
     echo "</div></div>";
     $editable = false;
-    $lock = null;
   }
   elseif($status == SURVEY_IS_DRAFT) {
     echo "<div class='info'>";
@@ -220,54 +243,25 @@ function add_current_survey_content($survey)
     echo " to Active on the Settings tab.";
     echo "</div></div>";
     $editable = true;
-    $lock = add_lock_content($survey);
   }
   else {
     log_error("Attempting to add closed survey as current");
     wp_die("Internal error, contact Time & Talent plugin author if this persists");
   }
 
-  add_revisions_content($survey);
-  add_survey_content($survey,$editable,$lock);
-
-  echo "</div>";
-}
-
-function add_lock_content($survey)
-{
-  $pid = $survey['post_id'];
-
-  // check to see if there is currently a lock on the content
-  // lock will be set to 0 if we're acquiring the lock
-  $lock = wp_check_post_lock($pid) ?? 0;
-  if($lock) {
-    // someone else has a lock, post a warning about this
-    // the actual disabling/enabling of the form is handled by javascript
-    $locked_by = get_userdata($lock)->display_name;
-    echo "<div class='info lock'>";
-    echo "<div>The survey is currently being edited by $locked_by.</div>";
-    echo "<div>You cannot make any changes until they have completed their edits.</div>";
-    echo "<div>You can stay on this page and wait...</div>";
-    echo "</div>";
-  } else {
-    // nobody else has a lock, acquire it now
-    wp_set_post_lock($pid);
-  }
-  return $lock;
-}
-
-function add_revisions_content($survey)
-{
-  $pid = $survey['post_id'];
-  //http://localhost/wp_sandbox/wp-admin/edit.php?post_type=tlc-ttsurvey-form
-  $url = admin_url() . "post.php?post=$pid&action=edit";
+  // revisions note
+  $url = admin_url() . "edit.php?post_type=" . SURVEY_POST_TYPE;
   echo "<div class='info revisions'`>";
   echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
   echo "</div>";
+
+  add_survey_content($survey,$editable);
+
+  echo "</div>";
 }
 
 
-function add_survey_content($survey,$editable=false,$lock=null)
+function add_survey_content($survey,$editable=false)
 {
   $name = $survey['name'];
   $pid = $survey['post_id'];
@@ -366,6 +360,7 @@ function add_survey_content($survey,$editable=false,$lock=null)
   enqueue_content_javascript($editable);
 }
 
+
 function enqueue_content_javascript($editable)
 {
   wp_register_script(
@@ -397,5 +392,33 @@ function enqueue_new_survey_javascript()
     '1.0.3',
     true
   );
+  wp_localize_script(
+    'tlc_ttsurvey_content_form',
+    'form_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('new_survey_form',wp_create_nonce('new_survey_form')),
+    ),
+  );
   wp_enqueue_script('tlc_ttsurvey_new_survey_form');
+}
+
+function enqueue_watch_lock_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_watch_lock',
+    plugin_url('admin/js/watch_content_lock.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_watch_lock',
+    'watch_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('watch_lock',wp_create_nonce('watch_lock')),
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_watch_lock');
 }

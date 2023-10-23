@@ -1,4 +1,3 @@
-var has_edit_lock = false;
 var survey_error = null;
 var saved_content = null;
 
@@ -172,42 +171,6 @@ function refresh_sendmail_preview(template)
 }
 
 
-function handle_heartbeat_send(event,data) 
-{
-  // send the pid and the current lock value
-  //   if we have the lock (lock==0), renew it
-  //   if we don't have the lock (lock!=0), try to obtain it
-  data.tlc_ttsurvey_lock = {
-    'pid':pid, 
-    'action': (has_edit_lock ? 'renew' : 'watch'),
-  };
-}
-
-function handle_heartbeat_tick(event,data) 
-{
-  if(has_edit_lock) {
-    // if we already have the lock, we no longer need to wait for it
-    // to become available.
-    return;
-  }
-  const rc = data.tlc_ttsurvey_lock;
-  if(!rc.got_lock) {
-    // we failed to get the lock.. keep waiting
-    return;
-  }
-
-  // we just acquired the lock
-  has_edit_lock = true;
-
-  // update the form accordingly
-  ce.lock_info.html("You may now edit the survey content.");
-  ce.lock_info.removeClass('lock').addClass('unlocked');
-
-  update_content_form();
-  ce.inputs.prop('readonly',false);
-}
-
-
 function content_has_changed()
 {
   var rval = false;
@@ -228,8 +191,8 @@ function update_state()
 {
   const has_change = content_has_changed();
 
-  ce.submit.prop('disabled', !(has_edit_lock && has_change) || survey_error );
-  ce.revert.prop('disabled', !(has_edit_lock && has_change) );
+  ce.submit.prop('disabled', !has_change || survey_error );
+  ce.revert.prop('disabled', !has_change );
 
   if(survey_error) {
     ce.survey.addClass('invalid');
@@ -319,64 +282,81 @@ function do_autosave()
   }
 }
 
+function hold_lock()
+{
+  jQuery.post(
+    form_vars.ajaxurl,
+    {
+      action:'tlc_ttsurvey',
+      nonce: form_vars.nonce,
+      query: 'obtain_content_lock',
+    },
+    function(response) {
+      if(!response.has_lock) {
+        window.location.reload(true);
+      }
+    },
+    'json',
+  );
+}
 
-jQuery(document).ready(
-  function($) {
-    ce.form = $('#tlc-ttsurvey-admin form.content');
-    ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
-    ce.lock_info = $('.content .info.lock').eq(0);
-    ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
-    ce.inputs = ce.form.find('textarea');
-    ce.survey = ce.form.find('textarea.survey').eq(0);
-    ce.error = ce.form.find('div.invalid.survey').eq(0);
-    ce.sendmail = ce.form.find('textarea.sendmail');
-    ce.preview = ce.form.find('.sendmail.preview');
-    ce.submit = ce.form.find('input.submit').eq(0);
-    ce.revert = ce.form.find('button.revert').eq(0);
 
-    pid = ce.form.find('input[name=pid]').eq(0).val();
+jQuery(document).ready( function($) {
+  ce.form = $('#tlc-ttsurvey-admin form.content');
+  ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
+  ce.lock_info = $('.content .info.lock').eq(0);
+  ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
+  ce.inputs = ce.form.find('textarea');
+  ce.survey = ce.form.find('textarea.survey').eq(0);
+  ce.error = ce.form.find('div.invalid.survey').eq(0);
+  ce.sendmail = ce.form.find('textarea.sendmail');
+  ce.preview = ce.form.find('.sendmail.preview');
+  ce.submit = ce.form.find('input.submit').eq(0);
+  ce.revert = ce.form.find('button.revert').eq(0);
 
-    ce.form_status.hide();
+  pid = ce.form.find('input[name=pid]').eq(0).val();
 
-    const active_block = form_vars['active_block'];
-    ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
-    ce.form.find('.content-block div.block').hide();
-    ce.form.find(`.content-block div.block.${active_block}`).show();
+  ce.form_status.hide();
 
-    //------------------------------------------------------------
-    // We're updating the form content here rather than in php to avoid
-    // dual maintenance and possible inconsistency that could result from that
-    //------------------------------------------------------------
+  const active_block = form_vars['active_block'];
+  ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
+  ce.form.find('.content-block div.block').hide();
+  ce.form.find(`.content-block div.block.${active_block}`).show();
 
-    update_content_form();
+  // setup up timer to hold edit lock
 
-    if(!form_vars['editable']) {
-      ce.inputs.prop('readonly',true);
-      return;
-    }
+  hold_lock();
+  setInterval(hold_lock,15000);
 
-    //------------------------------------------------------------
-    // The rest of the setup only applies if the form is editable
-    //------------------------------------------------------------
+  //------------------------------------------------------------
+  // We're updating the form content here rather than in php to avoid
+  // dual maintenance and possible inconsistency that could result from that
+  //------------------------------------------------------------
 
-    has_edit_lock = ce.form.find('input[name=lock]').eq(0).val() == 0;
-    ce.inputs.prop('readonly',!has_edit_lock);
+  update_content_form();
 
-    $(document).on( 'heartbeat-send', handle_heartbeat_send );
-    $(document).on( 'heartbeat-tick', handle_heartbeat_tick );
-
-    //------------------------------------------------------------
-    // content validation setup
-    //------------------------------------------------------------
-
-    ce.inputs.on('input', handle_input_event );
-    ce.inputs.on('input', do_autosave );
-
-    //------------------------------------------------------------
-    // form submission
-    //------------------------------------------------------------
-
-    ce.form.on('submit', handle_form_submit);
-    ce.revert.on('click', handle_form_revert);
+  if(!form_vars['editable']) {
+    ce.inputs.prop('readonly',true);
+    return;
   }
-);
+
+  //------------------------------------------------------------
+  // The rest of the setup only applies if the form is editable
+  //------------------------------------------------------------
+
+  ce.inputs.prop('readonly',false);
+
+  //------------------------------------------------------------
+  // content validation setup
+  //------------------------------------------------------------
+
+  ce.inputs.on('input', handle_input_event );
+  ce.inputs.on('input', do_autosave );
+
+  //------------------------------------------------------------
+  // form submission
+  //------------------------------------------------------------
+
+  ce.form.on('submit', handle_form_submit);
+  ce.revert.on('click', handle_form_revert);
+});

@@ -117,7 +117,6 @@ function handle_uninstall()
 
 /**
  * Ajax support
- *   Note this does not include heartbeat ajax (see below)
  **/
 
 require_once plugin_path('ajax.php');
@@ -131,9 +130,6 @@ add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 if( is_admin() ) /* Admin setup */
 {
   require_once plugin_path('admin/setup.php');
-
-  require_once plugin_path('admin/ajax/heartbeat.php');
-  add_filter('heartbeat_received',ns('handle_heartbeat'),10,3);
 }
 else /* Non-admin setup */
 {
