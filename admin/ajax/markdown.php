@@ -6,14 +6,17 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/markdown.php');
 
-function demo_render_sendmail_markdown($md)
+function render_demo_markdown($md)
 {
-  return render_sendmail_markdown(
+  return render_markdown(
     $md,
-    "Thomas Smith", // name
-    "tsmith59", // userid
-    "t.smith@tmail.net", // email
-    "demo_token", // token
+    array(
+      'name' => 'Thomas Smith',
+      'userid' => 'tsmith59',
+      'email' => 't.smith&tttmail.net',
+      'token' => 'demo_token',
+      'survey' => 'Demo',
+    )
   );
 }
 

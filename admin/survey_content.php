@@ -263,6 +263,8 @@ function add_current_survey_content($survey)
 
 function add_survey_content($survey,$editable=false)
 {
+  require_once plugin_path('include/sendmail.php');
+
   $name = $survey['name'];
   $pid = $survey['post_id'];
   $last_modified = $survey['last_modified'];
@@ -324,23 +326,25 @@ function add_survey_content($survey,$editable=false)
   echo "In addition, the following placeholders may be used to customize the message.";
   echo "</div>";
   echo "<table class=info>";
-  echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipient's full name</td></tr>";
-  echo "<tr><td>&lt;&lt;userid&gt;&gt;</td><td>Recipient's login userid</td></tr>";
-  echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email address</td></tr>";
-  echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
+  foreach(SENDMAIL_PLACEHOLDERS as $key=>$label) {
+    echo "<tr><td>&lt;&lt;$key&gt;&gt;<td><td>$label</td></tr>";
+  }
   echo "</table>";
 
-  // welcome
-
-  echo "<div class='email-template'>";
-  echo "<h3>Welcome</h3>";
-  echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
-  echo "<div class='sendmail preview welcome'>stuff</div>";
-  echo "</div>"; 
-
-  echo "</div>"; // sendmail block
-  echo "</div>"; // content-block
+  foreach(SENDMAIL_TEMPLATES as $key=>$tmpl) {
+    echo "<!-- $key -->";
+    $label = $tmpl['label'] ?? ucfirst($key);
+    $trigger = $tmpl['trigger'];
+    $placeholders = $tmpl['placeholders'] ?? array_keys(SENDMAIL_PLACEHOLDERS);
+    $placeholders = implode(', ',$placeholders);
+    echo "<div class='email-template'>";
+    echo "<h3>$label</h3>";
+    echo "<div class='info'>Sent when $trigger.</div>";
+    echo "<div class='info'><b>Placeholders:</b> $placeholders</div>";
+    echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
+    echo "<div class='sendmail preview $key'></div>";
+    echo "</div>"; 
+  }
 
   //
   // close out the form

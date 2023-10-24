@@ -230,6 +230,15 @@
   margin-left:1.5em;
 }
 
+#tlc-ttsurvey-admin .content div.info ul.deco{
+  margin:5px 0 5px 3em;
+  list-style:disc;
+}
+
+#tlc-ttsurvey-admin .content div.info ul.deco li {
+  margin:0;
+}
+
 #tlc-ttsurvey-admin .content div.revisions {
   margin-top: 8px;
 }
@@ -279,7 +288,7 @@
 }
 
 #tlc-ttsurvey-admin .content div.email-template h3 {
-  margin:0;
+  margin:1.5em 0 8px 0;
   font-size: 1.2em;
 }
 

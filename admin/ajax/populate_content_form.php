@@ -30,7 +30,7 @@ foreach ($content as $key=>$md) {
   if($key != 'survey') {
     $response['sendmail'][$key] = array(
       'md'=>$md, 
-      'html'=>demo_render_sendmail_markdown($md),
+      'html'=>render_demo_markdown($md),
     );
   }
 }
