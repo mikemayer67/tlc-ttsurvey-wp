@@ -1,4 +1,5 @@
 
+var ce = {}
 
 function hold_lock()
 {
@@ -18,34 +19,39 @@ function hold_lock()
   );
 }
 
+function handle_change()
+{
+  var existing_names = ce.form.find('input.existing').eq(0).val();
+  existing_names = JSON.parse(existing_names);
+
+  const new_name = ce.new_name.val()
+
+  err = "";
+  if(new_name.length<4) {
+    err = "too short";
+  }
+  else if(jQuery.inArray(new_name,existing_names)>=0) {
+    err = "existing survey";
+  }
+  else if(!/^[a-zA-Z0-9., -]+$/.test(new_name)) {
+    err = "invalid name";
+  }
+
+  ce.error.html(err);
+  ce.submit.prop('disabled',err.length>0);
+}
 
 jQuery(document).ready(
   function($) {
-    const ns_form = $('form.new-survey');
-    const ns_new_name = ns_form.find('input.new-name'); 
-    const ns_error = ns_form.find('span.error');
-    const ns_submit = ns_form.find('input.submit');
+    ce.form = $('form.new-survey');
+    ce.new_name = ce.form.find('input.new-name'); 
+    ce.error = ce.form.find('span.error');
+    ce.submit = ce.form.find('input.submit');
 
     hold_lock();
     setInterval(hold_lock,15000);
 
-    ns_new_name.on('keyup',function() {
-      ns_existing_names = ns_form.find('input.existing')[0].value;
-      ns_existing_names = JSON.parse(ns_existing_names);
-      new_name = ns_new_name.val()
-      err = "";
-      if(new_name.length<4) {
-        err = "too short";
-      }
-      else if($.inArray(new_name,ns_existing_names)>=0) {
-        err = "existing survey";
-      }
-      else if(!/^[a-zA-Z0-9., -]+$/.test(new_name)) {
-        err = "invalid name";
-      }
-      ns_submit.prop('disabled',err.length>0);
-      ns_error.html(err);
-    });
+    ce.new_name.on('keyup',handle_change);
   }
 );
 
