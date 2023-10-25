@@ -82,7 +82,11 @@ function add_admin_settings()
 {
   echo "<div class='label'>Survey Admins</div>";
   echo "<table class='caps'>";
-  echo "<tr><th></th><th>Manage</th><th>Content</th><th>Responses</th></tr>";
+  echo "<tr><th></th>";
+  foreach(explode(' ','Primary Manage Content Response') as $role) {
+    echo "<th>$role</th>";
+  }
+  echo "</tr>";
 
   $caps = survey_capabilities();
   foreach(get_users() as $user) {
@@ -93,16 +97,15 @@ function add_admin_settings()
     $response = $caps['responses'][$id] ? "checked" : "";
     $hidden_manage = '';
 
-    if(user_can($id,'manage_options')) {
-      $manage = 'checked disabled';
-      $hidden_manage = "<input type='hidden' value=1 name='caps[manage][$id]'>";
-    }
-
     echo "<tr>";
     echo "<td class='name'>$name</td>";
     echo "<td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[manage][$id]' $manage>";
-    echo $hiden_manage;
+    if(user_can($id,'manage_options')) {
+      echo "<input type='checkbox' checked disabled>";
+      echo "<input class='manage' type='hidden' value=1 name='caps[manage][$id]'>";
+    } else {
+      echo "<input class='manage' type='checkbox' value=1 name='caps[manage][$id]' $manage>";
+    }
     echo "</div></td><td><div>";
     echo "  <input type='checkbox' value=1 name='caps[content][$id]' $content>";
     echo "</div></td><td><div>";
