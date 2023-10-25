@@ -330,10 +330,12 @@ jQuery(document).ready( function($) {
 
   ce.form_status.hide();
 
-  const active_block = form_vars['active_block'];
   ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
   ce.form.find('.content-block div.block').hide();
-  ce.form.find(`.content-block div.block.${active_block}`).show();
+
+  const active = ce.active_block.val();
+  ce.form.find(`.content-block div.block.${active}`).show();
+
   ce.pid_navtabs.on('click', handle_pid_nav);
 
 

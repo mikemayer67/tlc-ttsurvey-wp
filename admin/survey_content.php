@@ -178,7 +178,7 @@ function add_new_survey_content()
   echo "      <input type='text' class='new-name' name='name' value='$suggested_name'>";
   echo "      <span class='error'></span>";
   echo "    </span>";
-  echo "    <div>";
+  echo "    <div class='button-box'>";
   $class = 'submit button button-primary button-large';
   echo "      <input type='submit' value='Create Survey' class='$class''>";
   echo "    </div>";
@@ -347,6 +347,8 @@ function add_survey_content($survey,$editable=false)
     echo "</div>"; 
   }
 
+  echo "</div>"; // block sendmail
+
   //
   // close out the form
   //   add submit button if editable
@@ -383,7 +385,6 @@ function enqueue_content_javascript($editable)
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
-      'active_block' => $_GET['block'] ?? 'survey',
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
@@ -399,7 +400,7 @@ function enqueue_new_survey_javascript()
     true
   );
   wp_localize_script(
-    'tlc_ttsurvey_content_form',
+    'tlc_ttsurvey_new_survey_form',
     'form_vars',
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
