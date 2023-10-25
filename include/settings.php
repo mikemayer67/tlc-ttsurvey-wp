@@ -17,12 +17,14 @@ const CAPS_KEY = 'caps';
 const PDF_URI_KEY = 'pdf_href';
 const LOG_LEVEL_KEY = 'log_level';
 const POST_UI_KEY = 'post_ui';
+const PRIMARY_ADMIN_KEY = 'primary_admin';
 
 $option_defaults = array(
   CAPS_KEY => [],
   PDF_URI_KEY => '',
   LOG_LEVEL_KEY => 'INFO',
   POST_UI_KEY => 'NONE',
+  PRIMARY_ADMIN_KEY => '',
 );
 
 /**
@@ -57,6 +59,15 @@ function set_survey_option($key,$value)
 }
 
 /**
+ * get userid of the primary admin
+ * @return userid of the primary admin
+ */
+function survey_primary_admin() {
+  return get_survey_option(PRIMARY_ADMIN_KEY);
+}
+
+
+/**
  * get URI for pdf of the survey
  * @return uri for link to pdf of the current survey
  */
@@ -70,6 +81,25 @@ function survey_pdf_uri() {
  */
 function survey_capabilities() {
   return get_survey_option(CAPS_KEY);
+}
+
+function survey_admins($role) {
+  $caps = survey_capabilities();
+  $users = $caps[$role] ?? array();
+  $rval = array_keys($users);
+
+  if($role == 'manage') {
+    foreach( get_users() as $user )
+    {
+      $id = $user->id;
+      if(user_can($id,'manage_options')) {
+        if(!in_array($id,$rval)) {
+          $rval[] = $id;
+        }
+      }
+    }
+  }
+  return $rval;
 }
 
 /**
@@ -133,6 +163,7 @@ function update_options_from_post()
 
   $new_caps = $_POST['caps'];
   $options[CAPS_KEY] = $new_caps;
+  $options[PRIMARY_ADMIN_KEY] = $_POST['primary_admin'];
 
   $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
   $options[POST_UI_KEY] = strtoupper($_POST['post_ui']);
@@ -145,7 +176,7 @@ function update_options_from_post()
   foreach(get_users() as $user) {
     $id = $user->id;
     $view = false;
-    foreach(['manage','responses','content'] as $cap) {
+    foreach(['manage','responses','content','tech'] as $cap) {
       $key = "tlc-ttsurvey-$cap";
       if($new_caps[$cap][$id]) {
         $user->add_cap($key);

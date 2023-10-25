@@ -1,5 +1,6 @@
 var survey_error = null;
 var saved_content = null;
+var autosave = {};
 
 var ajax_lock = false;
 var queue_timer = null;
@@ -33,15 +34,14 @@ function update_content_form()
         update_state_needed = false;
         current_content = saved_content;
 
-        if(localStorage.autosave) {
-          autosave = JSON.parse(localStorage.autosave);
+        if(autosave[pid]) {
           // equality means that the autosave is for the current revision
           //   earlier means that autosave is no longer applicable
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
-          if(autosave.last_modified == response.last_modified) {
+          if(autosave[pid].last_modified == response.last_modified) {
             update_state_needed = true;
-            current_content = autosave;
+            current_content = autosave[pid];
             ce.form_status.html('autosave').addClass('info').show();
           }
         } 
@@ -60,6 +60,13 @@ function update_content_form()
   );
 }
 
+function handle_pid_nav(event)
+{
+  event.preventDefault();
+  var href = this.href + '&block=' + ce.active_block.val();
+  window.location = href;
+}
+
 function handle_block_nav()
 {
   const target = this.dataset.target;
@@ -74,6 +81,8 @@ function handle_block_nav()
 
   blocks.hide();
   active_block.show();
+
+  ce.active_block.val(target);
 }
 
 function reset_queue()
@@ -173,17 +182,16 @@ function refresh_sendmail_preview(template)
 
 function content_has_changed()
 {
-  var rval = false;
-  if(saved_content) {
-    if(saved_content.survey != ce.survey.val()) {
-      rval = true;
-    } else {
-      const sendmail = saved_content.sendmail;
-      ce.sendmail.each(function() {
-        if( this.value != sendmail[this.name].md ) { rval = true; }
-      });
-    }
-  }
+  if(!saved_content) { return false; }
+
+  if(saved_content.survey != ce.survey.val()) { return true; }
+
+  rval = false;
+  ce.sendmail.each(function() {
+    saved_sendmail = saved_content.sendmail[this.name];
+    saved_md = saved_sendmail ? saved_sendmail.md : undefined;
+    if( this.value != saved_md ) { rval = true; }
+  });
   return rval;
 }
 
@@ -202,7 +210,6 @@ function update_state()
     ce.error.hide();
   }
 }
-
 
 function handle_form_submit(event)
 {
@@ -233,7 +240,8 @@ function handle_form_submit(event)
           saved_content.sendmail[key].md = ce.sendmail.filter('.'+key).val();
           saved_content.sendmail[key].html = ce.preview.filter('.'+key).html();
         }
-        localStorage.removeItem('autosave');
+        delete autosave[pid];
+        localStorage.autosave = JSON.stringify(autosave);
         update_state();
         reset_queue();
       } else {
@@ -257,7 +265,8 @@ function handle_form_revert(event)
   // assume that the saved_content has been validated already
   survey_error = false
 
-  localStorage.removeItem('autosave');
+  delete autosave[pid];
+  localStorage.autosave = JSON.stringify[autosave];
   reset_queue();
   update_state();
 }
@@ -265,21 +274,21 @@ function handle_form_revert(event)
 function do_autosave()
 {
   if( content_has_changed() ) {
-    var autosave_data = {
+    autosave[pid] = {
       survey: ce.survey.val(),
       sendmail: {},
       last_modified: ce.last_modified.val(),
     };
     ce.sendmail.each( function() {
-      autosave_data.sendmail[this.name] = {
+      autosave[pid].sendmail[this.name] = {
         md:this.value,
         html:ce.preview.filter('.'+this.name).html(),
       }
     });
-    localStorage.autosave = JSON.stringify(autosave_data);
   } else {
-    localStorage.removeItem('autosave');
+    delete autosave[pid];
   }
+  localStorage.autosave = JSON.stringify(autosave);
 }
 
 function hold_lock()
@@ -314,19 +323,21 @@ jQuery(document).ready( function($) {
   ce.submit = ce.form.find('input.submit').eq(0);
   ce.revert = ce.form.find('button.revert').eq(0);
 
+  ce.pid_navtabs = $('#tlc-ttsurvey-admin div.content a.pid.nav-tab');
+  ce.active_block = ce.form.find('input[name=active_block]');
+
   pid = ce.form.find('input[name=pid]').eq(0).val();
 
   ce.form_status.hide();
 
-  const active_block = form_vars['active_block'];
   ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
   ce.form.find('.content-block div.block').hide();
-  ce.form.find(`.content-block div.block.${active_block}`).show();
 
-  // setup up timer to hold edit lock
+  const active = ce.active_block.val();
+  ce.form.find(`.content-block div.block.${active}`).show();
 
-  hold_lock();
-  setInterval(hold_lock,15000);
+  ce.pid_navtabs.on('click', handle_pid_nav);
+
 
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
@@ -335,9 +346,18 @@ jQuery(document).ready( function($) {
 
   update_content_form();
 
+  // setup up timer to hold edit lock
+  hold_lock();
+  setInterval(hold_lock,15000);
+
+
   if(!form_vars['editable']) {
     ce.inputs.prop('readonly',true);
     return;
+  }
+
+  if(localStorage.autosave) {
+    autosave = JSON.parse(localStorage.autosave)
   }
 
   //------------------------------------------------------------

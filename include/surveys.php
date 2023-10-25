@@ -29,6 +29,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/sendmail.php');
 
 const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
@@ -336,9 +337,9 @@ function update_survey_content_from_post()
     return null;
   }
 
-  $data = array();
-  $keys = array('survey','welcome',);
-  foreach( $keys as $key ) {
+  $survey = $_POST['survey'] ?? '';
+  $data = array('survey' => $survey);
+  foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
     $data[$key] = $_POST[$key] ?? '';
   }
 

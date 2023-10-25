@@ -80,36 +80,43 @@ function add_settings_status()
 
 function add_admin_settings()
 {
-  echo "<div class='label'>Survey Admins</div>";
+  echo "<div class='label'>Survey Admins<span class='admin-error'></span></div>";
   echo "<table class='caps'>";
   echo "<tr><th></th>";
-  foreach(explode(' ','Primary Manage Content Response') as $role) {
+  foreach(explode(' ','Primary Manage Content Response Tech') as $role) {
     echo "<th>$role</th>";
   }
   echo "</tr>";
 
   $caps = survey_capabilities();
+  $primary_admin = survey_primary_admin();
   foreach(get_users() as $user) {
     $id = $user->id;
     $name = $user->display_name;
+    $primary = $id == $primary_admin ? "checked" : "";
     $manage = $caps['manage'][$id] ? "checked" : "";
     $content = $caps['content'][$id] ? "checked" : "";
     $response = $caps['responses'][$id] ? "checked" : "";
+    $tech = $caps['tech'][$id] ? "checked" : "";
     $hidden_manage = '';
 
     echo "<tr>";
     echo "<td class='name'>$name</td>";
     echo "<td><div>";
+    echo "<input class='primary' type='radio' name='primary_admin' value='$id' $primary>";
+    echo "</div></td><td><div>";
     if(user_can($id,'manage_options')) {
       echo "<input type='checkbox' checked disabled>";
-      echo "<input class='manage' type='hidden' value=1 name='caps[manage][$id]'>";
+      echo "<input class='manage $id' type='hidden' value=1 name='caps[manage][$id]'>";
     } else {
-      echo "<input class='manage' type='checkbox' value=1 name='caps[manage][$id]' $manage>";
+      echo "<input class='manage $id' type='checkbox' value=1 name='caps[manage][$id]' $manage>";
     }
     echo "</div></td><td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[content][$id]' $content>";
+    echo "<input type='checkbox' value=1 name='caps[content][$id]' $content>";
     echo "</div></td><td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[responses][$id]' $response>";
+    echo "<input type='checkbox' value=1 name='caps[responses][$id]' $response>";
+    echo "</div></td><td><div>";
+    echo "<input type='checkbox' value=1 name='caps[tech][$id]' $tech>";
     echo "</div></td>";
     echo "</tr>";
 

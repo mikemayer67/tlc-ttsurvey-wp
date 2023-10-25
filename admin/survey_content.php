@@ -126,10 +126,10 @@ function add_survey_navbar($active_pid,$current)
   foreach($tabs as $tab)
   {
     [$label,$pid] = $tab;
-    $class = $pid == $active_pid ? 'nav-tab nav-tab-active' : 'nav-tab';
+    $active = $pid == $active_pid ? 'nav-tab-active' : '';
     $query_args['pid'] = $pid;
     $uri = implode('?', array($uri_path,http_build_query($query_args)));
-    echo "<a class='$class' href='$uri'>$label</a>";
+    echo "<a class='pid nav-tab $active' href='$uri'>$label</a>";
   }
 
   echo "</div>";
@@ -178,7 +178,7 @@ function add_new_survey_content()
   echo "      <input type='text' class='new-name' name='name' value='$suggested_name'>";
   echo "      <span class='error'></span>";
   echo "    </span>";
-  echo "    <div>";
+  echo "    <div class='button-box'>";
   $class = 'submit button button-primary button-large';
   echo "      <input type='submit' value='Create Survey' class='$class''>";
   echo "    </div>";
@@ -263,6 +263,8 @@ function add_current_survey_content($survey)
 
 function add_survey_content($survey,$editable=false)
 {
+  require_once plugin_path('include/sendmail.php');
+
   $name = $survey['name'];
   $pid = $survey['post_id'];
   $last_modified = $survey['last_modified'];
@@ -286,6 +288,7 @@ function add_survey_content($survey,$editable=false)
 
   $active_block = $_GET['block'] ?? 'survey';
   echo "<div class='nav-tab-wrapper block'>";
+  echo "<input type='hidden' name='active_block' value='$active_block'>";
   $blocks = [['survey','Survey Form'],['sendmail','Email Templates']];
   foreach( $blocks as [$key,$label] ) {
     $class = 'block nav-tab';
@@ -324,23 +327,27 @@ function add_survey_content($survey,$editable=false)
   echo "In addition, the following placeholders may be used to customize the message.";
   echo "</div>";
   echo "<table class=info>";
-  echo "<tr><td>&lt;&lt;name&gt;&gt;</td><td>Recipient's full name</td></tr>";
-  echo "<tr><td>&lt;&lt;userid&gt;&gt;</td><td>Recipient's login userid</td></tr>";
-  echo "<tr><td>&lt;&lt;email&gt;&gt;</td><td>Recipient's email address</td></tr>";
-  echo "<tr><td>&lt;&lt;token&gt;&gt;</td><td>Recipient's access token</td></tr>";
+  foreach(SENDMAIL_PLACEHOLDERS as $key=>$label) {
+    echo "<tr><td>&lt;&lt;$key&gt;&gt;<td><td>$label</td></tr>";
+  }
   echo "</table>";
 
-  // welcome
+  foreach(SENDMAIL_TEMPLATES as $key=>$tmpl) {
+    echo "<!-- $key -->";
+    $label = $tmpl['label'] ?? ucfirst($key);
+    $trigger = $tmpl['trigger'];
+    $placeholders = $tmpl['placeholders'] ?? array_keys(SENDMAIL_PLACEHOLDERS);
+    $placeholders = implode(', ',$placeholders);
+    echo "<div class='email-template'>";
+    echo "<h3>$label</h3>";
+    echo "<div class='info'>Sent when $trigger.</div>";
+    echo "<div class='info'><b>Placeholders:</b> $placeholders</div>";
+    echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
+    echo "<div class='sendmail preview $key'></div>";
+    echo "</div>"; 
+  }
 
-  echo "<div class='email-template'>";
-  echo "<h3>Welcome</h3>";
-  echo "<div class='info'>Sent when a new participant registers for the survey.</div>";
-  echo "<textarea class='sendmail welcome' name='welcome' readonly></textarea>";
-  echo "<div class='sendmail preview welcome'>stuff</div>";
-  echo "</div>"; 
-
-  echo "</div>"; // sendmail block
-  echo "</div>"; // content-block
+  echo "</div>"; // block sendmail
 
   //
   // close out the form
@@ -378,7 +385,6 @@ function enqueue_content_javascript($editable)
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
-      'active_block' => $_GET['block'] ?? 'survey',
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
@@ -394,7 +400,7 @@ function enqueue_new_survey_javascript()
     true
   );
   wp_localize_script(
-    'tlc_ttsurvey_content_form',
+    'tlc_ttsurvey_new_survey_form',
     'form_vars',
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
