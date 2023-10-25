@@ -60,6 +60,13 @@ function update_content_form()
   );
 }
 
+function handle_pid_nav(event)
+{
+  event.preventDefault();
+  var href = this.href + '&block=' + ce.active_block.val();
+  window.location = href;
+}
+
 function handle_block_nav()
 {
   const target = this.dataset.target;
@@ -74,6 +81,8 @@ function handle_block_nav()
 
   blocks.hide();
   active_block.show();
+
+  ce.active_block.val(target);
 }
 
 function reset_queue()
@@ -202,7 +211,6 @@ function update_state()
   }
 }
 
-
 function handle_form_submit(event)
 {
   ce.form_status.hide();
@@ -315,6 +323,9 @@ jQuery(document).ready( function($) {
   ce.submit = ce.form.find('input.submit').eq(0);
   ce.revert = ce.form.find('button.revert').eq(0);
 
+  ce.pid_navtabs = $('#tlc-ttsurvey-admin div.content a.pid.nav-tab');
+  ce.active_block = ce.form.find('input[name=active_block]');
+
   pid = ce.form.find('input[name=pid]').eq(0).val();
 
   ce.form_status.hide();
@@ -323,6 +334,8 @@ jQuery(document).ready( function($) {
   ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
   ce.form.find('.content-block div.block').hide();
   ce.form.find(`.content-block div.block.${active_block}`).show();
+  ce.pid_navtabs.on('click', handle_pid_nav);
+
 
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
