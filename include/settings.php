@@ -72,6 +72,25 @@ function survey_capabilities() {
   return get_survey_option(CAPS_KEY);
 }
 
+function survey_admins($role) {
+  $caps = survey_capabilities();
+  $users = $caps[$role] ?? array();
+  $rval = array_keys($users);
+
+  if($role == 'manage') {
+    foreach( get_users() as $user )
+    {
+      $id = $user->id;
+      if(user_can($id,'manage_options')) {
+        if(!in_array($id,$rval)) {
+          $rval[] = $id;
+        }
+      }
+    }
+  }
+  return $rval;
+}
+
 /**
  * get survey log level
  * @return LOGGER_DEV, LOGGER_INFO, LOGGER_WARNING, or LOGGER_ERROR
@@ -145,7 +164,7 @@ function update_options_from_post()
   foreach(get_users() as $user) {
     $id = $user->id;
     $view = false;
-    foreach(['manage','responses','content'] as $cap) {
+    foreach(['manage','responses','content','tech'] as $cap) {
       $key = "tlc-ttsurvey-$cap";
       if($new_caps[$cap][$id]) {
         $user->add_cap($key);

@@ -34,6 +34,7 @@ function handle_form_submit(event)
 jQuery(document).ready(
   function($) {
     ce.form = $('#tlc-ttsurvey-admin div.settings form');
+    ce.primary = ce.form.find('input[name=primary_contact]');
 
     ce.form.on('submit', handle_form_submit);
   }

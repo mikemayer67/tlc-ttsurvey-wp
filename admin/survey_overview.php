@@ -94,12 +94,14 @@ function add_admins_overview()
   foreach(get_users() as $user) {
     $id = $user->id;
     $name = $user->display_name;
+    $tech = $caps['tech'][$id];
     $responses = $caps['responses'][$id];
     $content = $caps['content'][$id];
     $user_caps = array();
     if( $caps['manage'][$id] ) { $user_caps[] = "Manage"; }
     if( $caps['content'][$id] ) { $user_caps[] = "Content"; }
     if( $caps['responses'][$id] ) { $user_caps[] = "Responses"; }
+    if( $caps['tech'][$id] ) { $user_caps[] = "Tech"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
       echo "<tr><td class='name'>$name</td><td class='value'>$user_caps</td></tr>";

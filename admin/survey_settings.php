@@ -82,7 +82,11 @@ function add_admin_settings()
 {
   echo "<div class='label'>Survey Admins</div>";
   echo "<table class='caps'>";
-  echo "<tr><th></th><th>Manage</th><th>Content</th><th>Responses</th></tr>";
+  echo "<tr><th></th>";
+  foreach(array("Manage","Content","Responses","Tech") as $role) {
+    echo "<th>$role</th>";
+  }
+  echo "</tr>";
 
   $caps = survey_capabilities();
   foreach(get_users() as $user) {
@@ -91,6 +95,7 @@ function add_admin_settings()
     $manage = $caps['manage'][$id] ? "checked" : "";
     $content = $caps['content'][$id] ? "checked" : "";
     $response = $caps['responses'][$id] ? "checked" : "";
+    $tech = $caps['tech'][$id] ? "checked" : "";
     $hidden_manage = '';
 
     if(user_can($id,'manage_options')) {
@@ -107,6 +112,8 @@ function add_admin_settings()
     echo "  <input type='checkbox' value=1 name='caps[content][$id]' $content>";
     echo "</div></td><td><div>";
     echo "  <input type='checkbox' value=1 name='caps[responses][$id]' $response>";
+    echo "</div></td><td><div>";
+    echo "  <input type='checkbox' value=1 name='caps[tech][$id]' $tech>";
     echo "</div></td>";
     echo "</tr>";
 
