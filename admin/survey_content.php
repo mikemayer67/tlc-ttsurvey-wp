@@ -199,10 +199,8 @@ function add_past_survey_content($pid,$current)
   }
 
   if(!$current) {
-    $action = $_SERVER['REQUEST_URI'];
     echo "<form class='reopen-survey'>";
     echo "<input type='hidden' name='pid' value='$pid'>";
-    echo "<input type='hidden' name='acteion' value='$action'>";
     echo "<input type='submit' value='Reopen survey'>";
     echo "</form>";
 
