@@ -17,12 +17,14 @@ const CAPS_KEY = 'caps';
 const PDF_URI_KEY = 'pdf_href';
 const LOG_LEVEL_KEY = 'log_level';
 const POST_UI_KEY = 'post_ui';
+const PRIMARY_ADMIN_KEY = 'primary_admin';
 
 $option_defaults = array(
   CAPS_KEY => [],
   PDF_URI_KEY => '',
   LOG_LEVEL_KEY => 'INFO',
   POST_UI_KEY => 'NONE',
+  PRIMARY_ADMIN_KEY => '',
 );
 
 /**
@@ -55,6 +57,15 @@ function set_survey_option($key,$value)
     update_option(OPTIONS_KEY,$options);
   }
 }
+
+/**
+ * get userid of the primary admin
+ * @return userid of the primary admin
+ */
+function survey_primary_admin() {
+  return get_survey_option(PRIMARY_ADMIN_KEY);
+}
+
 
 /**
  * get URI for pdf of the survey
@@ -152,6 +163,7 @@ function update_options_from_post()
 
   $new_caps = $_POST['caps'];
   $options[CAPS_KEY] = $new_caps;
+  $options[PRIMARY_ADMIN_KEY] = $_POST['primary_admin'];
 
   $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
   $options[POST_UI_KEY] = strtoupper($_POST['post_ui']);

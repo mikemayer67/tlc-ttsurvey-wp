@@ -90,6 +90,7 @@ function add_admins_overview()
   echo "    <table>";
 
   $caps = survey_capabilities();
+  $primary_admin = survey_primary_admin();
 
   foreach(get_users() as $user) {
     $id = $user->id;
@@ -98,18 +99,23 @@ function add_admins_overview()
     $responses = $caps['responses'][$id];
     $content = $caps['content'][$id];
     $user_caps = array();
+    if( $id == $primary_admin ) { $user_caps[] = 'Primary'; }
     if( $caps['manage'][$id] ) { $user_caps[] = "Manage"; }
     if( $caps['content'][$id] ) { $user_caps[] = "Content"; }
     if( $caps['responses'][$id] ) { $user_caps[] = "Responses"; }
     if( $caps['tech'][$id] ) { $user_caps[] = "Tech"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
-      echo "<tr><td class='name'>$name</td><td class='value'>$user_caps</td></tr>";
+      echo "<tr>";
+      echo "<td class='name'>$primary$name</td>";
+      echo "<td class='value'>$user_caps</td>";
+      echo "</tr>";
     }
   }
   echo "    </table>";
   echo "  </td>";
   echo "</tr>";
+
 }
 
 function add_survey_url()

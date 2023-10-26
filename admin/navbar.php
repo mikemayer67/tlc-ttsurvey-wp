@@ -16,37 +16,6 @@ if($status) {
   $status = "<span class='tlc-status' style='display:none;'></span>";
 }
  
-if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
-  $action = $_POST['action'] ?? null;
-  if($action == "update") 
-  {
-    update_options_from_post();
-    update_survey_status_from_post();
-    $status = "<span class='tlc-status info'>updated</span>";
-  }
-  elseif($action == "clear-log") 
-  {
-    clear_logger();
-  }
-  elseif($action == "new-survey")
-  {
-    create_new_survey($_POST['name']);
-  }
-  elseif($action == "reopen-survey")
-  {
-    reopen_survey($_POST['pid']);
-  }
-  elseif($action == 'update-survey')
-  {
-    if(update_survey_content_from_post()) {
-      $status = "<span class='tlc-statusinfo '>updated</span>";
-    } else {
-      $status = "<span class='tlc-status error'>failed to update</span>";
-    }
-  }
-}
-
-
 echo "<div id='tlc-ttsurvey-admin'>";
 echo "<h1>$title$status</h1>";
 echo "<div class='nav-tab-wrapper'>";
@@ -58,7 +27,6 @@ $tabs = [
 if(plugin_admin_can('manage')) { $tabs[] = ['settings','Settings']; }
 if(plugin_admin_can('content')) { $tabs[] = ['content','Content']; }
 if(plugin_admin_can('responses')) { $tabs[] = ['responses','Responses']; }
-if(plugin_admin_can('manage')) { $tabs[] = ['log','Log']; }
 
 $cur_tab = $_GET['tab'] ?? 'overview';
 

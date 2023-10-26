@@ -26,13 +26,11 @@ function add_noscript_body()
 
 function add_script_body()
 {
-  log_dev("Add script_body");
   $current = current_survey();
   echo "<div class='content requires-javascript'>";
 
   // check to see if we have lock
   $lock = obtain_content_lock();
-  log_dev("Lock: ".print_r($lock,true));
   if($lock['has_lock']) {
     // we have the lock
     $active_pid = determine_content_tab($current);
@@ -150,8 +148,6 @@ function add_survey_tab_content($active_pid,$current)
 
 function add_new_survey_content()
 {
-  $action = $_SERVER['REQUEST_URI'];
-
   $existing_names = array();
   foreach(survey_catalog() as $pid=>$survey) {
     $existing_names[] = $survey['name'];
@@ -169,9 +165,7 @@ function add_new_survey_content()
 
   echo "<div class=new>";
   echo "  <h2>Create a New Survey</h2>";
-  echo "  <form class='new-survey' action='$action' method='post'>";
-  wp_nonce_field(OPTIONS_NONCE);
-  echo "    <input type='hidden' name='action' value='new-survey'>";
+  echo "  <form class='new-survey'>";
   echo "    <input class='existing' type='hidden' value='$existing_names'>";
   echo "    <span class='new-name'>";
   echo "      <span class='label'>Survey Name</span>";
@@ -199,13 +193,12 @@ function add_past_survey_content($pid,$current)
   }
 
   if(!$current) {
-    $action = $_SERVER['REQUEST_URI'];
-    echo "<form class='reopen-survey' action='$action' method='post'>";
-    wp_nonce_field(OPTIONS_NONCE);
-    echo "<input type='hidden' name='action' value='reopen-survey'>";
-    echo "<input type='hidden' name=pid value='$pid'>";
+    echo "<form class='reopen-survey'>";
+    echo "<input type='hidden' name='pid' value='$pid'>";
     echo "<input type='submit' value='Reopen survey'>";
     echo "</form>";
+
+    enqueue_reopen_javascript();
   }
 
   $name = $survey['name'];
@@ -388,6 +381,27 @@ function enqueue_content_javascript($editable)
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
+}
+
+function enqueue_reopen_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_reopen_form',
+    plugin_url('admin/js/reopen_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_reopen_form',
+    'reopen_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('reopen_form',wp_create_nonce('reopen_form')),
+      'content_url' => $_SERVER['REQUEST_URI'],
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_reopen_form');
 }
 
 function enqueue_new_survey_javascript()

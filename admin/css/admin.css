@@ -209,8 +209,39 @@
   margin-top:10px;
 }
 
+#tlc-ttsurvey-admin .settings .admin-error {
+  margin-left:1em;
+  font-weight:600;
+  color:#a00;
+}
+
+#tlc-ttsurvey-admin .settings .input-label {
+  padding-right:8px;
+}
+
 #tlc-ttsurvey-admin .settings table.caps td div {
   text-align:center;
+}
+
+#tlc-ttsurvey-admin .settings button.clear-log {
+  color:white;
+  background:#888;
+  border-color:black;
+  border-radius:5px;
+  border-width:1px;
+  font-size:14px;
+  line-height:2;
+  padding: 0 8px 0 8px;
+  cursor:pointer;
+}
+
+#tlc-ttsurvey-admin .settings a.log-file {
+  font-size:14px;
+  font-weight:600;
+}
+
+#tlc-ttsurvey-admin .settings button.clear-log:hover {
+  background:#999;
 }
 
 
@@ -360,56 +391,6 @@
   margin:5px 0;
 }
 
-
-/**
- * Log Tab
- */
-
-#tlc-ttsurvey-admin div.log {
-  margin-left:15px;
-  margin-top:15px;
-  border-width:1px;
-  border-color:black;
-  border-style:solid;
-  overflow-y:scroll;
-  width:95%;
-  height:500px;
-}
-
-#tlc-ttsurvey-admin div.log table {
-  table-layout: auto;
-  width:100%;
-}
-
-#tlc-ttsurvey-admin div.log tr.warning td {
-  color:#e88010;
-}
-
-#tlc-ttsurvey-admin div.log tr.error td {
-  color:#a00000;
-}
-
-#tlc-ttsurvey-admin div.log tr.info td {
-  color:#0000a0;
-}
-
-#tlc-ttsurvey-admin div.log td.date {
-  white-space:nowrap;
-}
-
-#tlc-ttsurvey-admin div.log td.message {
-  padding-left:5px;
-  font-weight:600;
-  width:100%;
-}
-
-#tlc-ttsurvey-admin div.log tr:nth-child(odd) {
-  background: white;
-}
-
-#tlc-ttsurvey-admin div.log tr:nth-child(even) {
-  background: #e0e0e0;
-}
 
 /**
  * Other stuff
