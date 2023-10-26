@@ -338,7 +338,6 @@ jQuery(document).ready( function($) {
 
   ce.pid_navtabs.on('click', handle_pid_nav);
 
-
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
   // dual maintenance and possible inconsistency that could result from that

@@ -200,12 +200,13 @@ function add_past_survey_content($pid,$current)
 
   if(!$current) {
     $action = $_SERVER['REQUEST_URI'];
-    echo "<form class='reopen-survey' action='$action' method='post'>";
-    wp_nonce_field(OPTIONS_NONCE);
-    echo "<input type='hidden' name='action' value='reopen-survey'>";
-    echo "<input type='hidden' name=pid value='$pid'>";
+    echo "<form class='reopen-survey'>";
+    echo "<input type='hidden' name='pid' value='$pid'>";
+    echo "<input type='hidden' name='acteion' value='$action'>";
     echo "<input type='submit' value='Reopen survey'>";
     echo "</form>";
+
+    enqueue_reopen_javascript();
   }
 
   $name = $survey['name'];
@@ -388,6 +389,27 @@ function enqueue_content_javascript($editable)
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
+}
+
+function enqueue_reopen_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_reopen_form',
+    plugin_url('admin/js/reopen_form.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_reopen_form',
+    'reopen_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('reopen_form',wp_create_nonce('reopen_form')),
+      'content_url' => $_SERVER['REQUEST_URI'],
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_reopen_form');
 }
 
 function enqueue_new_survey_javascript()

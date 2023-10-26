@@ -4,7 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('admin/ajax/markdown.php');
+require_once plugin_path('admin/ajax/demo_markdown.php');
 
 $pid = $_POST['pid'] ?? null;
 if(!$pid)
