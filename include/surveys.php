@@ -264,6 +264,8 @@ function reopen_survey($post_id)
 
   update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
 
+  log_info("Suvey $name ($post_id) reopened");
+
   return true;
 }
 

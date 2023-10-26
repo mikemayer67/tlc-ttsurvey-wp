@@ -22,10 +22,6 @@ if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
   {
     create_new_survey($_POST['name']);
   }
-  elseif($action == "reopen-survey")
-  {
-    reopen_survey($_POST['pid']);
-  }
 }
 
 
