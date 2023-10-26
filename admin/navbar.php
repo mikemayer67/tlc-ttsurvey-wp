@@ -16,15 +16,6 @@ if($status) {
   $status = "<span class='tlc-status' style='display:none;'></span>";
 }
  
-if(wp_verify_nonce($_POST['_wpnonce'],OPTIONS_NONCE)) {
-  $action = $_POST['action'] ?? null;
-  if($action == "new-survey")
-  {
-    create_new_survey($_POST['name']);
-  }
-}
-
-
 echo "<div id='tlc-ttsurvey-admin'>";
 echo "<h1>$title$status</h1>";
 echo "<div class='nav-tab-wrapper'>";

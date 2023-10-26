@@ -40,7 +40,7 @@ function sendmail_pwreset($email)
 
 function sendmail_welcome($email, $userid, $firstname, $lastname)
 {
-  log_dev("Send welcome email to $userid: $email");
+  log_info("Send welcome email to $userid: $email");
 
   $survey = current_survey();
   $pid = $survey['post_id'];

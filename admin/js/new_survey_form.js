@@ -41,6 +41,31 @@ function handle_change()
   ce.submit.prop('disabled',err.length>0);
 }
 
+
+function handle_new_survey(event)
+{
+  event.preventDefault();
+
+  new_name = ce.new_name.val();
+
+  jQuery.post(
+    form_vars['ajaxurl'],
+    {
+      'action':'tlc_ttsurvey',
+      'nonce':form_vars['nonce'],
+      'query':'new_survey',
+      'name':new_name,
+    },
+    function(response) {
+      if(response.ok) {
+        window.location.reload(true);
+      }
+    },
+    'json',
+  );
+}
+
+
 jQuery(document).ready(
   function($) {
     ce.form = $('form.new-survey');
@@ -52,6 +77,7 @@ jQuery(document).ready(
     setInterval(hold_lock,15000);
 
     ce.new_name.on('keyup',handle_change);
+    ce.form.on('submit',handle_new_survey);
   }
 );
 

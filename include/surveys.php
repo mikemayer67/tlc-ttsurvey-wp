@@ -299,6 +299,10 @@ function create_new_survey($name)
 
   update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
   update_post_meta($post_id,'responses',0);
+
+  log_info("Created new survey $name");
+
+  return true;
 }
 
 
@@ -332,8 +336,6 @@ function update_survey_content_from_post()
   $pid = $_POST['pid'] ?? '';
   $cur_pid = $current['post_id'];
 
-  log_dev("pid:$pid, cur_pid:$cur_pid");
-
   if(strcmp($pid,$cur_pid)!=0) {
     log_warning("Attempted to update survey $pid, current is $cur_pid");
     return null;
@@ -345,16 +347,12 @@ function update_survey_content_from_post()
     $data[$key] = $_POST[$key] ?? '';
   }
 
-  log_dev("data: ".print_r($data,true));
-
   $rval = wp_update_post(array(
     'ID' => $pid,
     'post_content' => wp_slash(json_encode($data)),
   ));
 
   wp_save_post_revision($pid);
-
-  log_dev("rval: $rval");
 
   if($rval) {
     $name = $current['name'];

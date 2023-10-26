@@ -26,13 +26,11 @@ function add_noscript_body()
 
 function add_script_body()
 {
-  log_dev("Add script_body");
   $current = current_survey();
   echo "<div class='content requires-javascript'>";
 
   // check to see if we have lock
   $lock = obtain_content_lock();
-  log_dev("Lock: ".print_r($lock,true));
   if($lock['has_lock']) {
     // we have the lock
     $active_pid = determine_content_tab($current);
@@ -150,8 +148,6 @@ function add_survey_tab_content($active_pid,$current)
 
 function add_new_survey_content()
 {
-  $action = $_SERVER['REQUEST_URI'];
-
   $existing_names = array();
   foreach(survey_catalog() as $pid=>$survey) {
     $existing_names[] = $survey['name'];
@@ -169,9 +165,7 @@ function add_new_survey_content()
 
   echo "<div class=new>";
   echo "  <h2>Create a New Survey</h2>";
-  echo "  <form class='new-survey' action='$action' method='post'>";
-  wp_nonce_field(OPTIONS_NONCE);
-  echo "    <input type='hidden' name='action' value='new-survey'>";
+  echo "  <form class='new-survey'>";
   echo "    <input class='existing' type='hidden' value='$existing_names'>";
   echo "    <span class='new-name'>";
   echo "      <span class='label'>Survey Name</span>";
