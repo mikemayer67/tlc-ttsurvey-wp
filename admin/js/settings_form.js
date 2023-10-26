@@ -60,6 +60,21 @@ function update_primary(event)
   }
 }
 
+function handle_clear_log(event)
+{
+  event.preventDefault()
+  if( confirm('Purse all plugin log data') ) {
+    jQuery.post(
+      form_vars['ajaxurl'],
+      {
+        'action':'tlc_ttsurvey',
+        'nonce':form_vars['nonce'],
+        'query':'clear_log',
+      },
+    );
+  }
+}
+
 jQuery(document).ready(
   function($) {
     ce.form = $('#tlc-ttsurvey-admin div.settings form');
@@ -67,11 +82,13 @@ jQuery(document).ready(
     ce.primary = ce.form.find('input.primary');
     ce.manage = ce.form.find('input.manage');
     ce.admin_error = ce.form.find('.admin-error');
+    ce.clear_log = ce.form.find('button.clear-log');
 
     update_primary();
     ce.manage.on('change',update_primary);
     ce.primary.on('change',update_primary);
 
     ce.form.on('submit', handle_form_submit);
+    ce.clear_log.on('click', handle_clear_log);
   }
 );

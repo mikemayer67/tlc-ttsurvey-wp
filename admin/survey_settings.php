@@ -24,7 +24,8 @@ function add_settings_form()
   add_settings_status();
   add_admin_settings();
   add_pdf_uri_setting();
-  add_advanced_settings();
+  add_log_settings();
+  add_post_editor();
 
   echo "<div class='button-box'>";
   echo "<input type='submit' class= 'submit button button-primary button-large' value='Save'>";
@@ -128,27 +129,54 @@ function add_pdf_uri_setting()
 {
   $pdf_uri = survey_pdf_uri();
   $pattern = '^(http|https|ftp|ftps)://[a-zA-Z].*$';
-  echo "<div class='label'>Survey Download URL</div>";
+  echo "<div class='label'>Download URL</div>";
   echo "<div class='info'>Location for a downloadable copy of the survey</div>";
   echo "<div class='settings'>";
   echo "<input type='URL' size=50 name='pdf_uri' value='$pdf_uri' pattern='$pattern'>";
   echo "</div>";
 }
 
-function add_advanced_settings()
+function add_log_settings()
 {
-  echo "<div class='label'>Advanced Settings</div>";
+  echo "<div class='label'>Logging</div>";
   echo "<table class='settings'>";
 
   $cur_level = survey_log_level();
   echo "<tr>";
-  echo "<td class='input-label'>Logging</td>";
+  echo "<td class='input-label'>Log Level</td>";
   echo "<td class='input-value'><select name='log_level'>";
   foreach(LOGGER_ as $log_level => $label) {
     $selected = ($log_level == $cur_level) ? "selected" : "";
     echo "<option value='$log_level' $selected>$label</option>";
   }
   echo "</select></td></tr>";
+
+  echo "<tr><td></td>";
+  echo "<td class='input-value'>";
+  $log_href = plugin_url(PLUGIN_LOG_FILE);
+  $timestamp = date('YmdHis');
+  $logfile = "TimeAndTalentSurvey_$timestamp.log";
+  log_dev("Downlaod logfile: $logfile");
+  echo "<a class='log-file' href='$log_href' target='_blank'>View Log File</a>";
+  echo "<br>";
+  echo "<a class='log-file' href='$log_href' download='$logfile'>Download Log File</a>";
+  echo "</td></tr>";
+
+  echo "<tr><td></td>";
+  echo "<td class='input-value'>";
+  echo "<button class='clear-log'>Clear Log</button>";
+  echo "</td></tr>";
+
+  echo "</table>";
+}
+
+function add_post_editor()
+{
+  echo "<div class='label'>Survey Post Editor</div>";
+  echo "<div class='info'>";
+  echo "Enable deletion, renaming, and revision management of surveys in the wp_posts table. ";
+  echo "</div>";
+  echo "<table class='settings'>";
 
   $cur_post_ui = survey_post_ui();
   echo "<tr>";
