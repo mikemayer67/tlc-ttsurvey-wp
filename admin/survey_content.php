@@ -256,8 +256,6 @@ function add_current_survey_content($survey)
 
 function add_survey_content($survey,$editable=false)
 {
-  require_once plugin_path('include/sendmail.php');
-
   $name = $survey['name'];
   $pid = $survey['post_id'];
   $last_modified = $survey['last_modified'];
@@ -282,7 +280,7 @@ function add_survey_content($survey,$editable=false)
   $active_block = $_GET['block'] ?? 'survey';
   echo "<div class='nav-tab-wrapper block'>";
   echo "<input type='hidden' name='active_block' value='$active_block'>";
-  $blocks = [['survey','Survey Form'],['sendmail','Email Templates']];
+  $blocks = [['survey','Survey Form'],['sendmail','Email Customization']];
   foreach( $blocks as [$key,$label] ) {
     $class = 'block nav-tab';
     if($key == $active_block) { $class = "$class nav-tab-active"; }
@@ -295,7 +293,7 @@ function add_survey_content($survey,$editable=false)
   //
   echo "<div class=content-block>";
 
-  // survey 
+  // Survey 
 
   echo "<div class='block survey'>";
   echo "<div class='info'>";
@@ -305,9 +303,10 @@ function add_survey_content($survey,$editable=false)
   echo "<div class='invalid survey'></div>";
   echo "</div>";
 
-  // email templates
+  // Email Customization
 
   echo "<div class='block sendmail'>";
+
   echo "<div class='info'>";
   echo "All email templates use markdown notation.  For more information, visit ";
   echo "the <a href='https://www.markdownguide.org/basic-syntax' target='_blank'>";
@@ -316,29 +315,23 @@ function add_survey_content($survey,$editable=false)
   // echo "Markdown Cheatsheet</a>.";
   echo "</div>";
 
-  echo "<div class='info'>";
-  echo "In addition, the following placeholders may be used to customize the message.";
-  echo "</div>";
-  echo "<table class=info>";
-  foreach(SENDMAIL_PLACEHOLDERS as $key=>$label) {
-    echo "<tr><td>&lt;&lt;$key&gt;&gt;<td><td>$label</td></tr>";
-  }
-  echo "</table>";
+  // - welcome
 
-  foreach(SENDMAIL_TEMPLATES as $key=>$tmpl) {
-    echo "<!-- $key -->";
-    $label = $tmpl['label'] ?? ucfirst($key);
-    $trigger = $tmpl['trigger'];
-    $placeholders = $tmpl['placeholders'] ?? array_keys(SENDMAIL_PLACEHOLDERS);
-    $placeholders = implode(', ',$placeholders);
-    echo "<div class='email-template'>";
-    echo "<h3>$label</h3>";
-    echo "<div class='info'>Sent when $trigger.</div>";
-    echo "<div class='info'><b>Placeholders:</b> $placeholders</div>";
-    echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
-    echo "<div class='sendmail preview $key'></div>";
-    echo "</div>"; 
-  }
+  echo "<!-- welcome -->";
+  echo "<div class='sendmail welcome'>";
+  echo "<div class='info'>Sent when a new user registers for the survey</div>";
+  echo "<textarea name='welcome' readonly></textarea>";
+  echo "<div class='sendmail preview welcome'></div>";
+  echo "</div>";
+  
+  // - login recovery
+
+  echo "<!-- login recovery -->";
+  echo "<div class='sendmail recovery'>";
+  echo "<div class='info'>Sent when a user requests help logging in</div>";
+  echo "<textarea name='recovery' readonly></textarea>";
+  echo "<div class='sendmail preview recovery'></div>";
+  echo "</div>";
 
   echo "</div>"; // block sendmail
 

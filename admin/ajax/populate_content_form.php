@@ -1,4 +1,4 @@
-<?php
+`<?php
 namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
@@ -18,22 +18,21 @@ if(!$pid)
 $post = get_post($pid);
 $content = json_decode($post->post_content,true);
 
+$sendmail = $content['sendmail'] ?? array();
+
+$rendered = array();
+foreach($sendmail as $key=>$content) {
+  $rendered[$key] = render_mail_content($key,$content);
+}
+
 $response = array(
   'ok'=>true,
   'pid'=>$pid,
   'last_modified'=>get_post_modified_time('U',true,$post),
   'survey'=>$content['survey'],
-  'sendmail'=>array(),
+  'sendmail'=>$sendmail,
+  'preview'=>$rendered,
 );
-
-foreach ($content as $key=>$md) {
-  if($key != 'survey') {
-    $response['sendmail'][$key] = array(
-      'md'=>$md, 
-      'html'=>render_demo_markdown($md),
-    );
-  }
-}
 
 $rval = json_encode($response);
 
