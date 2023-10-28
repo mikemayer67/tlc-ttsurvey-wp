@@ -7,23 +7,21 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+const SENDMAIL_TEMPLATES = array(
+  'welcome' => array(
+    'label' => 'Welcome',
+    'when' => 'a user registers for the survey',
+  ),
+  'recovery' => array(
+    'label' => 'Login Recovery',
+    'when' => 'a user requests help logging in',
+  ),
+);
+
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/markdown.php');
 
-function sendmail_render_preview($pid, $subject, $content)
-{
-  return sendmail_render_message(
-    $subject,
-    $content,
-    array(
-      'title' => get_post($pid)->post_title,
-      'email' => 't.smith@t3mail.net',
-      'userid' => 'tsmith13',
-      'name' => 'Thomas Smith',
-    ),
-  )
-}
 
 function sendmail_render_message($subject,$content,$data)
 {
@@ -34,6 +32,9 @@ function sendmail_render_message($subject,$content,$data)
   }
 
   $content = render_markdown($content);
+  $email = $data['email'];
+  $userid = $data['userid'];
+  $name = $data['name'];
 
   ob_start();
   require $subject_php;

@@ -156,7 +156,6 @@ function add_log_settings()
   $log_href = plugin_url(PLUGIN_LOG_FILE);
   $timestamp = date('YmdHis');
   $logfile = "TimeAndTalentSurvey_$timestamp.log";
-  log_dev("Downlaod logfile: $logfile");
   echo "<a class='log-file' href='$log_href' target='_blank'>View Log File</a>";
   echo "<br>";
   echo "<a class='log-file' href='$log_href' download='$logfile'>Download Log File</a>";

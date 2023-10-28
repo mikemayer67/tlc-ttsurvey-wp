@@ -1,10 +1,10 @@
-`<?php
+<?php
 namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('admin/ajax/demo_markdown.php');
+require_once plugin_path('include/sendmail.php');
 
 $pid = $_POST['pid'] ?? null;
 if(!$pid)
@@ -16,22 +16,37 @@ if(!$pid)
 }
 
 $post = get_post($pid);
-$content = json_decode($post->post_content,true);
+$content = $post->post_content;
+$content = json_decode($content,true);
 
-$sendmail = $content['sendmail'] ?? array();
+$survey = $content['survey'] ?? '';
 
-$rendered = array();
-foreach($sendmail as $key=>$content) {
-  $rendered[$key] = render_mail_content($key,$content);
+$sendmail = array();
+$preview = array();
+foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
+  # note... the field data should be same as that used in
+  #   admin/ajax/render_sendmail_preview.php
+  $custom_content = $content['sendmail'][$key] ?? '';
+  $sendmail[$key] = $custom_content;
+  $preview[$key] = sendmail_render_message(
+    $key,
+    stripslashes($custom_content),
+    array(
+      'title' => get_post($pid)->post_title,
+      'email' => 't.smith@t3mail.net',
+      'userid' => 'tsmith13',
+      'name' => 'Thomas Smith',
+    ),
+  );
 }
 
 $response = array(
   'ok'=>true,
   'pid'=>$pid,
   'last_modified'=>get_post_modified_time('U',true,$post),
-  'survey'=>$content['survey'],
+  'survey' => $content['survey'] ?? '',
   'sendmail'=>$sendmail,
-  'preview'=>$rendered,
+  'preview'=>$preview,
 );
 
 $rval = json_encode($response);

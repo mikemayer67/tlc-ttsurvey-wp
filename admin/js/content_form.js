@@ -32,7 +32,7 @@ function populate_form()
           preview: response.preview,
         };
 
-        update_state_needed = false;
+        from_autosave = false;
         current_content = saved_content;
 
         if(autosave[pid]) {
@@ -41,7 +41,7 @@ function populate_form()
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
           if(autosave[pid].last_modified == response.last_modified) {
-            update_state_needed = true;
+            from_autosave = true;
             current_content = autosave[pid];
             ce.form_status.html('autosave').addClass('info').show();
           }
@@ -49,14 +49,19 @@ function populate_form()
 
         ce.survey.val(current_content.survey);
 
-        for(const key in saved_content.sendmail) {
+        for(const key in current_content.sendmail) {
           ce.sendmail.filter('.'+key).val(current_content.sendmail[key]);
         }
-        for(const key in saved_content.preview) {
+        for(const key in current_content.preview) {
           ce.preview.filter('.'+key).html(current_content.preview[key]);
         }
 
-        if(update_state_needed) { update_state() }
+        if(from_autosave) { 
+          update_state();
+          for(const key in current_content.sendmail) {
+            refresh_sendmail_preview(key);
+          }
+        }
       }
     },
     'json',
@@ -164,6 +169,9 @@ function validate_survey_input()
 
 function refresh_sendmail_preview(subject)
 {
+  const input = ce.sendmail.filter('.'+subject)
+  const content = input.val()
+
   jQuery.post(
     form_vars['ajaxurl'],
     {
@@ -172,12 +180,13 @@ function refresh_sendmail_preview(subject)
       'query':'render_sendmail_preview',
       'pid':pid,
       'subject':subject,
-      'content':ce.sendmail.filter('.'+subject).val(),
+      'content':content,
     },
     function(response) {
       if(response.ok) {
         ce.preview.filter('.'+subject).html(response.preview);
         ajax_lock = false;
+
       }
     },
     'json',
@@ -194,8 +203,7 @@ function content_has_changed()
   rval = false;
   ce.sendmail.each(function() {
     saved_sendmail = saved_content.sendmail[this.name];
-    saved_md = saved_sendmail ? saved_sendmail.md : undefined;
-    if( this.value != saved_md ) { rval = true; }
+    if( this.value != saved_sendmail ) { rval = true; }
   });
   return rval;
 }
@@ -229,8 +237,10 @@ function handle_form_submit(event)
     'content':{},
   };
 
-  ce.inputs.each(function() {
-    data.content[this.name] = this.value;
+  data.content.survey = ce.survey.val();
+  data.content.sendmail = {}
+  ce.sendmail.each(function() {
+    data.content.sendmail[this.name] = this.value;
   });
 
   jQuery.post(
@@ -238,7 +248,7 @@ function handle_form_submit(event)
     data,
     function(response) {
       if(response.ok) {
-        ce.form_status.html('updated').addClass('info').show();
+        ce.form_status.html('saved').addClass('info').show();
         ce.last_modified.val(response.last_modified);
         saved_content.survey = ce.survey.val();
         for(const key in saved_content.sendmail) {
@@ -249,8 +259,8 @@ function handle_form_submit(event)
         }
         delete autosave[pid];
         localStorage.autosave = JSON.stringify(autosave);
-        update_state();
         reset_queue();
+        update_state();
       } else {
         alert("failed to save content: " + response.error);
       }
@@ -290,11 +300,9 @@ function do_autosave()
       last_modified: ce.last_modified.val(),
     };
     ce.sendmail.each( function() {
-      preview = ce.preview.filter('.'+this.name);
-    });
-    ce.preview.each( function() {
-      alert('check this.html (content_form.js::do_autosave)');
-      autosave[pid].preview[this.name] = this.html;
+      const name = this.name;
+      const value = this.value;
+      autosave[pid].sendmail[name] = value;
     });
   } else {
     delete autosave[pid];
