@@ -29,7 +29,11 @@ if(!$content)
 //   - Remove the current escaping from each value in the context array
 //   - Convert the context array to JSON
 //   - Fully escape the JSON for insertion into the wordpress database
-$content = addslashes(json_encode(array_map('stripslashes',$content)));
+//$content = array_map('stripslashes',$content);
+$content = stripslashes_deep($content);
+$content = json_encode($content);
+$content = addslashes($content);
+
 $post_data = array( 'ID'=>$pid, 'post_content'=>$content);
 $rc = wp_update_post($post_data, true);
 

@@ -7,35 +7,46 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const SENDMAIL_PLACEHOLDERS = array(
-  'survey'=>'The name of the survey',
-  'name'=>'The participant\'s full name',
-  'email'=>'The participant\'s email address',
-  'userid'=>'The participant\'s login userid',
-  'pwreset'=>'URL for resetting participant\'s password',
-);
-
 const SENDMAIL_TEMPLATES = array(
-  'welcome' => array (
-    'trigger' => 'a new participant registers for the survey',
-    'placeholders' => array('survey','name','userid','email'),
+  'welcome' => array(
+    'label' => 'Welcome',
+    'when' => 'a user registers for the survey',
   ),
   'recovery' => array(
-    'label' => 'Userid/Password Recovery',
-    'trigger' => 'a participant requests help with their userid/password',
+    'label' => 'Login Recovery',
+    'when' => 'a user requests help logging in',
   ),
 );
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/markdown.php');
 
-function sendmail_pwreset($email)
+
+function sendmail_render_message($subject,$content,$data)
 {
-  $survey = current_survey();
-  $pid = $survey['post_id'];
-  $name = $survey['name'];
+  $subject_php = plugin_path("include/sendmail/$subject.php");
+  if(!file_exists($subject_php)) {
+    log_error("Attempt to render invalid sendmail subject ($subject)");
+    return null;
+  }
 
-  return False;
+  $content = render_markdown($content);
+  $email = $data['email'];
+  $userid = $data['userid'];
+  $name = $data['name'];
+
+  ob_start();
+  require $subject_php;
+  $message = ob_get_contents();
+  ob_end_clean();
+  return $message;
+}
+
+function sendmail_login_recovery($email)
+{
+  log_info("Send login recovery email to $userid: $email");
+  return false;
 }
 
 function sendmail_welcome($email, $userid, $firstname, $lastname)
@@ -43,25 +54,30 @@ function sendmail_welcome($email, $userid, $firstname, $lastname)
   log_info("Send welcome email to $userid: $email");
 
   $survey = current_survey();
-  $pid = $survey['post_id'];
-  $name = $survey['name'];
+  $post = get_post($survey['post_id']);
+  $content = json_decode($post->post_content,true);
 
-  $placeholders = array(
-    'survey' => $name,
-    'email' => $email,
-    'userid' => $userid,
-    'name' => "$firstname $lastname",
+  $message = sendmail_render_message(
+    'welcome',
+    $content['sendmail']['welcome'],
+    array(
+      'title'=>$survey['name'],
+      'email'=>$email,
+      'userid'=>$userid,
+      'name'=>"$firstname $lastname",
+    )
   );
 
-  $post = get_post($pid);
-  $content = $post->post_content;
-  $content = json_decode($post->post_content,true);
-  $md = $content[$key];
-
-  $message = render_markdown($md,$placeholders);
   $headers = array('Content-Type: text/html; charset=UTF-8');
 
-  wp_mail($email,"$name Time & Talent survey",$message,$headers);
+  wp_mail(
+    $email,
+    $survey['name'] . ' Time & Talent survey',
+    $message,
+    array(
+      'Content-Type: text/html; charset=UTF-8',
+    )
+  );
 
   return true;
 }

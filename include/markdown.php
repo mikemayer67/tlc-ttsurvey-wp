@@ -12,7 +12,6 @@ function render_markdown($md,$placeholders=array())
   }
 
   $pd = new \Parsedown();
-  $html = $pd->text($md);
-  return "<div>$html</div>";
+  return $pd->text($md);
 }
 

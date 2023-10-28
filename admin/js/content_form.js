@@ -10,7 +10,7 @@ var pid = null;
 var ce = {};
 
 
-function update_content_form()
+function populate_form()
 {
   ce.form_status.hide();
 
@@ -29,9 +29,10 @@ function update_content_form()
         saved_content = {
           survey: response.survey,
           sendmail: response.sendmail,
+          preview: response.preview,
         };
 
-        update_state_needed = false;
+        from_autosave = false;
         current_content = saved_content;
 
         if(autosave[pid]) {
@@ -40,7 +41,7 @@ function update_content_form()
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
           if(autosave[pid].last_modified == response.last_modified) {
-            update_state_needed = true;
+            from_autosave = true;
             current_content = autosave[pid];
             ce.form_status.html('autosave').addClass('info').show();
           }
@@ -48,12 +49,19 @@ function update_content_form()
 
         ce.survey.val(current_content.survey);
 
-        for(const key in saved_content.sendmail) {
-          ce.sendmail.filter('.'+key).val(current_content.sendmail[key].md);
-          ce.preview.filter('.'+key).html(current_content.sendmail[key].html);
+        for(const key in current_content.sendmail) {
+          ce.sendmail.filter('.'+key).val(current_content.sendmail[key]);
+        }
+        for(const key in current_content.preview) {
+          ce.preview.filter('.'+key).html(current_content.preview[key]);
         }
 
-        if(update_state_needed) { update_state() }
+        if(from_autosave) { 
+          update_state();
+          for(const key in current_content.sendmail) {
+            refresh_sendmail_preview(key);
+          }
+        }
       }
     },
     'json',
@@ -106,10 +114,9 @@ function handle_input_event()
   queue = queue.filter( input => input != this.name );
   queue.push(this.name);
 
- // start the timer if it's not already running
- if(!queue_timer) {
-   queue_timer = setTimeout(watch_queue,500);
- }
+ // restart the timer; clear it if it's not already running
+ if(queue_timer) { clearTimeout(queue_timer); }
+ queue_timer = setTimeout(watch_queue,500);
 }
 
 function watch_queue()
@@ -121,7 +128,7 @@ function watch_queue()
   }
 
   if(queue.length==0) {
-    // nothing else on queue, quite timer, update state, and return
+    // nothing else on queue, quit timer, update state, and return
     clearTimeout(queue_timer);
     queue_timer = null;
     update_state();
@@ -130,6 +137,7 @@ function watch_queue()
 
   // handle next queued event and restart the timer
   ajax_lock = true;
+  queue_timer = null;
 
   input = queue.shift();
   if( input == "survey" ) {
@@ -159,20 +167,26 @@ function validate_survey_input()
   );
 }
 
-function refresh_sendmail_preview(template)
+function refresh_sendmail_preview(subject)
 {
+  const input = ce.sendmail.filter('.'+subject)
+  const content = input.val()
+
   jQuery.post(
     form_vars['ajaxurl'],
     {
       'action':'tlc_ttsurvey',
       'nonce':form_vars['nonce'],
-      'query':'render_sendmail_template',
-      'markdown':ce.sendmail.filter('.'+template).val(),
+      'query':'render_sendmail_preview',
+      'pid':pid,
+      'subject':subject,
+      'content':content,
     },
     function(response) {
       if(response.ok) {
-        ce.preview.filter('.'+template).html(response.rendered);
+        ce.preview.filter('.'+subject).html(response.preview);
         ajax_lock = false;
+
       }
     },
     'json',
@@ -189,8 +203,7 @@ function content_has_changed()
   rval = false;
   ce.sendmail.each(function() {
     saved_sendmail = saved_content.sendmail[this.name];
-    saved_md = saved_sendmail ? saved_sendmail.md : undefined;
-    if( this.value != saved_md ) { rval = true; }
+    if( this.value != saved_sendmail ) { rval = true; }
   });
   return rval;
 }
@@ -224,8 +237,10 @@ function handle_form_submit(event)
     'content':{},
   };
 
-  ce.inputs.each(function() {
-    data.content[this.name] = this.value;
+  data.content.survey = ce.survey.val();
+  data.content.sendmail = {}
+  ce.sendmail.each(function() {
+    data.content.sendmail[this.name] = this.value;
   });
 
   jQuery.post(
@@ -233,17 +248,19 @@ function handle_form_submit(event)
     data,
     function(response) {
       if(response.ok) {
-        ce.form_status.html('updated').addClass('info').show();
+        ce.form_status.html('saved').addClass('info').show();
         ce.last_modified.val(response.last_modified);
         saved_content.survey = ce.survey.val();
         for(const key in saved_content.sendmail) {
-          saved_content.sendmail[key].md = ce.sendmail.filter('.'+key).val();
-          saved_content.sendmail[key].html = ce.preview.filter('.'+key).html();
+          saved_content.sendmail[key] = ce.sendmail.filter('.'+key).val();
+        }
+        for(const key in saved_content.preview) {
+          saved_content.preview[key] = ce.preview.filter('.'+key).html();
         }
         delete autosave[pid];
         localStorage.autosave = JSON.stringify(autosave);
-        update_state();
         reset_queue();
+        update_state();
       } else {
         alert("failed to save content: " + response.error);
       }
@@ -259,8 +276,10 @@ function handle_form_revert(event)
 
   ce.survey.val(saved_content.survey);
   for(const key in saved_content.sendmail) {
-    ce.sendmail.filter('.'+key).val(saved_content.sendmail[key].md);
-    ce.preview.filter('.'+key).html(saved_content.sendmail[key].html);
+    ce.sendmail.filter('.'+key).val(saved_content.sendmail[key]);
+  }
+  for(const key in saved_content.preview) {
+    ce.preview.filter('.'+key).html(saved_content.preview[key]);
   }
   // assume that the saved_content has been validated already
   survey_error = false
@@ -277,13 +296,13 @@ function do_autosave()
     autosave[pid] = {
       survey: ce.survey.val(),
       sendmail: {},
+      preview: {},
       last_modified: ce.last_modified.val(),
     };
     ce.sendmail.each( function() {
-      autosave[pid].sendmail[this.name] = {
-        md:this.value,
-        html:ce.preview.filter('.'+this.name).html(),
-      }
+      const name = this.name;
+      const value = this.value;
+      autosave[pid].sendmail[name] = value;
     });
   } else {
     delete autosave[pid];
@@ -343,7 +362,7 @@ jQuery(document).ready( function($) {
   // dual maintenance and possible inconsistency that could result from that
   //------------------------------------------------------------
 
-  update_content_form();
+  populate_form();
 
   // setup up timer to hold edit lock
   hold_lock();

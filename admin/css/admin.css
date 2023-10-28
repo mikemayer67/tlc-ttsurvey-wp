@@ -333,7 +333,7 @@
 }
 
 #tlc-ttsurvey-admin .content div.content-block textarea {
-  height:15em;
+  height:10em;
 }
 
 #tlc-ttsurvey-admin .content .nav-tab-wrapper.survey {
@@ -367,6 +367,16 @@
 
 #tlc-ttsurvey-admin .content textarea.invalid {
   border-color:#b00;
+}
+
+#tlc-ttsurvey-admin div.block.sendmail h3 {
+  margin-top:2em;
+  margin-bottom:5px;
+}
+
+#tlc-ttsurvey-admin .sendmail.info {
+  font-weight: 300;
+  margin-bottom:1em;
 }
 
 #tlc-ttsurvey-admin .sendmail.preview {
