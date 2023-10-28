@@ -29,6 +29,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/sendmail.php');
 
 const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
@@ -263,6 +264,8 @@ function reopen_survey($post_id)
 
   update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
 
+  log_info("Suvey $name ($post_id) reopened");
+
   return true;
 }
 
@@ -296,6 +299,10 @@ function create_new_survey($name)
 
   update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
   update_post_meta($post_id,'responses',0);
+
+  log_info("Created new survey $name");
+
+  return true;
 }
 
 
@@ -329,20 +336,16 @@ function update_survey_content_from_post()
   $pid = $_POST['pid'] ?? '';
   $cur_pid = $current['post_id'];
 
-  log_dev("pid:$pid, cur_pid:$cur_pid");
-
   if(strcmp($pid,$cur_pid)!=0) {
     log_warning("Attempted to update survey $pid, current is $cur_pid");
     return null;
   }
 
-  $data = array();
-  $keys = array('survey','welcome',);
-  foreach( $keys as $key ) {
+  $survey = $_POST['survey'] ?? '';
+  $data = array('survey' => $survey);
+  foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
     $data[$key] = $_POST[$key] ?? '';
   }
-
-  log_dev("data: ".print_r($data,true));
 
   $rval = wp_update_post(array(
     'ID' => $pid,
@@ -350,8 +353,6 @@ function update_survey_content_from_post()
   ));
 
   wp_save_post_revision($pid);
-
-  log_dev("rval: $rval");
 
   if($rval) {
     $name = $current['name'];

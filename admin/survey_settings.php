@@ -24,7 +24,8 @@ function add_settings_form()
   add_settings_status();
   add_admin_settings();
   add_pdf_uri_setting();
-  add_advanced_settings();
+  add_log_settings();
+  add_post_editor();
 
   echo "<div class='button-box'>";
   echo "<input type='submit' class= 'submit button button-primary button-large' value='Save'>";
@@ -80,33 +81,43 @@ function add_settings_status()
 
 function add_admin_settings()
 {
-  echo "<div class='label'>Survey Admins</div>";
+  echo "<div class='label'>Survey Admins<span class='admin-error'></span></div>";
   echo "<table class='caps'>";
-  echo "<tr><th></th><th>Manage</th><th>Content</th><th>Responses</th></tr>";
+  echo "<tr><th></th>";
+  foreach(explode(' ','Primary Manage Content Response Tech') as $role) {
+    echo "<th>$role</th>";
+  }
+  echo "</tr>";
 
   $caps = survey_capabilities();
+  $primary_admin = survey_primary_admin();
   foreach(get_users() as $user) {
     $id = $user->id;
     $name = $user->display_name;
+    $primary = $id == $primary_admin ? "checked" : "";
     $manage = $caps['manage'][$id] ? "checked" : "";
     $content = $caps['content'][$id] ? "checked" : "";
     $response = $caps['responses'][$id] ? "checked" : "";
+    $tech = $caps['tech'][$id] ? "checked" : "";
     $hidden_manage = '';
-
-    if(user_can($id,'manage_options')) {
-      $manage = 'checked disabled';
-      $hidden_manage = "<input type='hidden' value=1 name='caps[manage][$id]'>";
-    }
 
     echo "<tr>";
     echo "<td class='name'>$name</td>";
     echo "<td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[manage][$id]' $manage>";
-    echo $hiden_manage;
+    echo "<input class='primary' type='radio' name='primary_admin' value='$id' $primary>";
     echo "</div></td><td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[content][$id]' $content>";
+    if(user_can($id,'manage_options')) {
+      echo "<input type='checkbox' checked disabled>";
+      echo "<input class='manage $id' type='hidden' value=1 name='caps[manage][$id]'>";
+    } else {
+      echo "<input class='manage $id' type='checkbox' value=1 name='caps[manage][$id]' $manage>";
+    }
     echo "</div></td><td><div>";
-    echo "  <input type='checkbox' value=1 name='caps[responses][$id]' $response>";
+    echo "<input type='checkbox' value=1 name='caps[content][$id]' $content>";
+    echo "</div></td><td><div>";
+    echo "<input type='checkbox' value=1 name='caps[responses][$id]' $response>";
+    echo "</div></td><td><div>";
+    echo "<input type='checkbox' value=1 name='caps[tech][$id]' $tech>";
     echo "</div></td>";
     echo "</tr>";
 
@@ -118,27 +129,53 @@ function add_pdf_uri_setting()
 {
   $pdf_uri = survey_pdf_uri();
   $pattern = '^(http|https|ftp|ftps)://[a-zA-Z].*$';
-  echo "<div class='label'>Survey Download URL</div>";
+  echo "<div class='label'>Download URL</div>";
   echo "<div class='info'>Location for a downloadable copy of the survey</div>";
   echo "<div class='settings'>";
   echo "<input type='URL' size=50 name='pdf_uri' value='$pdf_uri' pattern='$pattern'>";
   echo "</div>";
 }
 
-function add_advanced_settings()
+function add_log_settings()
 {
-  echo "<div class='label'>Advanced Settings</div>";
+  echo "<div class='label'>Logging</div>";
   echo "<table class='settings'>";
 
   $cur_level = survey_log_level();
   echo "<tr>";
-  echo "<td class='input-label'>Logging</td>";
+  echo "<td class='input-label'>Log Level</td>";
   echo "<td class='input-value'><select name='log_level'>";
   foreach(LOGGER_ as $log_level => $label) {
     $selected = ($log_level == $cur_level) ? "selected" : "";
     echo "<option value='$log_level' $selected>$label</option>";
   }
   echo "</select></td></tr>";
+
+  echo "<tr><td></td>";
+  echo "<td class='input-value'>";
+  $log_href = plugin_url(PLUGIN_LOG_FILE);
+  $timestamp = date('YmdHis');
+  $logfile = "TimeAndTalentSurvey_$timestamp.log";
+  echo "<a class='log-file' href='$log_href' target='_blank'>View Log File</a>";
+  echo "<br>";
+  echo "<a class='log-file' href='$log_href' download='$logfile'>Download Log File</a>";
+  echo "</td></tr>";
+
+  echo "<tr><td></td>";
+  echo "<td class='input-value'>";
+  echo "<button class='clear-log'>Clear Log</button>";
+  echo "</td></tr>";
+
+  echo "</table>";
+}
+
+function add_post_editor()
+{
+  echo "<div class='label'>Survey Post Editor</div>";
+  echo "<div class='info'>";
+  echo "Enable deletion, renaming, and revision management of surveys in the wp_posts table. ";
+  echo "</div>";
+  echo "<table class='settings'>";
 
   $cur_post_ui = survey_post_ui();
   echo "<tr>";
