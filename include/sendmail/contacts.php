@@ -19,7 +19,7 @@ function ids_to_email_list($ids) {
     $user = get_user_by('ID',$id);
     $name = $user->display_name;
     $email = $user->user_email;
-    $rval[] = "<a href='mailto:$email'>$name</a>";
+    $rval[] = "<a href='mailto:$email?subject=Time and Talent Survey'>$name</a>";
   }
   switch(count($rval)) {
   case 1:
