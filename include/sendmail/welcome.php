@@ -1,6 +1,11 @@
 <?php
 namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
+
+require_once plugin_path('include/users.php');
+
+$users_with_email = get_users_by_email($email);
+
 ?>
 
 <?=$content?>
@@ -13,6 +18,11 @@ if( ! defined('WPINC') ) { die; }
 </div>
 
 <?php
+if(count($users_with_email) > 1) {
+  $ids = implode(", ", $users_with_email);
+  echo "<div>Other Users with email $email: $ids</div>";
+}
+
 require plugin_path("include/sendmail/contacts.php");
 
 

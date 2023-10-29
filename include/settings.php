@@ -16,16 +16,28 @@ const OPTIONS_KEY = 'tlc_ttsurvey_options';
 const CAPS_KEY = 'caps';
 const PDF_URI_KEY = 'pdf_href';
 const LOG_LEVEL_KEY = 'log_level';
-const POST_UI_KEY = 'post_ui';
+const SURVEY_POST_UI_KEY = 'survey_post_ui';
+const USER_POST_UI_KEY = 'user_post_ui';
 const PRIMARY_ADMIN_KEY = 'primary_admin';
 
 $option_defaults = array(
   CAPS_KEY => [],
   PDF_URI_KEY => '',
   LOG_LEVEL_KEY => 'INFO',
-  POST_UI_KEY => 'NONE',
+  SURVEY_POST_UI_KEY => 'NONE',
+  USER_POST_UI_KEY => 'NONE',
   PRIMARY_ADMIN_KEY => '',
 );
+
+const POST_UI_NONE = 'NONE';
+const POST_UI_POSTS = 'POSTS';
+const POST_UI_TOOLS = 'TOOLS';
+const POST_UI_ = array(
+  'NONE' => "Disabled",
+  'POSTS' => "Posts menu",
+  'TOOLS' => "Tools menu",
+);
+
 
 /**
  * get option value
@@ -115,7 +127,11 @@ function survey_log_level() {
  * @return POST_UI_NONE, POST_UI_POSTS, POST_UI_TOOLS,
  */
 function survey_post_ui() {
-  return get_survey_option(POST_UI_KEY);
+  return get_survey_option(SURVEY_POST_UI_KEY);
+}
+
+function user_post_ui() {
+  return get_survey_option(USER_POST_UI_KEY);
 }
 
 /**
@@ -166,7 +182,8 @@ function update_options_from_post()
   $options[PRIMARY_ADMIN_KEY] = $_POST['primary_admin'];
 
   $options[LOG_LEVEL_KEY] = strtoupper($_POST['log_level']);
-  $options[POST_UI_KEY] = strtoupper($_POST['post_ui']);
+  $options[SURVEY_POST_UI_KEY] = strtoupper($_POST['survey_post_ui']);
+  $options[USER_POST_UI_KEY] = strtoupper($_POST['user_post_ui']);
 
   $options[PDF_URI_KEY] = sanitize_url(
     $_POST['pdf_uri'],
@@ -194,7 +211,9 @@ function update_options_from_post()
   update_option(OPTIONS_KEY,$options);
 
   require_once plugin_path('include/surveys.php');
+  require_once plugin_path('include/users.php');
   register_survey_post_type();
+  register_userid_post_type();
 }
 
 

@@ -35,15 +35,6 @@ const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
-const POST_UI_NONE = 'NONE';
-const POST_UI_POSTS = 'POSTS';
-const POST_UI_TOOLS = 'TOOLS';
-const POST_UI_ = array(
-  'NONE' => "Disabled",
-  'POSTS' => "Posts menu",
-  'TOOLS' => "Tools menu",
-);
-
 /**
  * Register the custom post type
  **/

@@ -131,6 +131,7 @@ if( is_admin() ) /* Admin setup */
 {
   require_once plugin_path('admin/setup.php');
   require_once plugin_path('include/surveys.php');
+  require_once plugin_path('include/users.php');
 }
 else /* Non-admin setup */
 {

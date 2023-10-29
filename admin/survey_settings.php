@@ -179,8 +179,18 @@ function add_post_editor()
 
   $cur_post_ui = survey_post_ui();
   echo "<tr>";
-  echo "<td class='input-label'>Post UI</td>";
-  echo "<td class='input-value'><select name='post_ui'>";
+  echo "<td class='input-label'>Survey Post UI</td>";
+  echo "<td class='input-value'><select name='survey_post_ui'>";
+  foreach(POST_UI_ as $post_ui => $label) {
+    $selected = ($post_ui == $cur_post_ui) ? "selected" : "";
+    echo "<option value='$post_ui' $selected>$label</option>";
+  }
+  echo "</select></td></tr>";
+
+  $cur_post_ui = user_post_ui();
+  echo "<tr>";
+  echo "<td class='input-label'>User Post UI</td>";
+  echo "<td class='input-value'><select name='user_post_ui'>";
   foreach(POST_UI_ as $post_ui => $label) {
     $selected = ($post_ui == $cur_post_ui) ? "selected" : "";
     echo "<option value='$post_ui' $selected>$label</option>";

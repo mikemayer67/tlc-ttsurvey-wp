@@ -131,13 +131,17 @@ function add_survey_url()
 function add_advanced()
 {
   $log_level = LOGGER_[survey_log_level()];
-  $post_ui = POST_UI_[survey_post_ui()];
+  $survey_post_ui = POST_UI_[survey_post_ui()];
+  $user_post_ui = POST_UI_[user_post_ui()];
   echo "<tr>";
   echo "  <td class='label'>Log Level</td>";
   echo "  <td class='value'>$log_level</td>";
   echo "</tr><tr>";
-  echo "  <td class='label'>Post UI</td>";
-  echo "  <td class='value'>$post_ui</td>";
+  echo "  <td class='label'>Survey Post UI</td>";
+  echo "  <td class='value'>$survey_post_ui</td>";
+  echo "</tr><tr>";
+  echo "  <td class='label'>User Post UI</td>";
+  echo "  <td class='value'>$user_post_ui</td>";
   echo "</tr>";
 }
 

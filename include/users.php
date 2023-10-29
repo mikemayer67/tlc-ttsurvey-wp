@@ -87,10 +87,23 @@ const USERID_POST_TYPE = 'tlc-ttsurvey-id';
 
 function register_userid_post_type()
 {
+  switch( user_post_ui() )
+  {
+  case POST_UI_POSTS:
+    $show_in_menu = 'edit.php';
+    break;
+  case POST_UI_TOOLS:
+    $show_in_menu = 'tools.php';
+    break;
+  default:
+    $show_in_menu = false;
+    break;
+  }
   register_post_type( USERID_POST_TYPE,
     array(
       'labels' => array(
         'name' => 'TLC TTSurvey Participants',
+        'menu_name' => "Time & Talent Participants",
         'singular_name' => 'Participant',
         'add_new' => 'New Participant',
         'add_new_item' => 'Add New Participant',
@@ -102,10 +115,11 @@ function register_userid_post_type()
         'not_found_in_trash' => 'No Participants found in Trash',
       ),
       'has_archive' => false,
+      'supports' => array('title','editor'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
-      'show_in_menu' => false,
+      'show_in_menu' => $show_in_menu,
     ),
   );
 }
@@ -128,7 +142,20 @@ function users_deactivate()
   unregister_post_type(USERID_POST_TYPE);
 }
 
+function users_edit_form_top($post)
+{
+  $type = $post->post_type;
+  if($post->post_type == USERID_POST_TYPE) {
+    $content_url = admin_url() . "admin.php?page=" . SETTINGS_PAGE_SLUG;
+    echo "<p class='tlc-post-warning'>";
+    echo "Be very careful editing this data.<br>";
+    echo "The JSON formatting must be preserved to avoid messing up the user data.";
+    echo "</p>";
+  }
+}
+
 add_action('init',ns('users_init'));
+add_action('edit_form_top',ns('users_edit_form_top'));
 
 
 /**
@@ -249,6 +276,26 @@ function get_user_anonid($userid)
   }
   log_warning("No anonid found for $userid");
   return null;
+}
+
+function get_users_by_email($email)
+{
+  $posts = get_posts(
+    array(
+      'post_type' => USERID_POST_TYPE,
+      'numberposts' => -1,
+      'meta_key' => 'email',
+      'meta_value' => $email,
+    )
+  );
+
+  $users = array();
+  foreach( $posts as $post) {
+    $users[] = $post->ID;
+  }
+  log_dev("Users with email $email: ".print_r($users,true));
+
+  return $users;
 }
 
 /**
