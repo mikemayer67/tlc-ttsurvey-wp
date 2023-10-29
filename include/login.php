@@ -259,7 +259,8 @@ function register_new_user(&$error=null)
     return false;
   }
 
-  $token = add_new_user($userid,$password1,$firstname,$lastname,$email);
+  $user = User::create($userid,$password1,$firstname,$lastname,$email);
+  $token = $user->access_token();
 
   log_info("Registered new user $firstname $lastname with userid $userid and token $token");
 
