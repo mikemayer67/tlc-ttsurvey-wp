@@ -207,7 +207,7 @@ function handle_send_userid()
   log_dev("handle_send_userid");
   require_once plugin_path('include/sendmail.php');
   $email = $_POST['email'];
-  if(sendmail_userid($email)) {
+  if(sendmail_login_recovery($email)) {
     set_status_info("Sent userid/password to $email");
   } else {
     set_status_warning("Unrecognized email address");

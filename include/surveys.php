@@ -45,15 +45,9 @@ function register_survey_post_type()
 {
   switch( survey_post_ui() )
   {
-  case POST_UI_POSTS:
-    $show_in_menu = 'edit.php';
-    break;
-  case POST_UI_TOOLS:
-    $show_in_menu = 'tools.php';
-    break;
-  default:
-    $show_in_menu = false;
-    break;
+  case POST_UI_POSTS: $show_in_menu = 'edit.php';  break;
+  case POST_UI_TOOLS: $show_in_menu = 'tools.php'; break;
+  default:            $show_in_menu = false;       break;
   }
   register_post_type( SURVEY_POST_TYPE,
     array(

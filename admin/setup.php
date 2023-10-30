@@ -13,6 +13,8 @@ const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/users.php');
 
 function handle_admin_init()
 {

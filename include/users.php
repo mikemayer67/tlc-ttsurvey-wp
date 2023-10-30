@@ -17,15 +17,17 @@ require_once plugin_path('include/validation.php');
  * to a single participant userid or anonymous id (anonid)
  *
  * The post title contains the userid or anonid
- * The post content contains validation information
- *   For user posts, contains a hash of the password
- *   For anonymous posts, contains a hash of the user's post id with the anonid
+ * The post content is a JSON string with the following fields:
  *
- * Post metadata is used to provide additional user information
- *   - name: actual name stored as an associate array with keys 'first' and 'last'
- *   - email: optional
- *   - access token: set in cookie
- * There is no biographical metadata associated with anonymous posts
+ *   Participant Entries:
+ *   - firstname
+ *   - lastname
+ *   - email (optional)
+ *   - access_token
+ *   - pw_hash: password hash
+ *
+ *   Anonymous Entries:
+ *   - anon_hash: hash of the anonid and post_id of the corresponding participant.
  *
  * Survey responses from each participant is attached to either a
  *   user post or an anonymous post as meta data. The metadata key 
@@ -143,7 +145,7 @@ function users_edit_form_top($post)
     $content_url = admin_url() . "admin.php?page=" . SETTINGS_PAGE_SLUG;
     echo "<p class='tlc-post-warning'>";
     echo "Be very careful editing this data.<br>";
-    echo "The JSON formatting must be preserved to avoid messing up the user data.";
+    echo "The JSON formatting, the userid, and any hashed value must be preserved to avoid messing up the user data.";
     echo "</p>";
   }
 }
@@ -157,14 +159,14 @@ add_action('edit_form_top',ns('users_edit_form_top'));
 
 class User {
   private $_post_id = null;
-  private $_userid = nul;;
+  private $_userid = null;
   private $_data = null;
 
   private function __construct($post)
   {
-    $_userid = $post->post_title;
-    $_post_id = $post->ID;
-    $_data = json_decode($post,true);
+    $this->_userid = $post->post_title;
+    $this->_post_id = $post->ID;
+    $this->_data = json_decode($post->post_content,true);
   }
 
   /**
@@ -173,15 +175,9 @@ class User {
 
   public static function from_post_id($post_id) 
   {
-    $posts = get_posts(
-      array(
-        'post_type' => USERID_POST_TYPE,
-        'numberposts' => -1,
-        'ID' => $post_id,
-      )
-    );
-    if(!$posts) { return null; }
-    return new User($posts[0]);
+    $post = get_post($post_id);
+    if(!$post) { return null; }
+    return new User($post);
   }
 
   public static function from_userid($userid) 
@@ -198,7 +194,9 @@ class User {
       log_error("Multiple posts associated with userid $userid");
       die;
     }
-    if(!$posts) { return null; }
+    if(!$posts) { 
+      return null; 
+    }
     return new User($posts[0]);
   }
 
@@ -255,7 +253,7 @@ class User {
       ),
       true
     );
-
+    
     return User::from_post_id($user_post_id);
   }
 
@@ -269,21 +267,14 @@ class User {
   public function last_name()    { return $this->_data['lastname']     ?? null; }
   public function email()        { return $this->_data['email']        ?? null; }
   public function access_token() { return $this->_data['access_token'] ?? null; }
-
-  public function set_name($firstname,$lastname) 
-  {
-    if(!adjust_and_validate_login_input('name',$firstname)) {
-      log_warning("Cannot update name for $this->_userid: invalid first name ($firstname)");
-      return false;
+  
+  public function display_name() {
+    $first = $this->first_name();
+    $last = $this->last_name();
+    if($first && $last) {
+      return implode(' ',array($first,$last));
     }
-    if(!adjust_and_validate_login_input('name',$lastname)) {
-      log_warning("Cannot update name for $this->_userid: invalid last name ($lastname)");
-      return false;
-    }
-    $this->_data['firstname'] = $firstname;
-    $this->_data['lastname'] = $lastname;
-    $this->commit();
-    return true;
+    return null;
   }
 
   /**
@@ -300,8 +291,26 @@ class User {
    * Setters
    **/
 
+  public function set_name($firstname,$lastname) 
+  {
+    log_dev("User::set_name($firstname,$lastname)");
+    if(!adjust_and_validate_login_input('name',$firstname)) {
+      log_warning("Cannot update name for $this->_userid: invalid first name ($firstname)");
+      return false;
+    }
+    if(!adjust_and_validate_login_input('name',$lastname)) {
+      log_warning("Cannot update name for $this->_userid: invalid last name ($lastname)");
+      return false;
+    }
+    $this->_data['firstname'] = $firstname;
+    $this->_data['lastname'] = $lastname;
+    $this->commit();
+    return true;
+  }
+
   public function set_email($email)
   {
+    log_dev("User::set_email($firstname,$email)");
     if(!adjust_and_validate_login_input('email',$email) ) {
       log_warning("Cannot update email for $this->_userid: invalid email ($email)");
       return false;
@@ -315,8 +324,14 @@ class User {
     return true;
   }
 
+  public function clear_email()
+  {
+    $this->set_email(null);
+  }
+
   public function set_password($password)
   {
+    log_dev("User::set_password($firstname,$password)");
     if(!adjust_and_validate_login_input('password',$password) ) {
       log_warning("Cannot update password for $this->_userid: invalid password");
       return false;
@@ -328,17 +343,20 @@ class User {
 
   public function regenerate_access_token()
   {
+    log_dev("User::regenerate_access_token()");
     $new_token = gen_access_token();
     $this->_data['access_token'] = $new_token;
     $this->commit();
+    log_dev("   token=$new_token");
     return $new_token;
   }
 
   private function commit()
   {
+    log_dev("User::commit()");
     wp_update_post(array(
       'ID' => $this->_post_id,
-      'post_content' => wp_slash(json_encode($this->_data));
+      'post_content' => wp_slash(json_encode($this->_data)),
     ));
   }
 
@@ -348,6 +366,7 @@ class User {
 
   public function anon_proxy()
   {
+    log_dev("User::anon_proxy()");
     $posts = get_posts(
       array(
         'post_type' => USERID_POST_TYPE,
@@ -357,6 +376,7 @@ class User {
     foreach($posts as $post) {
       $cand = new User($post);
       if($cand->is_anon_proxy_for($this->_post_id)) {
+        log_dev("  proxy = ".print_r($cand));
         return $cand;
       }
     }
@@ -416,6 +436,7 @@ function validate_user_password($userid,$password)
 
 function validate_user_access_token($userid,$token)
 {
+  log_dev("validate_user_access_token($userid,$token)");
   $user = User::from_userid($userid);
   if(!$user) { return false; }
   return $token == $user->access_token();
