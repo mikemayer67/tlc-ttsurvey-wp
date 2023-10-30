@@ -150,6 +150,9 @@ function login_init()
 
     switch($_POST['action'] ?? null)
     {
+    case 'login':
+      handle_login();
+      break;
     case 'resume':
       handle_login_resume();
       break;
@@ -167,6 +170,30 @@ function login_init()
 }
 
 add_action('init',ns('login_init'));
+
+function handle_login()
+{
+  log_dev("handle_login");
+  $userid = $_POST['userid'];
+  $user = User::from_userid($userid);
+  if($user) {
+    login_dev("valid user($userid)");
+    $password = $_POST['password'];
+    if($user->verify_password($password)) {
+      login_dev("valid password");
+      CookieJar::instance()->set_active_userid($userid);
+      if($_POST['remember'] ?? null) {
+        $token = $user->access_token();
+        remember_user_token($userid,$token);
+      } else {
+        forget_user_token($userid);
+      }
+      clear_status();
+      return;
+    }
+  }
+  set_status_warning("Invalid userid or password");
+}
 
 function handle_login_resume()
 {

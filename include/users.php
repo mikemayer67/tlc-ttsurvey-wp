@@ -284,7 +284,8 @@ class User {
   public function verify_password($password)
   {
     $pw_hash = $this->_data['pw_hash'] ?? '';
-    return password_verify($this->_userid, $pw_hash);
+    $rval = password_verify($password, $pw_hash);
+    return $rval;
   }
 
   /**

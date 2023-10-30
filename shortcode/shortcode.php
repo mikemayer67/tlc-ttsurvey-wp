@@ -62,6 +62,7 @@ function status_message($msg=null,$level=INFO_STATUS)
 function set_status_info($msg) { status_message($msg,INFO_STATUS); }
 function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
 function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
+function clear_status() { status_message(null); }
 
 
 function _shortcode_page($action,$page=null)
