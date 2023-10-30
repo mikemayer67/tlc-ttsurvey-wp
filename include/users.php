@@ -17,15 +17,17 @@ require_once plugin_path('include/validation.php');
  * to a single participant userid or anonymous id (anonid)
  *
  * The post title contains the userid or anonid
- * The post content contains validation information
- *   For user posts, contains a hash of the password
- *   For anonymous posts, contains a hash of the user's post id with the anonid
+ * The post content is a JSON string with the following fields:
  *
- * Post metadata is used to provide additional user information
- *   - name: actual name stored as an associate array with keys 'first' and 'last'
- *   - email: optional
- *   - access token: set in cookie
- * There is no biographical metadata associated with anonymous posts
+ *   Participant Entries:
+ *   - firstname
+ *   - lastname
+ *   - email (optional)
+ *   - access_token
+ *   - pw_hash: password hash
+ *
+ *   Anonymous Entries:
+ *   - anon_hash: hash of the anonid and post_id of the corresponding participant.
  *
  * Survey responses from each participant is attached to either a
  *   user post or an anonymous post as meta data. The metadata key 
@@ -87,10 +89,17 @@ const USERID_POST_TYPE = 'tlc-ttsurvey-id';
 
 function register_userid_post_type()
 {
+  switch( user_post_ui() )
+  {
+  case POST_UI_POSTS: $show_in_menu = 'edit.php';  break;
+  case POST_UI_TOOLS: $show_in_menu = 'tools.php'; break;
+  default:             $show_in_menu = false;      break;
+  }
   register_post_type( USERID_POST_TYPE,
     array(
       'labels' => array(
         'name' => 'TLC TTSurvey Participants',
+        'menu_name' => "Time & Talent Participants",
         'singular_name' => 'Participant',
         'add_new' => 'New Participant',
         'add_new_item' => 'Add New Participant',
@@ -102,10 +111,11 @@ function register_userid_post_type()
         'not_found_in_trash' => 'No Participants found in Trash',
       ),
       'has_archive' => false,
+      'supports' => array('title','editor'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
-      'show_in_menu' => false,
+      'show_in_menu' => $show_in_menu,
     ),
   );
 }
@@ -128,137 +138,270 @@ function users_deactivate()
   unregister_post_type(USERID_POST_TYPE);
 }
 
+function users_edit_form_top($post)
+{
+  $type = $post->post_type;
+  if($post->post_type == USERID_POST_TYPE) {
+    $content_url = admin_url() . "admin.php?page=" . SETTINGS_PAGE_SLUG;
+    echo "<p class='tlc-post-warning'>";
+    echo "Be very careful editing this data.<br>";
+    echo "The JSON formatting, the userid, and any hashed value must be preserved to avoid messing up the user data.";
+    echo "</p>";
+  }
+}
+
 add_action('init',ns('users_init'));
-
-
-/**
- * login validation
- **/
-
-
-function validate_user_password($userid,$password)
-{
-  log_dev("validate_user_password($userid,*****);");
-  $post = get_user_post($userid);
-  if(!$post) { 
-    log_info("Failed to validate password:: Invalid userid $userid");
-    return false;
-  }
-  $pw_hash = $post->content;
-  if(!password_verify($userid,$pw_hash)) {
-    log_info("Failed to validate password:: Incorrect password for $userid");
-    return false;
-  }
-  log_dev(" => password validated for $userid");
-  return true;
-}
-
-function validate_user_access_token($userid,$token)
-{
-  $post_id = get_user_post_id($userid);
-  if(!$post_id) { return false; }
-
-  $expected_token = get_post_meta($post_id,'access_token')[0] ?? "#";
-  return $token === $expected_token;
-}
+add_action('edit_form_top',ns('users_edit_form_top'));
 
 /**
- * User info lookup functions
+ * User class
  **/
 
-function get_user_post($userid)
-{
-  $posts = get_posts(
-    array(
-      'post_type' => USERID_POST_TYPE,
-      'numberposts' => -1,
-      'title' => $userid,
-    )
-  );
-  if(count($posts) > 1) {
-    # log error both to the plugin log and to the php error log
-    log_error("Multiple posts associated with userid $userid");
-    die;
+class User {
+  private $_post_id = null;
+  private $_userid = null;
+  private $_data = null;
+
+  private function __construct($post)
+  {
+    $this->_userid = $post->post_title;
+    $this->_post_id = $post->ID;
+    $this->_data = json_decode($post->post_content,true);
   }
-  if(!$posts) { 
+
+  /**
+   * User factory functions
+   **/
+
+  public static function from_post_id($post_id) 
+  {
+    $post = get_post($post_id);
+    if(!$post) { return null; }
+    return new User($post);
+  }
+
+  public static function from_userid($userid) 
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+        'title' => $userid,
+      )
+    );
+    if(count($posts) > 1) {
+      # log error both to the plugin log and to the php error log
+      log_error("Multiple posts associated with userid $userid");
+      die;
+    }
+    if(!$posts) { 
+      return null; 
+    }
+    return new User($posts[0]);
+  }
+
+  public static function from_email($email) 
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+      )
+    );
+    $users = array();
+    foreach($posts as $post) {
+      $cand = new User($post);
+      if($cand->email() == $email) { $users[] = $cand; }
+    }
+    return $users;
+  }
+
+  public static function create($userid,$password,$firstname,$lastname,$email=null)
+  {
+    $content = array(
+      'pw_hash' => password_hash($password,PASSWORD_DEFAULT),
+      'firstname' => $firstname,
+      'lastname' => $lastname,
+      'access_token' => gen_access_token(),
+    );
+    if($email) { $content['email'] = $email; }
+    
+    $user_post_id = wp_insert_post(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'post_title' => $userid,
+        'post_content' => json_encode($content),
+        'post_status' => 'publish',
+      ),
+      true
+    );
+
+    do {
+      $anonid = 'anon_'.random_int(100000,999999);
+    } while( User::from_userid($anonid) );
+
+    $anon_content = array(
+      'anon_hash' => password_hash("$anonid/$user_post_id",PASSWORD_DEFAULT),
+    );
+
+    $anon_post_id = wp_insert_post(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'post_title' => $anonid,
+        'post_content' => json_encode($anon_content),
+        'post_status' => 'publish',
+      ),
+      true
+    );
+    
+    return User::from_post_id($user_post_id);
+  }
+
+  /**
+   * Getters
+   **/
+
+  public function userid()       { return $this->_userid;                       }
+  public function post_id()      { return $this->_post_id;                      }
+  public function first_name()   { return $this->_data['firstname']    ?? null; }
+  public function last_name()    { return $this->_data['lastname']     ?? null; }
+  public function email()        { return $this->_data['email']        ?? null; }
+  public function access_token() { return $this->_data['access_token'] ?? null; }
+  
+  public function display_name() {
+    $first = $this->first_name();
+    $last = $this->last_name();
+    if($first && $last) {
+      return implode(' ',array($first,$last));
+    }
     return null;
   }
-  return $posts[0];
-}
 
-function get_user_post_id($userid)
-{
-  $post = get_user_post($userid);
-  if(!$post) { return null; }
+  /**
+   * Validation
+   **/
 
-  $post_id = $post->ID;
-  return $post_id;
-}
-
-function get_user_name($userid)
-{
-  $post_id = get_user_post_id($userid);
-  if(!$post_id) { return null; }
-  $name = get_post_meta($post_id,'name');
-  return $name['first'] . ' ' . $name['last'];
-}
-
-function get_user_firstname($userid)
-{
-  $post_id = get_user_post_id($userid);
-  if(!$post_id) { return null; }
-  $name = get_post_meta($post_id,'name');
-  return $name['first'];
-}
-
-function get_user_lastname($userid)
-{
-  $post_id = get_user_post_id($userid);
-  if(!$post_id) { return null; }
-  $name = get_post_meta($post_id,'name');
-  return $name['last'];
-}
-
-function get_user_email($userid)
-{
-  $post_id = get_user_post_id($userid);
-  if(!$post_id) { return null; }
-
-  $email = get_post_meta($post_id,'email');
-  return $email;
-}
-
-function get_user_anonid($userid)
-{
-  $user_post_id = get_user_post_id($userid);
-  if(!$user_post_id) { return null; }
-
-  $posts = get_posts(
-    array(
-      'post_type' => USERID_POST_TYPE,
-      'numberposts' => -1,
-    )
-  );
-
-  foreach($posts as $post) {
-    $anonid = $post->title;
-    $hash = $post->content;
-    if(password_verify("$anonid/$user_post_id",$hash)) {
-      return $anonid;
-    }
+  public function verify_password($password)
+  {
+    $pw_hash = $this->_data['pw_hash'] ?? '';
+    $rval = password_verify($password, $pw_hash);
+    return $rval;
   }
-  log_warning("No anonid found for $userid");
-  return null;
+
+  /**
+   * Setters
+   **/
+
+  public function set_name($firstname,$lastname) 
+  {
+    log_dev("User::set_name($firstname,$lastname)");
+    if(!adjust_and_validate_login_input('name',$firstname)) {
+      log_warning("Cannot update name for $this->_userid: invalid first name ($firstname)");
+      return false;
+    }
+    if(!adjust_and_validate_login_input('name',$lastname)) {
+      log_warning("Cannot update name for $this->_userid: invalid last name ($lastname)");
+      return false;
+    }
+    $this->_data['firstname'] = $firstname;
+    $this->_data['lastname'] = $lastname;
+    $this->commit();
+    return true;
+  }
+
+  public function set_email($email)
+  {
+    log_dev("User::set_email($firstname,$email)");
+    if(!adjust_and_validate_login_input('email',$email) ) {
+      log_warning("Cannot update email for $this->_userid: invalid email ($email)");
+      return false;
+    }
+    if($email) {
+      $this->_data['email'] = $email;
+    } else {
+      unset($this->_data['email']);
+    }
+    $this->commit();
+    return true;
+  }
+
+  public function clear_email()
+  {
+    $this->set_email(null);
+  }
+
+  public function set_password($password)
+  {
+    log_dev("User::set_password($firstname,$password)");
+    if(!adjust_and_validate_login_input('password',$password) ) {
+      log_warning("Cannot update password for $this->_userid: invalid password");
+      return false;
+    }
+    $this->_data['pw_hash'] = password_hash($password,PASSWORD_DEFAULT);
+    $this->commit();
+    return true;
+  }
+
+  public function regenerate_access_token()
+  {
+    log_dev("User::regenerate_access_token()");
+    $new_token = gen_access_token();
+    $this->_data['access_token'] = $new_token;
+    $this->commit();
+    log_dev("   token=$new_token");
+    return $new_token;
+  }
+
+  private function commit()
+  {
+    log_dev("User::commit()");
+    wp_update_post(array(
+      'ID' => $this->_post_id,
+      'post_content' => wp_slash(json_encode($this->_data)),
+    ));
+  }
+
+  /**
+   * Anonymous Proxy
+   **/
+
+  public function anon_proxy()
+  {
+    log_dev("User::anon_proxy()");
+    $posts = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+      )
+    );
+    foreach($posts as $post) {
+      $cand = new User($post);
+      if($cand->is_anon_proxy_for($this->_post_id)) {
+        log_dev("  proxy = ".print_r($cand));
+        return $cand;
+      }
+    }
+    return null;
+  }
+
+  public function is_anon_proxy_for($user_post_id) 
+  {
+    $hash = $this->_data['anon_hash'] ?? null;
+    if(is_null($hash)) { return null; }
+
+    $anonid = $this->_userid;
+    return password_verify("$anonid/$user_post_id",$hash);
+  }
 }
 
 /**
- * Functions to add new users
+ * support functions
  **/
 
 function is_userid_available($userid)
 {
-  $post_id = get_user_post_id($userid);
-  return $post_id ? false : true;
+  $existing = User::from_userid($userid);
+  return is_null($existing);
 }
 
 function gen_access_token()
@@ -272,115 +415,31 @@ function gen_access_token()
   return $access_token;
 }
 
-function add_new_user($userid, $password, $firstname, $lastname, $email=null)
-{
-  $user_hash = password_hash($password,PASSWORD_DEFAULT);
-
-  $post_args = array(
-    'post_type' => USERID_POST_TYPE,
-    'post_title' => $userid,
-    'post_content' => $user_hash,
-    'post_status' => 'publish',
-  );
-  $user_post_id = wp_insert_post($post_args,true);
-  $name = array('first'=>$firstname, 'last'=>$lastname);
-  $name_id = update_post_meta($user_post_id,'name',$name);
-
-  if($email) {
-    $email_id = update_post_meta($user_post_id,'email',$email);
-  }  
-
-  $access_token = gen_access_token();
-  $access_token_id = update_post_meta($user_post_id,'access_token',$access_token);
-
-  do {
-    $anonid = 'anon_'.random_int(100000,999999);
-  } while( get_user_post_id($anonid) );
-
-  $anon_hash = password_hash("$anonid/$user_post_id",PASSWORD_DEFAULT);
-
-  $anon_args = array(
-    'post_type' => USERID_POST_TYPE,
-    'post_title' => $anonid,
-    'post_content' => $anon_hash,
-    'post_status' => 'publish',
-  );
-
-  $anon_post_id = wp_insert_post($anonid_args,true);
-
-  return $access_token;
-}
-
 /**
- * Functions to update user attributes
+ * login validation
  **/
 
-function update_user_name($userid,$firstsname, $lastname)
+function validate_user_password($userid,$password)
 {
-  $user_post_id = get_user_post_id($userid);
-  if(!$user_post_id) { 
-    log_warning("Cannot update name for invalid userid ($userid)");
+  log_dev("validate_user_password($userid,*****);");
+  $user = User::from_userid($userid);
+  if(!$user) { 
+    log_info("Failed to validate password:: Invalid userid $userid");
     return false;
   }
-  if(!adjust_and_validate_login_input('name',$firstname)) {
-    log_warning("Cannot update name for $userid: invalid first name ($firstname)");
+  if(!$user->verify_password($password)) {
+    log_info("Failed to validate password:: Incorrect password for $userid");
     return false;
   }
-  if(!adjust_and_validate_login_input('name',$lastname)) {
-    log_warning("Cannot update name for $userid: invalid last name ($lastname)");
-    return false;
-  }
-
-  $name = array('first'=>$firstname, 'last'=>$lastname);
-  update_post_meta($user_post_id,'name',$name);
+  log_dev(" => password validated for $userid");
   return true;
 }
 
-function update_user_email($userid,$email)
+function validate_user_access_token($userid,$token)
 {
-  $user_post_id = get_user_post_id($userid);
-  if($user_post_id) { 
-    if(adjust_and_validate_login_input('email',$email) ) {
-      if($email) {
-        update_post_meta($user_post_id,'email',$email);
-      } else {
-        delete_post_meta($user_post_id,'email');
-      }
-      return true;
-    }
-    log_warning("Cannot update email for $userid: invalid email ($email)");
-  } else {
-    log_warning("Cannot update email for invalid userid ($userid)");
-  }
-  return false;
+  log_dev("validate_user_access_token($userid,$token)");
+  $user = User::from_userid($userid);
+  if(!$user) { return false; }
+  return $token == $user->access_token();
 }
 
-function update_user_password($userid,$password)
-{
-  $user_post_id = get_user_post_id($userid);
-  if($user_post_id) { 
-    if( adjust_and_validate_login_input('password',$password) ) {
-      wp_update_post(array(
-        'ID' => $user_post_id,
-        'post_content' => password_hash($password),
-      ));
-      return true;
-    } else {
-      log_warning("Cannot update password for $userid: invalid password");
-    }
-  } else {
-    log_warning("Cannot update password for invalid userid ($userid)");
-  }
-  return false;
-}
-
-function regenerate_user_access_token($userid)
-{
-  $user_post_id = get_user_post_id($userid);
-  if($user_post_id) {
-    $access_token = gen_access_token();
-    update_post_meta($user_post_id,'access_token',$access_token);
-  } else {
-    log_warning("Cannot regenerate access token for invalid userid ($userid)");
-  }
-}

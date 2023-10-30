@@ -150,6 +150,9 @@ function login_init()
 
     switch($_POST['action'] ?? null)
     {
+    case 'login':
+      handle_login();
+      break;
     case 'resume':
       handle_login_resume();
       break;
@@ -167,6 +170,30 @@ function login_init()
 }
 
 add_action('init',ns('login_init'));
+
+function handle_login()
+{
+  log_dev("handle_login");
+  $userid = $_POST['userid'];
+  $user = User::from_userid($userid);
+  if($user) {
+    login_dev("valid user($userid)");
+    $password = $_POST['password'];
+    if($user->verify_password($password)) {
+      login_dev("valid password");
+      CookieJar::instance()->set_active_userid($userid);
+      if($_POST['remember'] ?? null) {
+        $token = $user->access_token();
+        remember_user_token($userid,$token);
+      } else {
+        forget_user_token($userid);
+      }
+      clear_status();
+      return;
+    }
+  }
+  set_status_warning("Invalid userid or password");
+}
 
 function handle_login_resume()
 {
@@ -207,7 +234,7 @@ function handle_send_userid()
   log_dev("handle_send_userid");
   require_once plugin_path('include/sendmail.php');
   $email = $_POST['email'];
-  if(sendmail_userid($email)) {
+  if(sendmail_login_recovery($email)) {
     set_status_info("Sent userid/password to $email");
   } else {
     set_status_warning("Unrecognized email address");
@@ -259,7 +286,8 @@ function register_new_user(&$error=null)
     return false;
   }
 
-  $token = add_new_user($userid,$password1,$firstname,$lastname,$email);
+  $user = User::create($userid,$password1,$firstname,$lastname,$email);
+  $token = $user->access_token();
 
   log_info("Registered new user $firstname $lastname with userid $userid and token $token");
 

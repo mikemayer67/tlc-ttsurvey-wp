@@ -35,15 +35,6 @@ const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 
-const POST_UI_NONE = 'NONE';
-const POST_UI_POSTS = 'POSTS';
-const POST_UI_TOOLS = 'TOOLS';
-const POST_UI_ = array(
-  'NONE' => "Disabled",
-  'POSTS' => "Posts menu",
-  'TOOLS' => "Tools menu",
-);
-
 /**
  * Register the custom post type
  **/
@@ -54,15 +45,9 @@ function register_survey_post_type()
 {
   switch( survey_post_ui() )
   {
-  case POST_UI_POSTS:
-    $show_in_menu = 'edit.php';
-    break;
-  case POST_UI_TOOLS:
-    $show_in_menu = 'tools.php';
-    break;
-  default:
-    $show_in_menu = false;
-    break;
+  case POST_UI_POSTS: $show_in_menu = 'edit.php';  break;
+  case POST_UI_TOOLS: $show_in_menu = 'tools.php'; break;
+  default:            $show_in_menu = false;       break;
   }
   register_post_type( SURVEY_POST_TYPE,
     array(

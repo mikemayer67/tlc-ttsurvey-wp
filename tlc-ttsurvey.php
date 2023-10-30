@@ -130,7 +130,6 @@ add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 if( is_admin() ) /* Admin setup */
 {
   require_once plugin_path('admin/setup.php');
-  require_once plugin_path('include/surveys.php');
 }
 else /* Non-admin setup */
 {
