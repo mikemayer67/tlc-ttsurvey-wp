@@ -7,14 +7,9 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const LOGIN_FORM_NONCE = 'tlc-ttsurvey-login';
-
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/login.php');
-
-/**
- * handle login 
 
 /**
  * handle the plugin shortcode
@@ -43,9 +38,9 @@ function is_first_survey_on_page()
   }
 }
 
-const INFO_STATUS = 0;
-const WARNING_STATUS = 1;
-const ERROR_STATUS = 2;
+const INFO_STATUS = 'info';
+const WARNING_STATUS = 'warning';
+const ERROR_STATUS = 'error';
 function status_message($msg=null,$level=INFO_STATUS)
 {
   static $status = null;
@@ -68,13 +63,9 @@ function clear_status() { status_message(null); }
 function _shortcode_page($action,$page=null)
 {
   static $_shortcut_page = null;
-  if($action == '_get') {
-    return $_shortcode_page;
-  } elseif($action == '_set') {
-    $_shortcode_page = $page;
-  } elseif($action == '_clear') {
-    $_shortcode_page = null;
-  }
+  if($action == '_get')       { return $_shortcode_page;  } 
+  elseif($action == '_set')   { $_shortcode_page = $page; } 
+  elseif($action == '_clear') { $_shortcode_page = null;  }
 }
 
 function current_shortcode_page()
@@ -85,16 +76,8 @@ function current_shortcode_page()
   // - null
   return _shortcode_page('_get') ?? $_GET['tlcpage'] ?? null;
 }
-
-function set_current_shortcode_page($page)
-{
-  _shortcode_page('_set',$page);
-}
-
-function clear_current_shortcode_page()
-{
-  _shortcode_page('_clear');
-}
+function set_current_shortcode_page($page) { _shortcode_page('_set',$page); }
+function clear_current_shortcode_page()    { _shortcode_page('_clear');     }
 
 
 function handle_shortcode($attr,$content=null,$tag=null)
@@ -108,8 +91,10 @@ function handle_shortcode($attr,$content=null,$tag=null)
   echo "<div id='tlc-ttsurvey'>";
   add_noscript();
   add_status_message();
+  echo "<div class='shortcode-content'>"; // used to hot-swap content in AJAX response
   add_shortcode_content();
-  echo "</div>";
+  echo "</div>"; // shortcode-content
+  echo "</div>"; // tlc-ttsurvey
 
   $html = ob_get_contents();
   ob_end_clean();
@@ -136,28 +121,14 @@ function add_status_message()
 {
   $status = status_message();
   if(is_null($status)) { return ; }
-
-  $class = 'status w3-panel w3-card w3-border w3-leftbar';
-
   [$level,$msg] = $status;
-  switch($level)
-  {
-  case INFO_STATUS:
-    $class .= 'w3-pale-green w3-border-green';
-    break;
-  case WARNING_STATUS:
-    $class .= 'w3-pale-yellow w3-border-orange';
-    break;
-  case ERROR_STATUS:
-    $class .= 'w3-pale-red w3-border-red';
-    break;
-  default:
-    log_error("Unexpected survey status level encountered: $level");
-    return;
-  }
-  echo "<div class='$class'>$msg</div>";
+  echo "<div class='status $level w3-panel w3-card w3-border w3-leftbar'>$msg</div>";
 }
 
+/**
+ * This function should only be called when INITIALLY loading the shortcode content
+ *   It is not called when the content is replaced by an AJAX response handler
+ **/
 function add_shortcode_content()
 {
   $current_survey = current_survey();
@@ -167,86 +138,28 @@ function add_shortcode_content()
   }
 
   $page = current_shortcode_page();
-  log_dev("current_shortcode_page = $page");
-  if($page) 
-  {
-    if(in_array($page,['register','login','sendlogin']))
-    {
-      enqueue_login_scripts();
-      require plugin_path("shortcode/$page.php");
-    } elseif( $page=='survey' ) {
-      require plugin_path("shortcode/survey.php");
-    } else {
-      require plugin_path('shortcode/bad_page.php');
-    }
-    return;
-  }
-
   $userid = active_userid();
-  $tokens = cookie_tokens();
 
-  if( $userid ) {
-    require plugin_path('shortcode/survey.php');
+  log_dev("current_shortcode_page=$page / userid=$userid");
+
+  $content_loaded = false;
+  if($userid && !$page) {
+    require_once plugin_path("shortcode/survey.php");
+    $content_loaded = add_survey_content($userid);
+    if($content_loaded) {
+      enqueue_survey_script();
+    }
   }
-  elseif($tokens) {
-    # @@@ TODO: remove this hack
-    enqueue_login_scripts();
-    require plugin_path('shortcode/login.php');
-    #require plugin_path('shortcode/resume.php');
+  if(!$content_loaded) {
+    require_once plugin_path("shortcode/login.php");
+    $content_loaded = add_login_content($page);
+    if($content_loaded) {
+      enqueue_login_script();
+    }
   }
-  else {
-    enqueue_login_scripts();
-    require plugin_path('shortcode/login.php');
+  if(!$content_loaded) {
+    require plugin_path("shortcode/bad_page.php");
   }
-
-  return;
-}
-
-/**
- * Add the script and style enqueing
- */
-
-function register_shortcode_scripts()
-{
-  wp_register_script(
-    'tlc_ttsurvey_shortcode',
-    plugin_url('shortcode/js/shortcode.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-
-  wp_localize_script(
-    'tlc_ttsurvey_shortcode',
-    'shortcode_vars',
-    array(),
-  );
-
-  wp_enqueue_script('tlc_ttsurvey_shortcode');
-}
-
-function enqueue_login_scripts()
-{
-  log_dev("enqueue_login_scripts");
-
-  wp_register_script(
-    'tlc_ttsurvey_login',
-    plugin_url('shortcode/js/login.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-
-  wp_localize_script(
-    'tlc_ttsurvey_login',
-    'login_vars',
-    array(
-      'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => array('login',wp_create_nonce('login')),
-    ),
-  );
-
-  wp_enqueue_script('tlc_ttsurvey_login');
 }
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));

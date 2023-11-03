@@ -15,6 +15,8 @@ require_once plugin_path('include/validation.php');
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
 const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
 
+const LOGIN_FORM_NONCE = 'tlc-ttsurvey-login';
+
 class CookieJar
 {
   private static $_instance = null;

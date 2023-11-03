@@ -1,30 +1,67 @@
 <?php
 namespace TLC\TTSurvey;
 
-/**
- * Handle the user login form
- */
+if(!defined('WPINC')) { die; }
 
-if( ! defined('WPINC') ) { die; }
+require_once plugin_path('include/logger.php');
+require_once plugin_path('include/login.php');
 
-require_once plugin_path('shortcode/_login_elements.php');
+/****************************************************************
+ **
+ ** Login form container
+ ** 
+ ** This is what will repopulated when AJAX is used to swap
+ **  out the login form.
+ **
+ ****************************************************************/
 
-start_login_form("Survey Login","login");
+function add_login_content($page=null)
+{
+  if(!$page) {
+    $tokens = cookie_tokens();
+    if($tokens) { $page = 'resume'; }
+    else        { $page = 'userid';  }
+  }
+  $page = plugin_path("shortcode/login/$page.php");
+  if(!file_exists($page)) {
+    require plugin_path("shortcode/bad_page.php");
+    return false;
+  }
 
-add_login_input("userid");
-add_login_input("password");
+  require $page;
+  return true;
+}
 
-add_login_input("remember",array(
-  "label" => "Remember Me",
-  "value" => True,
-  'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",
-));
 
-add_login_submit("Log in","login");
+function enqueue_login_script()
+{
+  log_dev("enqueue_login_script");
 
-add_login_links([
-  ['forgot login info', 'sendlogin', 'left'],
-  ['register', 'register', 'right'],
-]);
+  wp_register_script(
+    'tlc_ttsurvey_login',
+    plugin_url('shortcode/js/login.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
 
-close_login_form();
+  wp_localize_script(
+    'tlc_ttsurvey_login',
+    'login_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('login',wp_create_nonce('login')),
+    ),
+  );
+
+  wp_enqueue_script('tlc_ttsurvey_login');
+}
+
+
+/****************************************************************
+ **
+ ** Userid/Password
+ **   with links to 
+ **
+ ****************************************************************/
+

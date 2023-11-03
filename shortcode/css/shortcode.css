@@ -23,6 +23,30 @@
   width: fit-content;
 }
 
+#tlc-ttsurvey div.status.info {
+  /* w3-pale-green */
+  color:#000!important;
+  background-color:#ddffdd!important;
+  /* w3-border-green */
+  border-color:#4CAF50!important;
+}
+
+#tlc-ttsurvey div.status.warning {
+  /* w3-pale-yellow */
+  color:#000!important;
+  background-color:#ffffcc!important;
+  /* w3-border-orange */
+  border-color:#ff9800!important;
+}
+
+#tlc-ttsurvey div.status.error {
+  /* w3-pale-red */
+  color:#000!important;
+  background-color:#ffdddd!important;
+  /* w3-border-red */
+  border-color:#f44336!important;
+}
+
 #tlc-ttsurvey div.instruction
 {
   padding:8px 0 0 0;
