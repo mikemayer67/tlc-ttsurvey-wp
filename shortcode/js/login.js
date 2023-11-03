@@ -2,19 +2,20 @@ var ce = {};
 
 function evaluate_register_inputs()
 {
-  submit = ce_register.find('button.submit').prop('disabled',true);
-  submit.prop('disabled',true);
+  ce.register_submit.prop('disabled',true);
+
+  const form = ce.register_form;
 
   data = {
     'action':'tlc_ttsurvey',
     'nonce':login_vars['nonce'],
     'query':'validate_register_form',
-    'firstname':ce_register.find('.input.name input.first').val(),
-    'lastname':ce_register.find('.input.name input.last').val(),
-    'userid':ce_register.find('.input.userid input').val(),
-    'password':ce_register.find('.input.password input.primary').val(),
-    'pw-confirm':ce_register.find('.input.password input.confirm').val(),
-    'email':ce_register.find('.input.email input').val(),
+    'firstname':form.find('.input.name input.first').val(),
+    'lastname':form.find('.input.name input.last').val(),
+    'userid':form.find('.input.userid input').val(),
+    'password':form.find('.input.password input.primary').val(),
+    'pw-confirm':form.find('.input.password input.confirm').val(),
+    'email':form.find('.input.email input').val(),
   };
 
   jQuery.post(
@@ -24,8 +25,8 @@ function evaluate_register_inputs()
       let keys = ['userid','password','name','email'];
       var all_ok = true;
       keys.forEach( function(key) {
-        var error_box = ce.register_form.find('.input .error.'+key);
-        var input = ce.register_form.find('.input.'+key+' input');
+        var error_box = form.find('.input .error.'+key);
+        var input = form.find('.input.'+key+' input');
         input.removeClass(['invalid','empty']);
         if( key in response ) {
           all_ok = false;
@@ -43,7 +44,7 @@ function evaluate_register_inputs()
           error_box.html("");
         }
       });
-      submit.prop("disabled",!all_ok);
+      ce.register_submit.prop("disabled",!all_ok);
     },
     'json',
   );
@@ -53,15 +54,16 @@ function setup_register_validation()
 {
   var keyup_timer = null;
 
-  ce.register_form.find('button.submit').prop('disabled',true);
-  ce.register_form.find('.error').hide()
+  ce.register_submit = ce.register_form.find('button.submit');
+  ce.register_error = ce.register_form.find('.error');
 
-  submit = ce.register_form.find('button.submit').prop('disabled',true);
+  ce.register_submit.prop('disabled',true);
+  ce.register_error.hide();
 
-  inputs = ce.register_form.find('input').not('input[type=checkbox]');
+  ce.register_inputs = ce.register_form.find('input').not('input[type=checkbox]');
 
-  inputs.on('input',function() {
-    submit.prop('disabled',true);
+  ce.register_inputs.on('input',function() {
+    ce_register_submit.prop('disabled',true);
     if(keyup_timer) { clearTimeout(keyup_timer); }
     keyup_timer = setTimeout( function() {
         keyup_timer = null;
@@ -72,16 +74,75 @@ function setup_register_validation()
   });
 }
 
+function setup_info_triggers()
+{
+  var info_trigger_timer = null;
+
+  ce.info_triggers.each(
+    function() {
+      var trigger = $(this)
+      var tgt_id = trigger.data('target');
+      var tgt = $('#'+tgt_id);
+      trigger.on('mouseenter', function(e) {
+        if(info_trigger_timer) { 
+          clearTimeout(info_trigger_timer); 
+          info_trigger_timer=null;
+        }
+        info_trigger_timer = setTimeout(function() {tgt.slideDown(100)}, 500);
+      });
+      trigger.on('mouseleave',function(e) {
+        if(info_trigger_timer) {
+          clearTimeout(info_trigger_timer); 
+          info_trigger_timer=null;
+        }
+        if(!tgt.hasClass('locked')) { tgt.slideUp(100) } 
+      });
+      trigger.on( 'click', function() { 
+        if(tgt.hasClass('locked')) {
+          tgt.removeClass('locked').slideUp(100)
+        } else {
+          tgt.addClass('locked').slideDown(100)
+        }
+      });
+
+      tgt.on( 'click', function() { tgt.removeClass('locked').slideUp(100) });
+    }
+  );
+}
+
+function setup_elements()
+{
+  // clear old elements (needed for AJAX repopulation of login form)
+  for( const key in ce ) { ce.off(); }
+  ce = {};
+
+  // populate the elements
+  ce.container = $('#tlc-ttsurvey-login');
+  ce.form = container.find('form.login');
+
+  // info trigger/box handling
+  ce.info_triggers = ce.form.find('.info-trigger');
+  ce.info_boxes = ce.from.find('.info-box');
+  ce.info_triggers.show();
+  ce.info_boxes.hide();
+  if(ce.info_triggers.length) { setup_info_triggers(); }
+
+  // userid/password form
+  ce.login_form = ce.container.filter('.login');
+  ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
+  ce.login_recovery_link.show();
+
+  // recovery form
+  ce.recovery_form = ce.container.filter('.recovery');
+
+  // register form
+  ce.register_form = ce.container.filter('.register').find('form.login');
+
+  if(ce.register_form.length) { setup_register_validation(); }
+}
+
 jQuery(document).ready(
-  function($) {
-    ce.register_form = $('div#tlc-ttsurvey div.register form');
-    ce.sendlogin_content = $('div#tlc-ttsurvey div.sendlogin');
-
-    ce.sendlogin_content.show();
-    
-    $('div#tlc-ttsurvey-login form.login div.sendlogin').show();
-
-    if( ce.register_form.length ) { setup_register_validation(); }
+  function($) { 
+    setup_elements(); 
   }
 );
-

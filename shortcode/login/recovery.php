@@ -15,7 +15,7 @@ $url = $_SERVER['HTTP_REFERER'];
 echo "<a href='$url'>Return to login page</a>";
 echo "</noscript>";
 
-start_login_form("Userid/Password Recovery",'sendlogin');
+start_login_form("Userid/Password Recovery",'recovery');
 
 add_login_instructions([
   'Please enter the address you provided when you registered to participate in the survey',
@@ -24,7 +24,7 @@ add_login_instructions([
 
 add_login_input("email");
 
-add_login_submit('Send email','sendlogin',['cancel'=>True]);
+add_login_submit('Send email','recovery',['cancel'=>True]);
 
 close_login_form();
 

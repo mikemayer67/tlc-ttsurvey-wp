@@ -72,7 +72,7 @@ div#tlc-ttsurvey-login form input.w3-input {
   border-top:none;
 }
 
-div#tlc-ttsurvey-login form.login div.sendlogin {
+div#tlc-ttsurvey-login form.login div.recovery {
   display:none;
 }
 
@@ -81,18 +81,18 @@ div#tlc-ttsurvey-login form.login div.sendlogin {
  **/
 
 /**
- * Senduserid Form
+ * Recovery Form
  **/
 
-div#tlc-ttsurvey-login.sendlogin {
+div#tlc-ttsurvey-login.recovery {
   display:none;
 }
 
-div#tlc-ttsurvey-login.sendlogin div.input {
+div#tlc-ttsurvey-login.recovery div.input {
   margin-top:0;
 }
 
-div#tlc-ttsurvey-login.sendlogin input.w3-input
+div#tlc-ttsurvey-login.recovery input.w3-input
 {
   width:100%;
 }

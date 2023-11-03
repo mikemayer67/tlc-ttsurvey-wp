@@ -189,7 +189,7 @@ function add_login_links($links)
 {
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-  echo "<div class='w3-panel'>";
+  echo "<div class='links w3-panel'>";
   foreach($links as $link)
   {
     [$label,$page,$side] = $link;
