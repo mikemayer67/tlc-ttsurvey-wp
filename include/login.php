@@ -150,21 +150,11 @@ function login_init()
 
     switch($_POST['action'] ?? null)
     {
-    case 'login':
-      handle_login();
-      break;
-    case 'resume':
-      handle_login_resume();
-      break;
-    case 'register':
-      handle_login_register();
-      break;
-    case 'logout':
-      handle_logout();
-      break;
-    case 'senduserid':
-      handle_send_userid();
-      break;
+    case 'login':     handle_login();          break;
+    case 'resume':    handle_login_resume();   break;
+    case 'register':  handle_login_register(); break;
+    case 'logout':    handle_logout();         break;
+    case 'sendlogin': handle_login_recovery(); break;
     }
   }
 }
@@ -229,16 +219,16 @@ function handle_logout()
   logout_active_user();
 }
 
-function handle_send_userid()
+function handle_login_recovery()
 {
-  log_dev("handle_send_userid");
+  log_dev("handle_login_recovery");
   require_once plugin_path('include/sendmail.php');
   $email = $_POST['email'];
   if(sendmail_login_recovery($email)) {
     set_status_info("Sent userid/password to $email");
   } else {
     set_status_warning("Unrecognized email address");
-    set_current_shortcode_page("senduserid");
+    set_current_shortcode_page("sendlogin");
   }
 }
 

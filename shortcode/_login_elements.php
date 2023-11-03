@@ -189,7 +189,7 @@ function add_login_links($links)
   {
     [$label,$page,$side] = $link;
     $page_uri = "$form_uri?tlcpage=$page";
-    echo "<div class='w3-$side'><a href='$page_uri'>$label</a></div>";
+    echo "<div class='w3-$side $page'><a href='$page_uri'>$label</a></div>";
   }
   echo "</div>";
 }

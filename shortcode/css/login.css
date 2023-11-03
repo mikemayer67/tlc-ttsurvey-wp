@@ -65,12 +65,15 @@ div#tlc-ttsurvey-login button {
   box-sizing: border-box;
 }
 
-div#tlc-ttsurvey-login form input.w3-input
-{
+div#tlc-ttsurvey-login form input.w3-input {
   width:100%;
   border-left:none;
   border-right:none;
   border-top:none;
+}
+
+div#tlc-ttsurvey-login form.login div.sendlogin {
+  display:none;
 }
 
 /**
@@ -81,20 +84,26 @@ div#tlc-ttsurvey-login form input.w3-input
  * Senduserid Form
  **/
 
-div#tlc-ttsurvey-login.senduserid div.input {
+div#tlc-ttsurvey-login.sendlogin {
+  display:none;
+}
+
+div#tlc-ttsurvey-login.sendlogin div.input {
   margin-top:0;
 }
 
-div#tlc-ttsurvey-login.senduserid input.w3-input
+div#tlc-ttsurvey-login.sendlogin input.w3-input
 {
   width:100%;
 }
+
+div
 
 /**
  * Resume Form
  **/
 
-divdiv#tlc-ttsurvey-login.resume-login form li {
+div#tlc-ttsurvey-login.resume-login form li {
   list-style-type: none;
   border-bottom: 1px solid #d5d5d5;
   border-radius: 10px;

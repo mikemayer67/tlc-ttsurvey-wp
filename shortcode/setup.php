@@ -167,11 +167,12 @@ function add_shortcode_content()
   }
 
   $page = current_shortcode_page();
+  log_dev("current_shortcode_page = $page");
   if($page) 
   {
-    if(in_array($page,['register','login','page','senduserid']))
+    if(in_array($page,['register','login','sendlogin']))
     {
-      enqueue_login_ajax_scripts();
+      enqueue_login_scripts();
       require plugin_path("shortcode/$page.php");
     } elseif( $page=='survey' ) {
       require plugin_path("shortcode/survey.php");
@@ -189,11 +190,12 @@ function add_shortcode_content()
   }
   elseif($tokens) {
     # @@@ TODO: remove this hack
+    enqueue_login_scripts();
     require plugin_path('shortcode/login.php');
     #require plugin_path('shortcode/resume.php');
   }
   else {
-    enqueue_login_ajax_scripts();
+    enqueue_login_scripts();
     require plugin_path('shortcode/login.php');
   }
 
@@ -223,27 +225,28 @@ function register_shortcode_scripts()
   wp_enqueue_script('tlc_ttsurvey_shortcode');
 }
 
-function enqueue_login_ajax_scripts()
+function enqueue_login_scripts()
 {
+  log_dev("enqueue_login_scripts");
+
   wp_register_script(
-    'tlc_ttsurvey_login_ajax',
-    plugin_url('shortcode/js/login_ajax.js'),
+    'tlc_ttsurvey_login',
+    plugin_url('shortcode/js/login.js'),
     array('jquery'),
     '1.0.3',
     true
   );
 
-  $key = 'login_ajax';
   wp_localize_script(
-    'tlc_ttsurvey_login_ajax',
+    'tlc_ttsurvey_login',
     'login_vars',
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => array($key,wp_create_nonce($key)),
+      'nonce' => array('login',wp_create_nonce('login')),
     ),
   );
 
-  wp_enqueue_script('tlc_ttsurvey_login_ajax');
+  wp_enqueue_script('tlc_ttsurvey_login');
 }
 
 wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));

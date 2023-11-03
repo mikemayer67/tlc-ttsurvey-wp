@@ -23,7 +23,7 @@ add_login_input("remember",array(
 add_login_submit("Log in","login");
 
 add_login_links([
-  ['forgot login info', 'senduserid', 'left'],
+  ['forgot login info', 'sendlogin', 'left'],
   ['register', 'register', 'right'],
 ]);
 
