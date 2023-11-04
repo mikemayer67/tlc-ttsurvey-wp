@@ -63,7 +63,7 @@ function setup_register_validation()
   ce.register_inputs = ce.register_form.find('input').not('input[type=checkbox]');
 
   ce.register_inputs.on('input',function() {
-    ce_register_submit.prop('disabled',true);
+    ce.register_submit.prop('disabled',true);
     if(keyup_timer) { clearTimeout(keyup_timer); }
     keyup_timer = setTimeout( function() {
         keyup_timer = null;
@@ -80,9 +80,9 @@ function setup_info_triggers()
 
   ce.info_triggers.each(
     function() {
-      var trigger = $(this)
+      var trigger = jQuery(this)
       var tgt_id = trigger.data('target');
-      var tgt = $('#'+tgt_id);
+      var tgt = jQuery('#'+tgt_id);
       trigger.on('mouseenter', function(e) {
         if(info_trigger_timer) { 
           clearTimeout(info_trigger_timer); 
@@ -117,12 +117,12 @@ function setup_elements()
   ce = {};
 
   // populate the elements
-  ce.container = $('#tlc-ttsurvey-login');
-  ce.form = container.find('form.login');
+  ce.container = jQuery('#tlc-ttsurvey-login');
+  ce.form = ce.container.find('form.login');
 
   // info trigger/box handling
   ce.info_triggers = ce.form.find('.info-trigger');
-  ce.info_boxes = ce.from.find('.info-box');
+  ce.info_boxes = ce.form.find('.info-box');
   ce.info_triggers.show();
   ce.info_boxes.hide();
   if(ce.info_triggers.length) { setup_info_triggers(); }
@@ -133,7 +133,8 @@ function setup_elements()
   ce.login_recovery_link.show();
 
   // recovery form
-  ce.recovery_form = ce.container.filter('.recovery');
+  ce.recovery = ce.container.filter('.recovery');
+  ce.recovery.show();
 
   // register form
   ce.register_form = ce.container.filter('.register').find('form.login');

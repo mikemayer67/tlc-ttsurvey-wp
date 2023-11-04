@@ -84,8 +84,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
 {
   if(!is_first_survey_on_page()) { return; }
 
-  register_shortcode_scripts();
-
   ob_start();
 
   echo "<div id='tlc-ttsurvey'>";

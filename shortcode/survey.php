@@ -13,7 +13,6 @@ const SURVEY_FORM_NONCE = 'tlc-ttsurvey-survey-form';
 
 function add_survey_content($userid=null)
 {
-  log_dev
   if(!$userid) {
     require_once plugin_path('include/login.php');
     $userid = active_userid();
