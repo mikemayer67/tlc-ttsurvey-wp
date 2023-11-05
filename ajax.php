@@ -13,8 +13,9 @@ function ajax_wrapper()
   }
 
   $query = $_POST['query'];
-  $ajax = is_admin() ? 'admin/ajax' : 'shortcode/ajax';
-  $query_file = plugin_path("$ajax/$query.php");
+  $admin = $_POST['admin'] ?? false;
+  [$path,$query] = explode('/',$query);
+  $query_file = plugin_path("$path/ajax/$query.php");
   if(!file_exists($query_file))
   {
     log_error("Bad ajax query ($query) @ ".__FILE__.":".__LINE__);

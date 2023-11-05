@@ -41,7 +41,7 @@ if(!($firstname && $lastname)) {
 
 if(!key_exists('password',$response))
 {
-  $confirm = adjust_login_input('password',$_POST['pw-confirm']);
+  $confirm = adjust_login_input('password',$_POST['pwconfirm']);
   if($confirm) {
     $password = adjust_login_input('password',$_POST['password']);
     if($confirm!=$password) {

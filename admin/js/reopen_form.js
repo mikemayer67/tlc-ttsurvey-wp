@@ -8,10 +8,10 @@ function handle_reopen_survey(event)
   jQuery.post(
     reopen_vars['ajaxurl'],
     {
-      'action':'tlc_ttsurvey',
-      'nonce':reopen_vars['nonce'],
-      'query':'reopen_survey',
-      'pid':pid,
+      action:'tlc_ttsurvey',
+      nonce:reopen_vars['nonce'],
+      query:'admin/reopen_survey',
+      pid:pid,
     },
     function(response) {
       if(response.ok) {

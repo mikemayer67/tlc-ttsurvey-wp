@@ -17,10 +17,10 @@ function populate_form()
   jQuery.post(
     form_vars['ajaxurl'],
     {
-      'action':'tlc_ttsurvey',
-      'nonce':form_vars['nonce'],
-      'query':'populate_content_form',
-      'pid':pid,
+      action:'tlc_ttsurvey',
+      nonce:form_vars['nonce'],
+      query:'admin/populate_content_form',
+      pid:pid,
     },
     function(response) {
       if(response.ok) {
@@ -154,10 +154,10 @@ function validate_survey_input()
   jQuery.post(
     form_vars['ajaxurl'],
     {
-      'action':'tlc_ttsurvey',
-      'nonce':form_vars['nonce'],
-      'query':'validate_content_form',
-      'survey':ce.survey.eq(0).val(),
+      action:'tlc_ttsurvey',
+      nonce:form_vars['nonce'],
+      query:'admin/validate_content_form',
+      survey:ce.survey.eq(0).val(),
     },
     function(response) {
       survey_error = response.ok ? null : response.error;
@@ -175,12 +175,12 @@ function refresh_sendmail_preview(subject)
   jQuery.post(
     form_vars['ajaxurl'],
     {
-      'action':'tlc_ttsurvey',
-      'nonce':form_vars['nonce'],
-      'query':'render_sendmail_preview',
-      'pid':pid,
-      'subject':subject,
-      'content':content,
+      action:'tlc_ttsurvey',
+      nonce:form_vars['nonce'],
+      query:'admin/render_sendmail_preview',
+      pid:pid,
+      subject:subject,
+      content:content,
     },
     function(response) {
       if(response.ok) {
@@ -230,11 +230,11 @@ function handle_form_submit(event)
   event.preventDefault();
 
   data = {
-    'action':'tlc_ttsurvey',
-    'nonce':form_vars['nonce'],
-    'query':'submit_content_form',
-    'pid':pid,
-    'content':{},
+    action:'tlc_ttsurvey',
+    nonce:form_vars['nonce'],
+    query:'admin/submit_content_form',
+    pid:pid,
+    content:{},
   };
 
   data.content.survey = ce.survey.val();
@@ -316,8 +316,8 @@ function hold_lock()
     form_vars.ajaxurl,
     {
       action:'tlc_ttsurvey',
-      nonce: form_vars.nonce,
-      query: 'obtain_content_lock',
+      nonce:form_vars.nonce,
+      query:'admin/obtain_content_lock',
     },
     function(response) {
       if(!response.has_lock) {

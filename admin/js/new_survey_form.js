@@ -8,7 +8,7 @@ function hold_lock()
     {
       action:'tlc_ttsurvey',
       nonce: form_vars.nonce,
-      query: 'obtain_content_lock',
+      query: admin/'obtain_content_lock',
     },
     function(response) {
       if(!response.has_lock) {
@@ -51,10 +51,10 @@ function handle_new_survey(event)
   jQuery.post(
     form_vars['ajaxurl'],
     {
-      'action':'tlc_ttsurvey',
-      'nonce':form_vars['nonce'],
-      'query':'new_survey',
-      'name':new_name,
+      action:'tlc_ttsurvey',
+      nonce:form_vars['nonce'],
+      query:'admin/new_survey',
+      name:new_name,
     },
     function(response) {
       if(response.ok) {

@@ -7,15 +7,15 @@ function evaluate_register_inputs()
   const form = ce.register_form;
 
   data = {
-    'action':'tlc_ttsurvey',
-    'nonce':login_vars['nonce'],
-    'query':'validate_register_form',
-    'firstname':form.find('.input.name input.first').val(),
-    'lastname':form.find('.input.name input.last').val(),
-    'userid':form.find('.input.userid input').val(),
-    'password':form.find('.input.password input.primary').val(),
-    'pw-confirm':form.find('.input.password input.confirm').val(),
-    'email':form.find('.input.email input').val(),
+    action:'tlc_ttsurvey',
+    nonce:login_vars['nonce'],
+    query:'shortcode/validate_register_form',
+    firstname:form.find('.input.name input.first').val(),
+    lastname:form.find('.input.name input.last').val(),
+    userid:form.find('.input.userid input').val(),
+    password:form.find('.input.password input.primary').val(),
+    pwconfirm:form.find('.input.password input.confirm').val(),
+    email:form.find('.input.email input').val(),
   };
 
   jQuery.post(
@@ -50,7 +50,7 @@ function evaluate_register_inputs()
   );
 }
 
-function setup_register_validation()
+function register_setup()
 {
   var keyup_timer = null;
 
@@ -74,7 +74,7 @@ function setup_register_validation()
   });
 }
 
-function setup_info_triggers()
+function info_setup()
 {
   var info_trigger_timer = null;
 
@@ -110,6 +110,64 @@ function setup_info_triggers()
   );
 }
 
+function recovery_setup()
+{
+  var keyup_timer = null;
+
+  ce.recovery_form = ce.recovery.find('form.login');
+  ce.recovery_email = ce.recovery_form.find('input[name=email]');
+  ce.recovery_submit = ce.recovery_form.find('button.submit');
+  ce.recovery_error = ce.recovery_form.find('.error');
+
+  ce.recovery_submit.prop('disabled',true);
+  ce.recovery_error.hide();
+
+  ce.recovery.show();
+
+  ce.recovery_email.on('input',function() {
+    ce.recovery_submit.prop('disabled',true);
+    if(keyup_timer) { clearTimeout(keyup_timer); }
+    keyup_timer = setTimeout( function() {
+        keyup_timer = null;
+        evaluate_recovery_inputs();
+      },
+      500,
+    );
+  });
+}
+
+function evaluate_recovery_inputs()
+{
+  ce.recovery_submit.prop('disabled',true);
+
+  data = {
+    action:'tlc_ttsurvey',
+    nonce:login_vars['nonce'],
+    query:'shortcode/validate_recovery_form',
+    email:ce.recovery_email.val(),
+  };
+
+  jQuery.post(
+    login_vars['ajaxurl'],
+    data,
+    function(response) {
+      ce.recovery_email.removeClass(["empty","invalid"]);
+      if(response.ok) {
+        ce.recovery_error.html("").hide();
+        ce.recovery_submit.prop('disabled',false);
+      } else if(response.empty) {
+        ce.recovery_error.html("").show();
+        ce.recovery_email.addClass("empty");
+      } else {
+        ce.recovery_error.html(response.error).show();
+        ce.recovery_email.addClass("invalid");
+      }
+    },
+    'json',
+  );
+}
+
+
 function setup_elements()
 {
   // clear old elements (needed for AJAX repopulation of login form)
@@ -125,7 +183,7 @@ function setup_elements()
   ce.info_boxes = ce.form.find('.info-box');
   ce.info_triggers.show();
   ce.info_boxes.hide();
-  if(ce.info_triggers.length) { setup_info_triggers(); }
+  if(ce.info_triggers.length) { info_setup(); }
 
   // userid/password form
   ce.login_form = ce.container.filter('.login');
@@ -134,12 +192,11 @@ function setup_elements()
 
   // recovery form
   ce.recovery = ce.container.filter('.recovery');
-  ce.recovery.show();
+  if(ce.recovery.length) { recovery_setup(); }
 
   // register form
   ce.register_form = ce.container.filter('.register').find('form.login');
-
-  if(ce.register_form.length) { setup_register_validation(); }
+  if(ce.register_form.length) { register_setup(); }
 }
 
 jQuery(document).ready(

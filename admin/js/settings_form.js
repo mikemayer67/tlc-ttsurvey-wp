@@ -6,9 +6,9 @@ function handle_form_submit(event)
 
   var url = '';
   var data = {
-    'action':'tlc_ttsurvey',
-    'nonce':form_vars['nonce'],
-    'query':'submit_settings_form',
+    action:'tlc_ttsurvey',
+    nonce:form_vars['nonce'],
+    query:'admin/submit_settings_form',
   };
 
   const inputs = ce.form.serializeArray();
@@ -67,9 +67,9 @@ function handle_clear_log(event)
     jQuery.post(
       form_vars['ajaxurl'],
       {
-        'action':'tlc_ttsurvey',
-        'nonce':form_vars['nonce'],
-        'query':'clear_log',
+        action:'tlc_ttsurvey',
+        nonce:form_vars['nonce'],
+        query:'admin/clear_log',
       },
     );
   }
