@@ -79,7 +79,7 @@ add_login_input("remember",array(
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",
 ));
 
-add_login_submit("Register",'register',['cancel'=>True]);
+add_login_submit("Register",'register',true);
 
 close_login_form();
 

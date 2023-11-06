@@ -134,6 +134,8 @@ function recovery_setup()
       500,
     );
   });
+
+  ce.recovery_form.on('submit',send_recovery_email)
 }
 
 function evaluate_recovery_inputs()
@@ -165,6 +167,12 @@ function evaluate_recovery_inputs()
     },
     'json',
   );
+}
+
+function send_recovery_email(event)
+{
+  const email = ce.recovery_email.val();
+  alert(`Send recovery for ${email}`);
 }
 
 

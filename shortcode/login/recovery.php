@@ -24,7 +24,7 @@ add_login_instructions([
 
 add_login_input("email");
 
-add_login_submit('Send email','recovery',['cancel'=>True]);
+add_login_submit('Send email','recovery',true);
 
 close_login_form();
 

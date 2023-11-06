@@ -20,6 +20,11 @@ if( ! defined('WPINC') ) { die; }
 function ns($s) { return __NAMESPACE__.'\\'.$s; }
 
 /**
+ * name of the plugin
+ */
+function plugin_name() { return plugin_basename(__FILE__); }
+
+/**
  * absolute path to the plugin file
  */
 function plugin_file() { return __FILE__; }

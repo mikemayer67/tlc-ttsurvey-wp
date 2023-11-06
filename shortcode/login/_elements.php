@@ -158,10 +158,8 @@ function add_login_input($type,$kwargs=array())
   echo "</div>";  // input
 }
 
-function add_login_submit($label,$action,$kwargs=array())
+function add_login_submit($label,$action,$cancel=False)
 {
-  $cancel = $kwargs['cancel'] ?? False;
-
   $btn_classes = 'w3-button w3-section w3-ripple w3-right w3-margin-left';
   $submit_classes = "submit $btn_classes w3-blue-gray";
   $cancel_classes = "cancel $btn_classes w3-light-gray";
