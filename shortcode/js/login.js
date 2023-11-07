@@ -180,8 +180,21 @@ function cancel_recovery(event)
 function send_recovery_email(event)
 {
   event.preventDefault();
-  const email = ce.recovery_email.val();
-  alert(`Send recovery for ${email}`);
+
+  data = {
+    action:'tlc_ttsurvey',
+    nonce:login_vars['nonce'],
+    query:'shortcode/send_recovery_email',
+    email:ce.recovery_email.val(),
+  };
+  jQuery.post(
+    login_vars['ajaxurl'],
+    data,
+    function(response) {
+      alert(response);
+    },
+    'json',
+  );
 }
 
 
