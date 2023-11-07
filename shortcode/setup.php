@@ -62,7 +62,7 @@ function clear_status() { status_message(null); }
 
 function _shortcode_page($action,$page=null)
 {
-  static $_shortcut_page = null;
+  static $_shortcode_page = null;
   if($action == '_get')       { return $_shortcode_page;  } 
   elseif($action == '_set')   { $_shortcode_page = $page; } 
   elseif($action == '_clear') { $_shortcode_page = null;  }
@@ -160,7 +160,11 @@ function add_shortcode_content()
   }
 }
 
-wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
-wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
+function enqueue_shortcode_style()
+{
+  wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
+  wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
+}
+add_action('wp_enqueue_scripts',ns('enqueue_shortcode_style'));
 
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));

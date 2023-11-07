@@ -92,13 +92,13 @@ function add_admin_settings()
   $caps = survey_capabilities();
   $primary_admin = survey_primary_admin();
   foreach(get_users() as $user) {
-    $id = $user->id;
+    $id = $user->ID;
     $name = $user->display_name;
-    $primary = $id == $primary_admin ? "checked" : "";
-    $manage = $caps['manage'][$id] ? "checked" : "";
-    $content = $caps['content'][$id] ? "checked" : "";
-    $response = $caps['responses'][$id] ? "checked" : "";
-    $tech = $caps['tech'][$id] ? "checked" : "";
+    $primary  = ( $id == $primary_admin            ) ? "checked" : "";
+    $manage   = ( $caps['manage'][$id]    ?? false ) ? "checked" : "";
+    $content  = ( $caps['content'][$id]   ?? false ) ? "checked" : "";
+    $response = ( $caps['responses'][$id] ?? false ) ? "checked" : "";
+    $tech     = ( $caps['tech'][$id]      ?? false ) ? "checked" : "";
     $hidden_manage = '';
 
     echo "<tr>";

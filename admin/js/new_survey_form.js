@@ -8,7 +8,7 @@ function hold_lock()
     {
       action:'tlc_ttsurvey',
       nonce: form_vars.nonce,
-      query: admin/'obtain_content_lock',
+      query: 'admin/obtain_content_lock',
     },
     function(response) {
       if(!response.has_lock) {

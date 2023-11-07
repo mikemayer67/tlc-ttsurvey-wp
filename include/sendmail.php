@@ -45,7 +45,7 @@ function sendmail_render_message($subject,$content,$data)
 
 function sendmail_login_recovery($email)
 {
-  log_info("Send login recovery email to $userid: $email");
+  log_info("Send login recovery email to $email");
   return false;
 }
 

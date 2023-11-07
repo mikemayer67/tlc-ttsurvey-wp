@@ -103,7 +103,7 @@ function survey_admins($role) {
   if($role == 'manage') {
     foreach( get_users() as $user )
     {
-      $id = $user->id;
+      $id = $user->ID;
       if(user_can($id,'manage_options')) {
         if(!in_array($id,$rval)) {
           $rval[] = $id;
@@ -191,7 +191,7 @@ function update_options_from_post()
   );
 
   foreach(get_users() as $user) {
-    $id = $user->id;
+    $id = $user->ID;
     $view = false;
     foreach(['manage','responses','content','tech'] as $cap) {
       $key = "tlc-ttsurvey-$cap";

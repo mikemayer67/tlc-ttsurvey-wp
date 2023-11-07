@@ -93,21 +93,18 @@ function add_admins_overview()
   $primary_admin = survey_primary_admin();
 
   foreach(get_users() as $user) {
-    $id = $user->id;
+    $id = $user->ID;
     $name = $user->display_name;
-    $tech = $caps['tech'][$id];
-    $responses = $caps['responses'][$id];
-    $content = $caps['content'][$id];
     $user_caps = array();
     if( $id == $primary_admin ) { $user_caps[] = 'Primary'; }
-    if( $caps['manage'][$id] ) { $user_caps[] = "Manage"; }
-    if( $caps['content'][$id] ) { $user_caps[] = "Content"; }
-    if( $caps['responses'][$id] ) { $user_caps[] = "Responses"; }
-    if( $caps['tech'][$id] ) { $user_caps[] = "Tech"; }
+    if( $caps['manage'][$id] ?? false ) { $user_caps[] = "Manage"; }
+    if( $caps['content'][$id] ?? false ) { $user_caps[] = "Content"; }
+    if( $caps['responses'][$id] ?? false ) { $user_caps[] = "Responses"; }
+    if( $caps['tech'][$id] ?? false ) { $user_caps[] = "Tech"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
       echo "<tr>";
-      echo "<td class='name'>$primary$name</td>";
+      echo "<td class='name'>$name</td>";
       echo "<td class='value'>$user_caps</td>";
       echo "</tr>";
     }
