@@ -51,6 +51,7 @@ function enqueue_login_script()
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('login',wp_create_nonce('login')),
+      'survey_url' => survey_url(),
     ),
   );
 

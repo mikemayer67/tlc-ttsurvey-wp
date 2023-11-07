@@ -117,12 +117,16 @@ function recovery_setup()
   ce.recovery_form = ce.recovery.find('form.login');
   ce.recovery_email = ce.recovery_form.find('input[name=email]');
   ce.recovery_submit = ce.recovery_form.find('button.submit');
+  ce.recovery_cancel = ce.recovery_form.find('button.cancel');
   ce.recovery_error = ce.recovery_form.find('.error');
 
   ce.recovery_submit.prop('disabled',true);
   ce.recovery_error.hide();
 
   ce.recovery.show();
+
+  ce.recovery_cancel.on('click',cancel_recovery);
+  ce.recovery_form.on('submit',send_recovery_email)
 
   ce.recovery_email.on('input',function() {
     ce.recovery_submit.prop('disabled',true);
@@ -134,8 +138,6 @@ function recovery_setup()
       500,
     );
   });
-
-  ce.recovery_form.on('submit',send_recovery_email)
 }
 
 function evaluate_recovery_inputs()
@@ -169,8 +171,15 @@ function evaluate_recovery_inputs()
   );
 }
 
+function cancel_recovery(event)
+{
+  event.preventDefault();
+  window.location.href = login_vars.survey_url;
+}
+
 function send_recovery_email(event)
 {
+  event.preventDefault();
   const email = ce.recovery_email.val();
   alert(`Send recovery for ${email}`);
 }

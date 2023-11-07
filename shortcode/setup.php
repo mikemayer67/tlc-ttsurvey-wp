@@ -21,6 +21,11 @@ require_once plugin_path('include/login.php');
  * @param string $tag shortcode tag
  */
 
+function survey_url()
+{
+  return 'http://localhost'.parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?tlc=1';
+}
+
 function is_first_survey_on_page()
 {
   static $is_first = true;
@@ -164,7 +169,25 @@ function enqueue_shortcode_style()
 {
   wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
   wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
-}
-add_action('wp_enqueue_scripts',ns('enqueue_shortcode_style'));
 
+  wp_register_script(
+    'tlc_ttsurvey_shortcode',
+    plugin_url('shortcode/js/shortcode.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_shortcode',
+    'shortcode_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('shortcode',wp_create_nonce('shortcode')),
+      'scroll' => $_REQUEST['tlc'] ?? 0,
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_shortcode');
+}
+
+add_action('wp_enqueue_scripts',ns('enqueue_shortcode_style'));
 add_shortcode('tlc-ttsurvey', ns('handle_shortcode'));

@@ -15,7 +15,7 @@ wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));
 
 function start_login_form($header,$name) 
 {
-  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  $form_uri = survey_url();
 
   $w3_card = 'w3-container w3-card-4 w3-border w3-border-blue-gray';
   echo "<div id='tlc-ttsurvey-login' class='card $name $w3_card'>";
@@ -185,13 +185,13 @@ function add_login_submit($label,$action,$cancel=False)
 
 function add_login_links($links)
 {
-  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  $form_uri = survey_url();
 
   echo "<div class='links w3-panel'>";
   foreach($links as $link)
   {
     [$label,$page,$side] = $link;
-    $page_uri = "$form_uri?tlcpage=$page";
+    $page_uri = "$form_uri&tlcpage=$page";
     echo "<div class='w3-$side $page'><a href='$page_uri'>$label</a></div>";
   }
   echo "</div>";
