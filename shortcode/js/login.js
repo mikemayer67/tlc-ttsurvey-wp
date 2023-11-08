@@ -181,17 +181,28 @@ function send_recovery_email(event)
 {
   event.preventDefault();
 
-  data = {
+  localStorage.removeItem('reset_keys');
+
+  const email = ce.recovery_email.val();
+  const data = {
     action:'tlc_ttsurvey',
     nonce:login_vars['nonce'],
     query:'shortcode/send_recovery_email',
-    email:ce.recovery_email.val(),
+    email:email,
   };
   jQuery.post(
     login_vars['ajaxurl'],
     data,
     function(response) {
-      alert(response);
+      if(response.ok) {
+        localStorage.reset_keys = JSON.stringify(response.keys);
+        ce.status.val("Login info sent to "+email);
+        window.location.href = login_vars.survey_url;
+      }
+      if(response.error) {
+        ce.status.val("No login info sent: " + response.error);
+      }
+      ce.recovery_form.submit();
     },
     'json',
   );
@@ -207,6 +218,7 @@ function setup_elements()
   // populate the elements
   ce.container = jQuery('#tlc-ttsurvey-login');
   ce.form = ce.container.find('form.login');
+  ce.status = ce.form.find('input[name=status]');
 
   // info trigger/box handling
   ce.info_triggers = ce.form.find('.info-trigger');

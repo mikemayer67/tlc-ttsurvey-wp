@@ -7,6 +7,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
+
 $tokens = cookie_tokens();
 
 $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);

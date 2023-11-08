@@ -27,19 +27,13 @@ if( ! defined('WPINC') ) { die; }
  *   - responses: number of submitted survey forms
  **/
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
-require_once plugin_path('include/sendmail.php');
-
-const SURVEY_IS_DRAFT = 'draft';
-const SURVEY_IS_ACTIVE = 'active';
-const SURVEY_IS_CLOSED = 'closed';
 
 /**
  * Register the custom post type
  **/
-
-const SURVEY_POST_TYPE = 'tlc-ttsurvey-form';
 
 function register_survey_post_type()
 {

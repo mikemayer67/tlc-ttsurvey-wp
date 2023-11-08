@@ -23,7 +23,7 @@ require_once plugin_path('include/login.php');
 
 function survey_url()
 {
-  return 'http://localhost'.parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?tlc=1';
+  return parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?tlc=1';
 }
 
 function is_first_survey_on_page()

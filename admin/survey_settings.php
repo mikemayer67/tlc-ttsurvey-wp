@@ -10,6 +10,7 @@ if(!plugin_admin_can('manage')) {
   return;
 }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 

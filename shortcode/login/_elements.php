@@ -3,6 +3,7 @@ namespace TLC\TTSurvey;
 
 if(!defined('WPINC')) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 
 wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));
@@ -23,6 +24,7 @@ function start_login_form($header,$name)
   echo "<form class='login w3-container' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
   echo "<input type='hidden' name='refresh' value='1'>";
+  echo "<input type='hidden' name='status' value=''>";
 }
 
 function close_login_form()

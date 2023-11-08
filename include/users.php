@@ -8,6 +8,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
@@ -289,6 +290,16 @@ class User {
   }
 
   /**
+   * Password
+   **/
+
+  public function set_password_reset_token($token)
+  {
+    $expires = current_time('U',true) + LOGIN_RECOVERY_TIMEOUT;
+    update_post_meta($this->_post_id,'pw_reset_token',"$expires:$token");
+  }
+
+  /**
    * Setters
    **/
 
@@ -404,11 +415,11 @@ function is_userid_available($userid)
   return is_null($existing);
 }
 
-function gen_access_token()
+function gen_access_token($token_length=25)
 {
   $access_token = '';
   $token_pool = '123456789123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for($i=0; $i<25; $i++) {
+  for($i=0; $i<$token_length; $i++) {
     $index = rand(0,strlen($token_pool)-1);
     $access_token .= $token_pool[$index];
   }

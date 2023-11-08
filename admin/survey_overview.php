@@ -5,6 +5,7 @@ if(!defined('WPINC')) { die; }
 
 if( !plugin_admin_can('view') ) { wp_die('Unauthorized user'); }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/logger.php');

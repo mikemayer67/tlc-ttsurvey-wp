@@ -7,23 +7,12 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-const SENDMAIL_TEMPLATES = array(
-  'welcome' => array(
-    'label' => 'Welcome',
-    'when' => 'a user registers for the survey',
-  ),
-  'recovery' => array(
-    'label' => 'Login Recovery',
-    'when' => 'a user requests help logging in',
-  ),
-);
-
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/markdown.php');
 
-
-function sendmail_render_message($subject,$content,$data)
+function sendmail_render_message($subject,$custom_content,$message_data)
 {
   $subject_php = plugin_path("include/sendmail/$subject.php");
   if(!file_exists($subject_php)) {
@@ -31,10 +20,7 @@ function sendmail_render_message($subject,$content,$data)
     return null;
   }
 
-  $content = render_markdown($content);
-  $email = $data['email'];
-  $userid = $data['userid'];
-  $name = $data['name'];
+  $custom_content = render_markdown($custom_content);
 
   ob_start();
   require $subject_php;
@@ -43,32 +29,19 @@ function sendmail_render_message($subject,$content,$data)
   return $message;
 }
 
-function sendmail_login_recovery($email)
+function _sendmail_send($email,$subject,$message_data) 
 {
-  log_info("Send login recovery email to $email");
-  return false;
-}
-
-function sendmail_welcome($email, $userid, $firstname, $lastname)
-{
-  log_info("Send welcome email to $userid: $email");
-
   $survey = current_survey();
   $post = get_post($survey['post_id']);
   $content = json_decode($post->post_content,true);
 
-  $message = sendmail_render_message(
-    'welcome',
-    $content['sendmail']['welcome'],
-    array(
-      'title'=>$survey['name'],
-      'email'=>$email,
-      'userid'=>$userid,
-      'name'=>"$firstname $lastname",
-    )
-  );
+  $message_data['title'] = $survey['name'];
 
-  $headers = array('Content-Type: text/html; charset=UTF-8');
+  $message = sendmail_render_message(
+    $subject,
+    $content['sendmail'][$subject],
+    $message_data,
+  )
 
   wp_mail(
     $email,
@@ -78,6 +51,31 @@ function sendmail_welcome($email, $userid, $firstname, $lastname)
       'Content-Type: text/html; charset=UTF-8',
     )
   );
+}
 
-  return true;
+function sendmail_login_recovery($email,$keys)
+{
+  log_info("Send login recovery email to $email");
+
+  return _sendmail_send(
+    $email,
+    'recovery',
+    array( 'keys'=>$keys ),
+  );
+
+}
+
+function sendmail_welcome($email, $userid, $firstname, $lastname)
+{
+  log_info("Send welcome email to $userid: $email");
+
+  return _sendmail_send(
+    $email, 
+    'welcome', 
+    array(
+      'email'=>$email,
+      'userid'=>$userid,
+      'name'=>"$firstname $lastname",
+    ),
+  );
 }

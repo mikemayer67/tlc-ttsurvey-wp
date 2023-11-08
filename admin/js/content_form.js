@@ -285,7 +285,7 @@ function handle_form_revert(event)
   survey_error = false
 
   delete autosave[pid];
-  localStorage.autosave = JSON.stringify[autosave];
+  localStorage.autosave = JSON.stringify(autosave);
   reset_queue();
   update_state();
 }

@@ -8,9 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 if( ! is_admin() ) { return; }
 
-const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
-const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
-
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');

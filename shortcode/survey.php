@@ -7,9 +7,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
-
-const SURVEY_FORM_NONCE = 'tlc-ttsurvey-survey-form';
 
 function add_survey_content($userid=null)
 {

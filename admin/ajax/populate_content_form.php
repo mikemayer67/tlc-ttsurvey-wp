@@ -3,6 +3,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/sendmail.php');
 
