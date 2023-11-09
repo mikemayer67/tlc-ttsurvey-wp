@@ -120,55 +120,12 @@ function recovery_setup()
   ce.recovery_cancel = ce.recovery_form.find('button.cancel');
   ce.recovery_error = ce.recovery_form.find('.error');
 
-  ce.recovery_submit.prop('disabled',true);
   ce.recovery_error.hide();
-
   ce.recovery.show();
 
   ce.recovery_cancel.on('click',cancel_recovery);
   ce.recovery_form.on('submit',send_recovery_email)
 
-  ce.recovery_email.on('input',function() {
-    ce.recovery_submit.prop('disabled',true);
-    if(keyup_timer) { clearTimeout(keyup_timer); }
-    keyup_timer = setTimeout( function() {
-        keyup_timer = null;
-        evaluate_recovery_inputs();
-      },
-      500,
-    );
-  });
-}
-
-function evaluate_recovery_inputs()
-{
-  ce.recovery_submit.prop('disabled',true);
-
-  data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/validate_recovery_form',
-    email:ce.recovery_email.val(),
-  };
-
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
-    function(response) {
-      ce.recovery_email.removeClass(["empty","invalid"]);
-      if(response.ok) {
-        ce.recovery_error.html("").hide();
-        ce.recovery_submit.prop('disabled',false);
-      } else if(response.empty) {
-        ce.recovery_error.html("").show();
-        ce.recovery_email.addClass("empty");
-      } else {
-        ce.recovery_error.html(response.error).show();
-        ce.recovery_email.addClass("invalid");
-      }
-    },
-    'json',
-  );
 }
 
 function cancel_recovery(event)

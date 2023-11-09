@@ -46,3 +46,6 @@ echo "<div style='margin-top:20px;'>";
 echo "<p style='font-style:italic;'>The password reset links must be used";
 echo " within $timeout minutes and must be used on the same device and";
 echo " browser used to request this email.</div>";
+
+echo "<br>";
+require plugin_path("include/sendmail/contacts.php");
