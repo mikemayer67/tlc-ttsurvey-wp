@@ -10,7 +10,7 @@ $nkeys = count($keys);
 $scheme = parse_url($_SERVER['HTTP_REFERER'],PHP_URL_SCHEME);
 $host = parse_url($_SERVER['HTTP_REFERER'],PHP_URL_HOST);
 $path = parse_url($_SERVER['HTTP_REFERER'],PHP_URL_PATH);
-$survey_url = "$scheme://$host/$path?tlc=1";
+$survey_url = "$scheme://$host/$path?tlc=1&tlcpage=pwreset";
 
 $timeout = intval(round(LOGIN_RECOVERY_TIMEOUT / 60));
 
@@ -35,7 +35,7 @@ foreach($keys as $key=>$info)
   echo "</b></div>";
 
   echo "<div style='margin-left:8px;'>";
-  echo "Password Reset: $survey_url&pwr=$key";
+  echo "Password Reset: $survey_url&token=$key";
   echo "</div>";
 
   echo "</div>";

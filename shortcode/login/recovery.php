@@ -1,10 +1,6 @@
 <?php
 namespace TLC\TTSurvey;
 
-/**
- * TLC Time and Talent plugin shortcode setup
- */
-
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('shortcode/login/_elements.php');
