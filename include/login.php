@@ -221,15 +221,9 @@ function handle_logout()
 
 function handle_login_recovery()
 {
-  log_dev("handle_login_recovery");
-  require_once plugin_path('include/sendmail.php');
-  $email = $_POST['email'];
-  if(sendmail_login_recovery($email)) {
-    set_status_info("Sent userid/password to $email");
-  } else {
-    set_status_warning("Unrecognized email address");
-    set_current_shortcode_page("recovery");
-  }
+  $status = $_POST['status'];
+  if($status) { set_status_warning($status); }
+  clear_current_shortcode_page();
 }
 
 

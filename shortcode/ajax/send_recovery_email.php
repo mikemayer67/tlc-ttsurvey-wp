@@ -5,6 +5,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/users.php');
+require_once plugin_path('include/sendmail.php');
 require_once plugin_path('include/validation.php');
 require_once plugin_path('shortcode/login.php');
 

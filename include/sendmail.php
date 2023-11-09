@@ -41,9 +41,9 @@ function _sendmail_send($email,$subject,$message_data)
     $subject,
     $content['sendmail'][$subject],
     $message_data,
-  )
+  );
 
-  wp_mail(
+  return wp_mail(
     $email,
     $survey['name'] . ' Time & Talent survey',
     $message,

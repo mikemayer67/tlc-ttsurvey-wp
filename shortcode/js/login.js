@@ -196,13 +196,13 @@ function send_recovery_email(event)
     function(response) {
       if(response.ok) {
         localStorage.reset_keys = JSON.stringify(response.keys);
-        ce.status.val("Login info sent to "+email);
-        window.location.href = login_vars.survey_url;
+        alert("Login info sent to "+email);
+        ce.recovery_form.off('submit');
+        ce.recovery_submit.click();
       }
       if(response.error) {
-        ce.status.val("No login info sent: " + response.error);
+        alert(response.error);
       }
-      ce.recovery_form.submit();
     },
     'json',
   );

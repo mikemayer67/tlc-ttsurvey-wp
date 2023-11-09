@@ -9,6 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
+require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/login.php');
 
 /**
