@@ -46,8 +46,6 @@ function register_setup()
 
 function evaluate_register_inputs()
 {
-  ce.register_submit.prop('disabled',true);
-
   const form = ce.register_form;
 
   data = {
@@ -181,14 +179,19 @@ function pwreset_setup()
   ce.pwreset_form = ce.pwreset.find('form.login');
   ce.pwreset_submit = ce.pwreset_form.find('button.submit');
   ce.pwreset_cancel = ce.pwreset_form.find('button.cancel');
-  ce.pwreset_error = ce.pwreset_form.find('.error');
+  ce.pwreset_error = ce.pwreset_form.find('.input .error');
+  ce.pwreset_userid_error = ce.pwreset_form.find('.input.userid .error');
+  ce.pwreset_password_error = ce.pwreset_form.find('.input.password .error');
+  ce.pwreset_inputs = ce.pwreset_form.find('.input input');
+  ce.pwreset_userid = ce.pwreset_inputs.filter('[name=userid]');
+  ce.pwreset_password = ce.pwreset_inputs.filter('[type=password]');
+
+  ce.pwreset_error.hide();
 
   const reset_token = ce.pwreset_form.find('input[name=reset_token]').val();
   const server_time = Number(
     ce.pwreset_form.find('input[name=server_time]').val()
   );
-
-  ce.pwreset_error.hide();
 
   const pwreset = JSON.parse(localStorage.pwreset ?? "{}");
   pwreset_user_info = pwreset.tokens[reset_token] ?? null;
@@ -198,7 +201,76 @@ function pwreset_setup()
   if(server_time > pwreset.expires) {
     pwreset_failure("Password reset link expired");
   }
+  
+  ce.pwreset_password.on('input', function() {
+    if(keyup_timer) { clearTimeout(keyup_timer) }
+    keyup_timer = setTimeout( function() {
+        keyup_timer = null;
+        pwreset_validate_password();
+      },
+      500,
+    )
+  });
+
+  ce.pwreset_inputs.on('input',function() {
+    ce.status_message.hide(400,'linear');
+  });
+
+  ce.pwreset_cancel.on('click',cancel_pwreset);
+  ce.pwreset_form.on('submit',send_pwreset);
 }
+
+function cancel_pwreset(event)
+{
+  event.preventDefault();
+  window.location.href = login_vars.survey_url;
+}
+
+function send_pwreset(event)
+{
+  event.preventDefault();
+
+  if(!pwreset_validate_password()) { return }
+
+  const userid = ce.pwreset_userid.val();
+  if( userid !== pwreset_user_info.userid ) {
+    ce.status_message.removeClass(['info','warning']).addClass('error');
+    ce.status_message.html('Incorrect userid for password reset link');
+    ce.status_message.show(200,'linear');
+  }
+}
+
+function pwreset_validate_password()
+{
+  const password = ce.pwreset_password.get(0).value;
+  const confirm = ce.pwreset_password.get(1).value;
+
+  error = null;
+  if( password.length == 0 ) { 
+    error = '';
+  } else if( password.length < 8 ) {
+    error = 'too short';
+  } else if( password.length > 128 ) {
+    error = 'too long';
+  } else if( !/[a-zA-Z]/.test(password) ) {
+    error = 'must contain at least one letter';
+  } else if(bad=/[^a-zA-Z0-9 !@%^*_=~,.-]/.exec(password)) {
+    error = "cannot contain '" + bad + "'";
+  } else if (confirm.length == 0) {
+    error = "missing password confirmation";
+  } else if (confirm !== password) {
+    error = "passwords don't match";
+  }
+
+  if(error === null) {
+    ce.pwreset_password_error.hide();
+    return true;
+  } else {
+    ce.pwreset_password_error.html(error).show();
+    return false;
+  }
+}
+
 
 
 //----------------------------------------
