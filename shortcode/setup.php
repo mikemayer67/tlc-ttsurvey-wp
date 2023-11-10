@@ -93,11 +93,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   ob_start();
 
   echo "<div id='tlc-ttsurvey'>";
-  add_noscript();
-  add_status_message();
-  echo "<div class='shortcode-content'>"; // used to hot-swap content in AJAX response
   add_shortcode_content();
-  echo "</div>"; // shortcode-content
   echo "</div>"; // tlc-ttsurvey
 
   $html = ob_get_contents();
@@ -105,20 +101,38 @@ function handle_shortcode($attr,$content=null,$tag=null)
   return $html;
 }
 
-function add_noscript()
+function add_javascript_recommended()
 {
   $pdf_uri = survey_pdf_uri();
+  echo "<noscript><div>";
+  echo "<div class='noscript header'>";
+  echo "This survey works best with Javascript enabled";
+  echo "</div>";
+  echo "<p>If you cannot turn on Javascript, you may want to complete a ";
+  echo "paper copy of the survey.";
   if($pdf_uri) {
-    $download = "You can download a PDF version <a target='_blank' href='$pdf_uri'>here</a>.</p>";
-  } else {
-    $download = "";
+    echo "You can download a PDF version ";
+    echo "<a target='_blank' href='$pdf_uri'>here</a>.";
   }
-?>
-  <noscript><div>
-  <div class='noscript'>This survey works best with Javascript enabled</div>
-  <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
-  </div></noscript>
-<?php
+  echo "</p>";
+  echo "</div></noscript>";
+}
+
+function start_javascript_required($page)
+{
+  $return_url = survey_url();
+  echo "<noscript><div>";
+  echo "<div class='noscript header'>";
+  echo "$page requires that Javascript be enabled";
+  echo "</div>";
+  echo "<p><a href='$return_url'>Return to login page</a></p>";
+  echo "</div></noscript>";
+  echo "<div class='javascript-required'>";
+}
+
+function end_javascript_required()
+{
+  echo "</div>";
 }
 
 function add_status_message()

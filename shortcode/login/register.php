@@ -9,6 +9,9 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('shortcode/login/_elements.php');
 
+add_javascript_recommended();
+add_status_message();
+
 start_login_form("Register for the Survey","register");
 
 if( $_POST['refresh'] ?? False ) {

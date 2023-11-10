@@ -152,7 +152,6 @@ function pwreset_setup()
   ce.pwreset_error = ce.pwreset_form.find('.error');
 
   ce.recovery_error.hide();
-  ce.recovery.show();
 }
 
 
@@ -201,6 +200,9 @@ function setup_elements()
   // clear old elements (needed for AJAX repopulation of login form)
   for( const key in ce ) { ce.off(); }
   ce = {};
+
+  // show javascript required elements
+  jQuery('#tlc-ttsurvey .javascript-required').show();
 
   // populate the elements
   ce.container = jQuery('#tlc-ttsurvey-login');

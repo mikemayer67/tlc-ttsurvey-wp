@@ -33,6 +33,7 @@ div#tlc-ttsurvey-login.card
 div#tlc-ttsurvey-login form
 {
   background-color:#e8e8e8;
+  margin:0;
 }
 
 /**
@@ -84,10 +85,6 @@ div#tlc-ttsurvey-login form.login div.recovery {
  * Recovery Form
  **/
 
-div#tlc-ttsurvey-login.recovery {
-  display:none;
-}
-
 div#tlc-ttsurvey-login.recovery div.input {
   margin-top:0;
 }
@@ -95,10 +92,6 @@ div#tlc-ttsurvey-login.recovery div.input {
 /**
  * Password Reset Form
  **/
-
-div#tlc-ttsurvey-login.pwreset {
-  display:none;
-}
 
 div#tlc-ttsurvey-login.pwreset div.input {
   margin-top:0;
