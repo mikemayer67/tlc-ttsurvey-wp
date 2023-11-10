@@ -5,7 +5,7 @@ function watch_lock()
     {
       action:'tlc_ttsurvey',
       nonce:watch_vars.nonce,
-      query:'obtain_content_lock',
+      query:'admin/obtain_content_lock',
     },
     function(response) {
       if(response.has_lock) {

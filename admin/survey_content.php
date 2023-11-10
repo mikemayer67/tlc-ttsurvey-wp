@@ -11,6 +11,7 @@ if( !plugin_admin_can('content') ) {
 
 const FIRST_TAB = 'first';
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/sendmail.php');
 require_once plugin_path('admin/content_lock.php');

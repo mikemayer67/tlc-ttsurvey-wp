@@ -7,7 +7,10 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('shortcode/_login_elements.php');
+require_once plugin_path('shortcode/login/_elements.php');
+
+add_javascript_recommended();
+add_status_message();
 
 start_login_form("Register for the Survey","register");
 
@@ -79,7 +82,7 @@ add_login_input("remember",array(
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",
 ));
 
-add_login_submit("Register",'register',['cancel'=>True]);
+add_login_submit("Register",'register',true);
 
 close_login_form();
 

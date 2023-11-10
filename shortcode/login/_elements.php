@@ -1,22 +1,35 @@
 <?php
 namespace TLC\TTSurvey;
 
-/**
- * Common Look and Feel elements ued by all survey pages, forms, etc.
- **/
+if(!defined('WPINC')) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
+
+wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));
+
+/****************************************************************
+ **
+ ** Common Look and Feel for all login forms
+ **
+ ****************************************************************/
 
 function start_login_form($header,$name) 
 {
-  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  $form_uri = survey_url();
 
   $w3_card = 'w3-container w3-card-4 w3-border w3-border-blue-gray';
   echo "<div id='tlc-ttsurvey-login' class='card $name $w3_card'>";
   echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
   echo "<form class='login w3-container' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
-  echo "<input type='hidden' name='refresh' value='1'>";
+  add_hidden_input('refresh',1);
+  add_hidden_input('status','');
+}
+
+function add_hidden_input($name,$value)
+{
+  echo "<input type='hidden' name='$name' value='$value'>";
 }
 
 function close_login_form()
@@ -28,15 +41,14 @@ function close_login_form()
 function add_login_instructions($instructions)
 {
   echo "<div>";
-  foreach($instructions as $instruction)
-  {
+  foreach($instructions as $instruction) {
     echo "<div class='instruction'>$instruction</div>";
   }
   echo "</div>";
 }
 
 /**
- * Function for providing commong look and feel to form inputs
+ * Input Fields
  *
  * Recognized input types:
  *   userid 
@@ -153,10 +165,8 @@ function add_login_input($type,$kwargs=array())
   echo "</div>";  // input
 }
 
-function add_login_submit($label,$action,$kwargs=array())
+function add_login_submit($label,$action,$cancel=False)
 {
-  $cancel = $kwargs['cancel'] ?? False;
-
   $btn_classes = 'w3-button w3-section w3-ripple w3-right w3-margin-left';
   $submit_classes = "submit $btn_classes w3-blue-gray";
   $cancel_classes = "cancel $btn_classes w3-light-gray";
@@ -182,16 +192,15 @@ function add_login_submit($label,$action,$kwargs=array())
 
 function add_login_links($links)
 {
-  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  $form_uri = survey_url();
 
-  echo "<div class='w3-panel'>";
+  echo "<div class='links w3-panel'>";
   foreach($links as $link)
   {
     [$label,$page,$side] = $link;
-    $page_uri = "$form_uri?tlcpage=$page";
-    echo "<div class='w3-$side'><a href='$page_uri'>$label</a></div>";
+    $page_uri = "$form_uri&tlcpage=$page";
+    echo "<div class='w3-$side $page'><a href='$page_uri'>$label</a></div>";
   }
   echo "</div>";
 }
 
-wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));

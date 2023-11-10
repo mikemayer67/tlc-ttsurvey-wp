@@ -8,6 +8,7 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
@@ -289,6 +290,37 @@ class User {
   }
 
   /**
+   * Password
+   **/
+
+  public function set_password_reset_token($token,$expires)
+  {
+    update_post_meta($this->_post_id,'pw_reset_token',"$expires:$token");
+  }
+
+  public function update_password($token,$password,&$error=null) 
+  {
+    $reset_token = get_post_meta($this->_post_id,'pw_reset_token') ?? null;
+    delete_post_meta($this->_post_id,'pw_reset_token');
+    if(!$reset_token) { 
+      $error = "No current password reset request";
+      return false;
+    }
+    $reset_token = $reset_token[0];
+    list($expires,$expected) = explode(':',$reset_token);
+    if( $token !== $expected ) {
+      $error = "Invalid reset request";
+      return false;
+    }
+    $now = current_time('U',true);
+    if($now > $expires) {
+      $error = "Password reset request has expired";
+      return false;
+    }
+    return $this->set_password($password);
+  }
+
+  /**
    * Setters
    **/
 
@@ -332,7 +364,7 @@ class User {
 
   public function set_password($password)
   {
-    log_dev("User::set_password($firstname,$password)");
+    log_dev("User::set_password($password)");
     if(!adjust_and_validate_login_input('password',$password) ) {
       log_warning("Cannot update password for $this->_userid: invalid password");
       return false;
@@ -404,11 +436,11 @@ function is_userid_available($userid)
   return is_null($existing);
 }
 
-function gen_access_token()
+function gen_access_token($token_length=25)
 {
   $access_token = '';
   $token_pool = '123456789123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for($i=0; $i<25; $i++) {
+  for($i=0; $i<$token_length; $i++) {
     $index = rand(0,strlen($token_pool)-1);
     $access_token .= $token_pool[$index];
   }

@@ -11,6 +11,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
+
 const OPTIONS_KEY = 'tlc_ttsurvey_options';
 
 const CAPS_KEY = 'caps';
@@ -27,15 +29,6 @@ $option_defaults = array(
   SURVEY_POST_UI_KEY => 'NONE',
   USER_POST_UI_KEY => 'NONE',
   PRIMARY_ADMIN_KEY => '',
-);
-
-const POST_UI_NONE = 'NONE';
-const POST_UI_POSTS = 'POSTS';
-const POST_UI_TOOLS = 'TOOLS';
-const POST_UI_ = array(
-  'NONE' => "Disabled",
-  'POSTS' => "Posts menu",
-  'TOOLS' => "Tools menu",
 );
 
 
@@ -103,7 +96,7 @@ function survey_admins($role) {
   if($role == 'manage') {
     foreach( get_users() as $user )
     {
-      $id = $user->id;
+      $id = $user->ID;
       if(user_can($id,'manage_options')) {
         if(!in_array($id,$rval)) {
           $rval[] = $id;
@@ -191,7 +184,7 @@ function update_options_from_post()
   );
 
   foreach(get_users() as $user) {
-    $id = $user->id;
+    $id = $user->ID;
     $view = false;
     foreach(['manage','responses','content','tech'] as $cap) {
       $key = "tlc-ttsurvey-$cap";

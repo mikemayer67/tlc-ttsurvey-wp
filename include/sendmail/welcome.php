@@ -3,9 +3,13 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/users.php');
-?>
 
-<?=$content?>
+$email = $message_data['email'];
+$userid = $message_data['userid'];
+$name = $message_data['name'];
+
+echo $custom_content;
+?>
 
 <div style='margin-left:1em;'>
 <ul>

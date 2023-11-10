@@ -20,6 +20,11 @@ if( ! defined('WPINC') ) { die; }
 function ns($s) { return __NAMESPACE__.'\\'.$s; }
 
 /**
+ * name of the plugin
+ */
+function plugin_name() { return plugin_basename(__FILE__); }
+
+/**
  * absolute path to the plugin file
  */
 function plugin_file() { return __FILE__; }
@@ -37,7 +42,7 @@ function plugin_path($path) { return plugin_dir() . '/' . $path; }
 /**
  * convert path relative to the plugin directory to a URL
  */
-function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
+function plugin_url($rel_url='') { return plugin_dir_url(__FILE__).'/'.$rel_url; }
 
 /**
  * returns base64 encoded svg icon
@@ -134,7 +139,7 @@ if( is_admin() ) /* Admin setup */
 else /* Non-admin setup */
 {
   require_once plugin_path('include/login.php');
-  require_once plugin_path('shortcode/shortcode.php');
+  require_once plugin_path('shortcode/setup.php');
 }
 
 

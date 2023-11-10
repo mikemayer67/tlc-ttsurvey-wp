@@ -8,9 +8,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 if( ! is_admin() ) { return; }
 
-const OPTIONS_NONCE = 'tlc-ttsurvey-settings';
-const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
-
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
@@ -62,12 +60,17 @@ function populate_settings_page()
   echo "</div>";
 }
 
-wp_register_script(
-  'tlc_admin_scripts',
-  plugin_url('admin/js/admin.js'),
-  array('jquery'),
-  '1.0.3',
-  true
-);
+function enqueue_setup_script()
+{
+  wp_register_script(
+    'tlc_admin_scripts',
+    plugin_url('admin/js/admin.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
 
-wp_enqueue_script('tlc_admin_scripts');
+  wp_enqueue_script('tlc_admin_scripts');
+}
+
+add_action('admin_enqueue_scripts',ns('enqueue_setup_script'));

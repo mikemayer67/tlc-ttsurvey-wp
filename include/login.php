@@ -7,9 +7,9 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/users.php');
-require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/validation.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
@@ -144,27 +144,23 @@ function login_init()
   #   the header has been completed.
   CookieJar::instance();
 
+  $status = $_REQUEST['status'] ?? "";
+  if($status) {
+    list($level,$msg) = explode("::",$status);
+    status_message($msg,$level);
+  }
+
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
     require_once plugin_path('include/users.php');
 
     switch($_POST['action'] ?? null)
     {
-    case 'login':
-      handle_login();
-      break;
-    case 'resume':
-      handle_login_resume();
-      break;
-    case 'register':
-      handle_login_register();
-      break;
-    case 'logout':
-      handle_logout();
-      break;
-    case 'senduserid':
-      handle_send_userid();
-      break;
+    case 'login':    handle_login();          break;
+    case 'resume':   handle_login_resume();   break;
+    case 'register': handle_login_register(); break;
+    case 'logout':   handle_logout();         break;
+    case 'recovery': handle_login_recovery(); break;
     }
   }
 }
@@ -229,17 +225,15 @@ function handle_logout()
   logout_active_user();
 }
 
-function handle_send_userid()
+function handle_login_recovery()
 {
-  log_dev("handle_send_userid");
-  require_once plugin_path('include/sendmail.php');
-  $email = $_POST['email'];
-  if(sendmail_login_recovery($email)) {
-    set_status_info("Sent userid/password to $email");
-  } else {
-    set_status_warning("Unrecognized email address");
-    set_current_shortcode_page("senduserid");
+  $status = $_POST['status'];
+
+  if($status) { 
+    list($level,$msg) = explode('::',$status);
+    status_message($msg,$level);
   }
+  clear_current_shortcode_page();
 }
 
 
