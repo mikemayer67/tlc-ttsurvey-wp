@@ -14,7 +14,6 @@ $password = adjust_login_input('password',$_POST['password']);
 
 $user = User::from_userid($userid);
 if(!$user) {
-  log_dev("reset_password: invalid userid=$userid");
   echo json_encode(array(
     'ok'=>false,
     'error'=>'invalid userid $userid',
@@ -26,7 +25,6 @@ $error = '';
 $result = $user->update_password($token,$password,$error);
 if(!$result) {
   if(!$error) { $error = "Internal error: password not updated"; }
-  log_dev("reset_password: failed: error=$error");
   echo json_encode(array(
     'ok'=>false,
     'error'=>$error,
@@ -34,8 +32,5 @@ if(!$result) {
   wp_die();
 }
 
-$rval = json_encode(array('ok'=>true));
-log_dev("reset_password successful, returning: $rval");
-
-echo $rval;
+echo json_encode(array('ok'=>true));
 wp_die();

@@ -39,8 +39,6 @@ function add_survey_content($userid=null)
 
 function enqueue_survey_script()
 {
-  log_dev("enqueue_survey_script");
-
   wp_register_script(
     'tlc_ttsurvey_script',
     plugin_url('shortcode/js/survey.js'),

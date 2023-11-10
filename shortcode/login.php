@@ -35,8 +35,6 @@ function add_login_content($page=null)
 
 function enqueue_login_script()
 {
-  log_dev("enqueue_login_script");
-
   wp_register_script(
     'tlc_ttsurvey_login',
     plugin_url('shortcode/js/login.js'),

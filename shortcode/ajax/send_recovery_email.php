@@ -12,14 +12,12 @@ require_once plugin_path('shortcode/login.php');
 
 $email = adjust_login_input('email',$_POST['email']);
 if(!$email) { 
-  log_dev("send_recovery_email: empty");
   echo json_encode(array('ok'=>false));
   wp_die();
 }
 
 $users = User::from_email($email);
 if(!$users) {
-  log_dev("send_recovery_email: no matches found for $email");
   echo json_encode(array(
     'ok'=>false,
     'error'=>"warning::unrecognized email $email",
