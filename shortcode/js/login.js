@@ -1,6 +1,22 @@
 var ce = {};
 
 //----------------------------------------
+// Userid/Password Login Form
+//----------------------------------------
+
+function login_form_setup()
+{
+  ce.login_inputs = ce.login_form.find('input');
+
+  ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
+  ce.login_recovery_link.show();
+
+  ce.login_inputs.on('input',function() {
+    ce.status_message.hide(400,'linear');
+  });
+}
+
+//----------------------------------------
 // New User Registration Form
 //----------------------------------------
 
@@ -112,7 +128,7 @@ function send_recovery_email(event)
 {
   event.preventDefault();
 
-  localStorage.removeItem('reset_keys');
+  localStorage.removeItem('pwreset');
 
   const email = ce.recovery_email.val();
   const data = {
@@ -126,7 +142,11 @@ function send_recovery_email(event)
     data,
     function(response) {
       if(response.ok) {
-        localStorage.reset_keys = JSON.stringify(response.keys);
+        pwreset = {
+          expires: response.expires,
+          tokens: response.tokens,
+        }
+        localStorage.pwreset = JSON.stringify(pwreset);
         ce.input_status.val("info::Login info sent to "+email);
         ce.recovery_form.off('submit');
         ce.recovery_submit.click();
@@ -143,9 +163,17 @@ function send_recovery_email(event)
 
 
 //----------------------------------------
-// Login Info Recovery Form
+// Password Reset Form
 //----------------------------------------
 
+var pwreset_user_info = {}
+
+function pwreset_failure(error)
+{
+  const status = encodeURIComponent("warning::"+error);
+  const new_url = login_vars.survey_url+'&status=' + status;
+  window.location.href = new_url;
+}
 function pwreset_setup()
 {
   var keyup_timer = null;
@@ -155,7 +183,21 @@ function pwreset_setup()
   ce.pwreset_cancel = ce.pwreset_form.find('button.cancel');
   ce.pwreset_error = ce.pwreset_form.find('.error');
 
+  const reset_token = ce.pwreset_form.find('input[name=reset_token]').val();
+  const server_time = Number(
+    ce.pwreset_form.find('input[name=server_time]').val()
+  );
+
   ce.pwreset_error.hide();
+
+  const pwreset = JSON.parse(localStorage.pwreset ?? "{}");
+  pwreset_user_info = pwreset.tokens[reset_token] ?? null;
+  if(!pwreset_user_info) {
+    pwreset_failure('Password recovery link was not requested from this device');
+  }
+  if(server_time > pwreset.expires) {
+    pwreset_failure("Password reset link expired");
+  }
 }
 
 
@@ -223,8 +265,7 @@ function setup_elements()
 
   // userid/password form
   ce.login_form = ce.container.filter('.login');
-  ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
-  ce.login_recovery_link.show();
+  if(ce.login_form.length) { login_form_setup(); }
 
   // recovery form
   ce.recovery = ce.container.filter('.recovery');

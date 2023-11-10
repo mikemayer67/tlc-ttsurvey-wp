@@ -23,8 +23,13 @@ function start_login_form($header,$name)
   echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
   echo "<form class='login w3-container' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
-  echo "<input type='hidden' name='refresh' value='1'>";
-  echo "<input type='hidden' name='status' value=''>";
+  add_hidden_input('refresh',1);
+  add_hidden_input('status','');
+}
+
+function add_hidden_input($name,$value)
+{
+  echo "<input type='hidden' name='$name' value='$value'>";
 }
 
 function close_login_form()

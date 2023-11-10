@@ -293,9 +293,8 @@ class User {
    * Password
    **/
 
-  public function set_password_reset_token($token)
+  public function set_password_reset_token($token,$expires)
   {
-    $expires = current_time('U',true) + LOGIN_RECOVERY_TIMEOUT;
     update_post_meta($this->_post_id,'pw_reset_token',"$expires:$token");
   }
 

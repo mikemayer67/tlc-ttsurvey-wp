@@ -144,17 +144,15 @@ function login_init()
   #   the header has been completed.
   CookieJar::instance();
 
+  $status = $_REQUEST['status'] ?? "";
+  if($status) {
+    list($level,$msg) = explode("::",$status);
+    status_message($msg,$level);
+  }
+
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
     require_once plugin_path('include/users.php');
-
-    $status = $_POST['status'] ?? "";
-    if($status) {
-      list($level,$msg) = explode("::",$status);
-      log_dev("status: $status, $level, $msg");
-      status_message($msg,$level);
-    }
-
 
     switch($_POST['action'] ?? null)
     {
@@ -230,7 +228,11 @@ function handle_logout()
 function handle_login_recovery()
 {
   $status = $_POST['status'];
-  if($status) { set_status_warning($status); }
+
+  if($status) { 
+    list($level,$msg) = explode('::',$status);
+    status_message($msg,$level);
+  }
   clear_current_shortcode_page();
 }
 

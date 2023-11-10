@@ -10,6 +10,8 @@ start_javascript_required('Password reset');
 add_status_message();
 
 start_login_form("Password Reset",'pwreset');
+add_hidden_input('reset_token',$_GET['token']);
+add_hidden_input('server_time',current_time('U',true));
 
 add_login_instructions([
   'Enter your userid and the new password you would like to use.'
