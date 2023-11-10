@@ -298,6 +298,28 @@ class User {
     update_post_meta($this->_post_id,'pw_reset_token',"$expires:$token");
   }
 
+  public function update_password($token,$password,&$error=null) 
+  {
+    $reset_token = get_post_meta($this->_post_id,'pw_reset_token') ?? null;
+    delete_post_meta($this->_post_id,'pw_reset_token');
+    if(!$reset_token) { 
+      $error = "No current password reset request";
+      return false;
+    }
+    $reset_token = $reset_token[0];
+    list($expires,$expected) = explode(':',$reset_token);
+    if( $token !== $expected ) {
+      $error = "Invalid reset request";
+      return false;
+    }
+    $now = current_time('U',true);
+    if($now > $expires) {
+      $error = "Password reset request has expired";
+      return false;
+    }
+    return $this->set_password($password);
+  }
+
   /**
    * Setters
    **/
@@ -342,7 +364,7 @@ class User {
 
   public function set_password($password)
   {
-    log_dev("User::set_password($firstname,$password)");
+    log_dev("User::set_password($password)");
     if(!adjust_and_validate_login_input('password',$password) ) {
       log_warning("Cannot update password for $this->_userid: invalid password");
       return false;

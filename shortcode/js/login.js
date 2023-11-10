@@ -194,9 +194,10 @@ function pwreset_setup()
   );
 
   const pwreset = JSON.parse(localStorage.pwreset ?? "{}");
-  pwreset_user_info = pwreset.tokens[reset_token] ?? null;
+  const reset_tokens = pwreset.tokens ?? {};
+  pwreset_user_info = reset_tokens[reset_token] ?? null;
   if(!pwreset_user_info) {
-    pwreset_failure('Password recovery link was not requested from this device');
+    pwreset_failure('Password recovery link not found');
   }
   if(server_time > pwreset.expires) {
     pwreset_failure("Password reset link expired");
@@ -237,7 +238,34 @@ function send_pwreset(event)
     ce.status_message.removeClass(['info','warning']).addClass('error');
     ce.status_message.html('Incorrect userid for password reset link');
     ce.status_message.show(200,'linear');
+    return;
   }
+
+  const data = {
+    action:'tlc_ttsurvey',
+    nonce:login_vars['nonce'],
+    query:'shortcode/reset_password',
+    userid:userid,
+    token:pwreset_user_info.reset,
+    password:ce.pwreset_password.val(),
+  };
+  jQuery.post(
+    login_vars['ajaxurl'],
+    data,
+    function(response) {
+      localStorage.removeItem('pwreset');
+      const name = pwreset_user_info.name;
+      var status = '';
+      if(response.ok) {
+        status = encodeURIComponent('info::password updated for '+name);
+      } else {
+        status = encodeURIComponent('warning::'+response.error);
+      }
+      const new_url = login_vars.survey_url+'&status='+status;
+      window.location.href = new_url;
+    },
+    'json',
+  );
 }
 
 function pwreset_validate_password()

@@ -10,7 +10,6 @@ require_once plugin_path('include/sendmail.php');
 require_once plugin_path('include/validation.php');
 require_once plugin_path('shortcode/login.php');
 
-$response = array();
 $email = adjust_login_input('email',$_POST['email']);
 if(!$email) { 
   log_dev("send_recovery_email: empty");
@@ -53,7 +52,6 @@ if(!sendmail_login_recovery($email,$tokens))
   ));
   wp_die();
 }
-
 
 echo json_encode(array(
   'ok'=>true,

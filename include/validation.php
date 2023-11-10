@@ -5,7 +5,7 @@ require_once plugin_path('include/users.php');
 
 function adjust_and_validate_login_input($key,&$value,&$error=null)
 {
-  $value = ajust_login_input($key,$value);
+  $value = adjust_login_input($key,$value);
   return validate_login_input($key,$value,$error);
 }
 
@@ -75,7 +75,7 @@ function validate_login_input($key,$value,&$error=null)
     elseif(!preg_match("/[a-zA-Z]/",$value)) {
       $error = "must contain at least one letter";
     }
-    elseif(preg_match("(/[^a-zA-Z0-9 !@%^*_=~,.-])/",$value,$m)) 
+    elseif(preg_match("/([^a-zA-Z0-9 !@%^*_=~,.-])/",$value,$m)) 
     {
       $error = "cannot contain ($m[1])";
     }

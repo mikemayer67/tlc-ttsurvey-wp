@@ -47,9 +47,7 @@ function _sendmail_send($email,$subject,$message_data)
     $email,
     $survey['name'] . ' Time & Talent survey',
     $message,
-    array(
-      'Content-Type: text/html; charset=UTF-8',
-    )
+    'Content-Type: text/html; charset=UTF-8',
   );
 }
 
@@ -57,10 +55,7 @@ function sendmail_login_recovery($email,$keys)
 {
   log_info("Send login recovery email to $email");
 
-  return _sendmail_send(
-    $email,
-    'recovery',
-    array( 'keys'=>$keys ),
+  return _sendmail_send( $email, 'recovery', array( 'keys'=>$keys ),
   );
 
 }
