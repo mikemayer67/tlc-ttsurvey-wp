@@ -4,7 +4,6 @@
 
 #tlc-ttsurvey div.noscript {
   font-family: sans-serif;
-  width: 100%;
   font-size: larger;
   font-weight: bold;
   color: white;
@@ -12,10 +11,17 @@
   padding: 5px 10px;
 }
 
+#tlc-ttsurvey noscript > div {
+  background:white;
+  border-width:1px;
+  border-style:solid;
+}
+
 #tlc-ttsurvey p.noscript {
   color: brown;
   margin-top:0;
   margin-left:1em;
+  margin-right:1em;
 }
 
 #tlc-ttsurvey div.status {

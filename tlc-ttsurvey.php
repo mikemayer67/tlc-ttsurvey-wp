@@ -42,7 +42,7 @@ function plugin_path($path) { return plugin_dir() . '/' . $path; }
 /**
  * convert path relative to the plugin directory to a URL
  */
-function plugin_url($rel_url) { return plugin_dir_url(__FILE__).'/'.$rel_url; }
+function plugin_url($rel_url='') { return plugin_dir_url(__FILE__).'/'.$rel_url; }
 
 /**
  * returns base64 encoded svg icon

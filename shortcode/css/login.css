@@ -93,6 +93,18 @@ div#tlc-ttsurvey-login.recovery div.input {
 }
 
 /**
+ * Password Reset Form
+ **/
+
+div#tlc-ttsurvey-login.pwreset {
+  display:none;
+}
+
+div#tlc-ttsurvey-login.pwreset div.input {
+  margin-top:0;
+}
+
+/**
  * Resume Form
  **/
 

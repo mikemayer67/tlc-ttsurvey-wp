@@ -1,5 +1,33 @@
 var ce = {};
 
+//----------------------------------------
+// New User Registration Form
+//----------------------------------------
+
+function register_setup()
+{
+  var keyup_timer = null;
+
+  ce.register_submit = ce.register_form.find('button.submit');
+  ce.register_error = ce.register_form.find('.error');
+
+  ce.register_submit.prop('disabled',true);
+  ce.register_error.hide();
+
+  ce.register_inputs = ce.register_form.find('input').not('input[type=checkbox]');
+
+  ce.register_inputs.on('input',function() {
+    ce.register_submit.prop('disabled',true);
+    if(keyup_timer) { clearTimeout(keyup_timer); }
+    keyup_timer = setTimeout( function() {
+        keyup_timer = null;
+        evaluate_register_inputs();
+      },
+      500,
+    );
+  });
+}
+
 function evaluate_register_inputs()
 {
   ce.register_submit.prop('disabled',true);
@@ -50,65 +78,9 @@ function evaluate_register_inputs()
   );
 }
 
-function register_setup()
-{
-  var keyup_timer = null;
-
-  ce.register_submit = ce.register_form.find('button.submit');
-  ce.register_error = ce.register_form.find('.error');
-
-  ce.register_submit.prop('disabled',true);
-  ce.register_error.hide();
-
-  ce.register_inputs = ce.register_form.find('input').not('input[type=checkbox]');
-
-  ce.register_inputs.on('input',function() {
-    ce.register_submit.prop('disabled',true);
-    if(keyup_timer) { clearTimeout(keyup_timer); }
-    keyup_timer = setTimeout( function() {
-        keyup_timer = null;
-        evaluate_register_inputs();
-      },
-      500,
-    );
-  });
-}
-
-function info_setup()
-{
-  var info_trigger_timer = null;
-
-  ce.info_triggers.each(
-    function() {
-      var trigger = jQuery(this)
-      var tgt_id = trigger.data('target');
-      var tgt = jQuery('#'+tgt_id);
-      trigger.on('mouseenter', function(e) {
-        if(info_trigger_timer) { 
-          clearTimeout(info_trigger_timer); 
-          info_trigger_timer=null;
-        }
-        info_trigger_timer = setTimeout(function() {tgt.slideDown(100)}, 500);
-      });
-      trigger.on('mouseleave',function(e) {
-        if(info_trigger_timer) {
-          clearTimeout(info_trigger_timer); 
-          info_trigger_timer=null;
-        }
-        if(!tgt.hasClass('locked')) { tgt.slideUp(100) } 
-      });
-      trigger.on( 'click', function() { 
-        if(tgt.hasClass('locked')) {
-          tgt.removeClass('locked').slideUp(100)
-        } else {
-          tgt.addClass('locked').slideDown(100)
-        }
-      });
-
-      tgt.on( 'click', function() { tgt.removeClass('locked').slideUp(100) });
-    }
-  );
-}
+//----------------------------------------
+// Login Info Recovery Form
+//----------------------------------------
 
 function recovery_setup()
 {
@@ -166,6 +138,64 @@ function send_recovery_email(event)
 }
 
 
+//----------------------------------------
+// Login Info Recovery Form
+//----------------------------------------
+
+function pwreset_setup()
+{
+  var keyup_timer = null;
+
+  ce.pwreset_form = ce.pwreset.find('form.login');
+  ce.pwreset_submit = ce.pwreset_form.find('button.submit');
+  ce.pwreset_cancel = ce.pwreset_form.find('button.cancel');
+  ce.pwreset_error = ce.pwreset_form.find('.error');
+
+  ce.recovery_error.hide();
+  ce.recovery.show();
+}
+
+
+//----------------------------------------
+// Common Login Forms Setup
+//----------------------------------------
+
+function info_setup()
+{
+  var info_trigger_timer = null;
+
+  ce.info_triggers.each(
+    function() {
+      var trigger = jQuery(this)
+      var tgt_id = trigger.data('target');
+      var tgt = jQuery('#'+tgt_id);
+      trigger.on('mouseenter', function(e) {
+        if(info_trigger_timer) { 
+          clearTimeout(info_trigger_timer); 
+          info_trigger_timer=null;
+        }
+        info_trigger_timer = setTimeout(function() {tgt.slideDown(100)}, 500);
+      });
+      trigger.on('mouseleave',function(e) {
+        if(info_trigger_timer) {
+          clearTimeout(info_trigger_timer); 
+          info_trigger_timer=null;
+        }
+        if(!tgt.hasClass('locked')) { tgt.slideUp(100) } 
+      });
+      trigger.on( 'click', function() { 
+        if(tgt.hasClass('locked')) {
+          tgt.removeClass('locked').slideUp(100)
+        } else {
+          tgt.addClass('locked').slideDown(100)
+        }
+      });
+
+      tgt.on( 'click', function() { tgt.removeClass('locked').slideUp(100) });
+    }
+  );
+}
+
 function setup_elements()
 {
   // clear old elements (needed for AJAX repopulation of login form)
@@ -192,6 +222,10 @@ function setup_elements()
   // recovery form
   ce.recovery = ce.container.filter('.recovery');
   if(ce.recovery.length) { recovery_setup(); }
+
+  // pwreset form
+  ce.pwreset = ce.container.filter('.pwreset');
+  if(ce.pwreset.length) { pwreset_setup(); }
 
   // register form
   ce.register_form = ce.container.filter('.register').find('form.login');

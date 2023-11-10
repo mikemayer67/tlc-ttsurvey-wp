@@ -3,13 +3,14 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('shortcode/setup.php');
 require_once plugin_path('shortcode/login/_elements.php');
 
-echo "<noscript>";
+echo "<noscript><div>";
 echo "<p class='noscript'>Password reset requires that Javascript be enabled.</p>";
-$url = $_SERVER['HTTP_REFERER'];
-echo "<a href='$url'>Return to login page</a>";
-echo "</noscript>";
+$return_url = survey_url();
+echo "<a href='$return_url'>Return to login page</a>";
+echo "</div></noscript>";
 
 start_login_form("Password Reset",'pwreset');
 

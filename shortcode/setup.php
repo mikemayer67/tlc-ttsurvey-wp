@@ -114,10 +114,10 @@ function add_noscript()
     $download = "";
   }
 ?>
-  <noscript>
+  <noscript><div>
   <div class='noscript'>This survey works best with Javascript enabled</div>
   <p class=noscript>If you cannot turn on Javascript, you may want to complete a paper copy of the survey. <?=$download?></p>
-  </noscript>
+  </div></noscript>
 <?php
 }
 
