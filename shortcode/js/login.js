@@ -84,8 +84,6 @@ function evaluate_register_inputs()
 
 function recovery_setup()
 {
-  var keyup_timer = null;
-
   ce.recovery_form = ce.recovery.find('form.login');
   ce.recovery_email = ce.recovery_form.find('input[name=email]');
   ce.recovery_submit = ce.recovery_form.find('button.submit');
@@ -97,6 +95,10 @@ function recovery_setup()
 
   ce.recovery_cancel.on('click',cancel_recovery);
   ce.recovery_form.on('submit',send_recovery_email)
+
+  ce.recovery_email.on('input',function() {
+    ce.status_message.hide(400,'linear')
+  });
 
 }
 
@@ -125,12 +127,14 @@ function send_recovery_email(event)
     function(response) {
       if(response.ok) {
         localStorage.reset_keys = JSON.stringify(response.keys);
-        alert("Login info sent to "+email);
+        ce.input_status.val("info::Login info sent to "+email);
         ce.recovery_form.off('submit');
         ce.recovery_submit.click();
       }
       if(response.error) {
-        alert(response.error);
+        var [level,msg] = response.error.split('::');
+        ce.status_message.removeClass(['info','warning','error'])
+        ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
     },
     'json',
@@ -151,7 +155,7 @@ function pwreset_setup()
   ce.pwreset_cancel = ce.pwreset_form.find('button.cancel');
   ce.pwreset_error = ce.pwreset_form.find('.error');
 
-  ce.recovery_error.hide();
+  ce.pwreset_error.hide();
 }
 
 
@@ -205,9 +209,10 @@ function setup_elements()
   jQuery('#tlc-ttsurvey .javascript-required').show();
 
   // populate the elements
+  ce.status_message = jQuery('#tlc-ttsurvey #status-message');
   ce.container = jQuery('#tlc-ttsurvey-login');
   ce.form = ce.container.find('form.login');
-  ce.status = ce.form.find('input[name=status]');
+  ce.input_status = ce.form.find('input[name=status]');
 
   // info trigger/box handling
   ce.info_triggers = ce.form.find('.info-trigger');

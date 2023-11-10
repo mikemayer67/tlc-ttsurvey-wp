@@ -27,19 +27,21 @@
   display: none;
 }
 
-#tlc-ttsurvey div.status {
+#tlc-ttsurvey #status-message {
   width: fit-content;
+  margin: 15px 0;
+  padding: 3px 15px;
 }
 
-#tlc-ttsurvey div.status.info {
-  /* w3-pale-green */
+#tlc-ttsurvey #status-message.info {
+  /* w3-pale-blue */
   color:#000!important;
-  background-color:#ddffdd!important;
-  /* w3-border-green */
-  border-color:#4CAF50!important;
+  background-color:#ddffff!important;
+  /* w3-border-blue */
+  border-color:#2196F3!important;
 }
 
-#tlc-ttsurvey div.status.warning {
+#tlc-ttsurvey #status-message.warning {
   /* w3-pale-yellow */
   color:#000!important;
   background-color:#ffffcc!important;
@@ -47,7 +49,7 @@
   border-color:#ff9800!important;
 }
 
-#tlc-ttsurvey div.status.error {
+#tlc-ttsurvey #status-message.error {
   /* w3-pale-red */
   color:#000!important;
   background-color:#ffdddd!important;

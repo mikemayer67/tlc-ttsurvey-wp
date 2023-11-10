@@ -22,7 +22,7 @@ if(!$users) {
   log_dev("send_recovery_email: no matches found for $email");
   echo json_encode(array(
     'ok'=>false,
-    'error'=>"unrecognized email $email",
+    'error'=>"warning::unrecognized email $email",
   ));
   wp_die();
 }
@@ -47,7 +47,7 @@ if(!sendmail_login_recovery($email,$reset_keys))
   log_error("Failed to send login recovery email to $email");
   echo json_encode(array(
     'ok'=>false,
-    'error'=>"sendmail failed",
+    'error'=>"error::internal error: failed to send email",
   ));
   wp_die();
 }

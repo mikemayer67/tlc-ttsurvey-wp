@@ -148,6 +148,14 @@ function login_init()
   {
     require_once plugin_path('include/users.php');
 
+    $status = $_POST['status'] ?? "";
+    if($status) {
+      list($level,$msg) = explode("::",$status);
+      log_dev("status: $status, $level, $msg");
+      status_message($msg,$level);
+    }
+
+
     switch($_POST['action'] ?? null)
     {
     case 'login':    handle_login();          break;
@@ -208,7 +216,6 @@ function handle_login_register()
   }
   else
   {
-    set_status_warning($error);
     set_current_shortcode_page('register');
   }
 }
@@ -221,8 +228,6 @@ function handle_logout()
 
 function handle_login_recovery()
 {
-  $status = $_POST['status'];
-  if($status) { set_status_warning($status); }
   clear_current_shortcode_page();
 }
 
