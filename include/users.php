@@ -28,7 +28,7 @@ require_once plugin_path('include/validation.php');
  *   - pw_hash: password hash
  *
  *   Anonymous Entries:
- *   - anon_hash: hash of the anonid and post_id of the corresponding participant.
+ *   - n/a
  *
  * Survey responses from each participant is attached to either a
  *   user post or an anonymous post as meta data. The metadata key 
@@ -76,10 +76,15 @@ require_once plugin_path('include/validation.php');
  *     - association between userid/anonid is never included in any logs
  *       or wordpress internal tables other than as described below:
  *     - linkage between userid and anonid is obfuscated through a 
- *       password hash of the user's post id and the anonid.  While this
- *       is not perfect security, it will require a degree of effort to
- *       map the relationship.  It will not be available to a casual
- *       viewer of the wordpress database.
+ *       bijection manipulation of the anonid. This obfuscated anonid is 
+ *       stored in the metadata associated with the userid.  While this
+ *       is not perfect security, it will require a degree of effort to 
+ *       map the relationship.  It will not be available to a casual 
+ *       viewer of the wordpress database. 
+ *     - Users without an anonymous proxy are assigned a bogus 
+ *       (obfuscated) anonid so that it is not easily discernable
+ *       who has or has not provided anonymous responses.
+ *
  **/
 
 /**
@@ -87,6 +92,8 @@ require_once plugin_path('include/validation.php');
  **/
 
 const USERID_POST_TYPE = 'tlc-ttsurvey-id';
+const ANON_USERID = '_anonymous';
+
 
 function register_userid_post_type()
 {
@@ -227,7 +234,7 @@ class User {
     );
     if($email) { $content['email'] = $email; }
     
-    $user_post_id = wp_insert_post(
+    $post_id = wp_insert_post(
       array(
         'post_type' => USERID_POST_TYPE,
         'post_title' => $userid,
@@ -237,25 +244,12 @@ class User {
       true
     );
 
-    do {
-      $anonid = 'anon_'.random_int(100000,999999);
-    } while( User::from_userid($anonid) );
+    // Don't set up the real anonyous proxy until needed, but to
+    // help hide who has or has not submitted anonymous responses,
+    // add the anonid metadata pointing back to user.
+    update_post_meta($post_id,'anonid',User::_encode_anon($post_id));
 
-    $anon_content = array(
-      'anon_hash' => password_hash("$anonid/$user_post_id",PASSWORD_DEFAULT),
-    );
-
-    $anon_post_id = wp_insert_post(
-      array(
-        'post_type' => USERID_POST_TYPE,
-        'post_title' => $anonid,
-        'post_content' => json_encode($anon_content),
-        'post_status' => 'publish',
-      ),
-      true
-    );
-    
-    return User::from_post_id($user_post_id);
+    return User::from_post_id($post_id);
   }
 
   /**
@@ -397,32 +391,51 @@ class User {
    * Anonymous Proxy
    **/
 
+  private static function _encode_anon($anonid) { return ($anonid * 81) ^ 0xce67; }
+  private static function _decode_anon($anonid) { return ($anonid ^ 0xce67) / 81; }
+
   public function anon_proxy()
   {
+    if($this->_userid === ANON_USERID) {
+      // Anonymous proxies cannot have their own anonymous proxies
+      return null;
+    }
+
     log_dev("User::anon_proxy()");
-    $posts = get_posts(
+    $anonids = get_post_meta($this->_post_id,'anonid');
+
+    if(count($anonids) > 1) {
+      // Oops... internal error resulted in multiple anon proxies
+      log_error("Multiple anonymous proxies for userid $this->_userid");
+      die;
+    } 
+    
+    if(count($anonids) == 1) {
+      // This is what we should expect... but doesn't mean that 
+      // there's actually an anonymous proxy set up yet.
+      // Verify that the anonid is really for an anonymous user.
+      $anonid = User::_decode_anon($anonids[0]);
+      $anon = User::from_post_id($anonid);
+      if($anon && $anon->userid() === ANON_USERID) {
+        return $anon;
+      }
+    } 
+
+    // Looks like we need to create the anonymous proxy
+
+    $anonid = wp_insert_post(
       array(
         'post_type' => USERID_POST_TYPE,
-        'numberposts' => -1,
-      )
+        'post_title' => ANON_USERID,
+        'post_content' => '{}',
+        'post_status' => 'publish',
+      ),
+      true
     );
-    foreach($posts as $post) {
-      $cand = new User($post);
-      if($cand->is_anon_proxy_for($this->_post_id)) {
-        log_dev("  proxy = ".print_r($cand));
-        return $cand;
-      }
-    }
-    return null;
-  }
 
-  public function is_anon_proxy_for($user_post_id) 
-  {
-    $hash = $this->_data['anon_hash'] ?? null;
-    if(is_null($hash)) { return null; }
+    update_post_meta($this->_post_id,'anonid',User::_encode_anon($anonid));
 
-    $anonid = $this->_userid;
-    return password_verify("$anonid/$user_post_id",$hash);
+    return User::from_post_id($anonid);
   }
 }
 
