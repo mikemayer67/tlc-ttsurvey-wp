@@ -6,7 +6,7 @@ require_once plugin_path('include/users.php');
 
 $email = $message_data['email'];
 $userid = $message_data['userid'];
-$name = $message_data['name'];
+$name = $message_data['username'];
 
 echo $custom_content;
 ?>
@@ -24,7 +24,7 @@ $others = array();
 foreach($users_with_email as $user) {
   $id = $user->userid();
   if($id != $userid) { 
-    $name = $user->display_name();
+    $name = $user->username();
     $others[] = "$name ($id)";
   }
 }

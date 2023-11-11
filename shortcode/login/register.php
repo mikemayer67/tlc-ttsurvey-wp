@@ -16,15 +16,12 @@ start_login_form("Register for the Survey","register");
 
 if( $_POST['refresh'] ?? False ) {
   $userid = $_POST['userid'] ?? null;
-  $username = array( 
-    $_POST['name-first'] ?? null,
-    $_POST['name-last'] ?? null,
-  );
+  $username = $_POST['username'] ?? null;
   $email = $_POST['email'] ?? null;
   $remember = $_POST['remember'] ?? False;
 } else {
   $userid = null;
-  $username = array(null,null);
+  $username = null;
   $email = null;
   $remember = True;
 }
@@ -51,11 +48,10 @@ INFO
 ));
 
 add_login_input("username",array(
-  "name" => "name",
   "value" => $username,
   "info" => <<<INFO
 How your name will appear on the survey summary report
-<p class=info-list><b>must</b> contain a valid name</p>
+<p class=info-list><b>must</b> contain a valid full name</p>
 <p class=info-list><b>may</b> contain apostrophes</p>
 <p class=info-list><b>may></b> contain hyphens</p>
 <p class=info-list>Extra whitespace will be removed</p>

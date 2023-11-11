@@ -52,8 +52,7 @@ function evaluate_register_inputs()
     action:'tlc_ttsurvey',
     nonce:login_vars['nonce'],
     query:'shortcode/validate_register_form',
-    firstname:form.find('.input.name input.first').val(),
-    lastname:form.find('.input.name input.last').val(),
+    username:form.find('.input.username input').val(),
     userid:form.find('.input.userid input').val(),
     password:form.find('.input.password input.primary').val(),
     pwconfirm:form.find('.input.password input.confirm').val(),
@@ -64,7 +63,7 @@ function evaluate_register_inputs()
     login_vars['ajaxurl'],
     data,
     function(response) {
-      let keys = ['userid','password','name','email'];
+      let keys = ['userid','password','username','email'];
       var all_ok = true;
       keys.forEach( function(key) {
         var error_box = form.find('.input .error.'+key);
@@ -254,10 +253,10 @@ function send_pwreset(event)
     data,
     function(response) {
       localStorage.removeItem('pwreset');
-      const name = pwreset_user_info.name;
+      const username = pwreset_user_info.username;
       var status = '';
       if(response.ok) {
-        status = encodeURIComponent('info::password updated for '+name);
+        status = encodeURIComponent('info::password updated for '+username);
       } else {
         status = encodeURIComponent('warning::'+response.error);
       }

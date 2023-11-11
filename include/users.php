@@ -21,8 +21,7 @@ require_once plugin_path('include/validation.php');
  * The post content is a JSON string with the following fields:
  *
  *   Participant Entries:
- *   - firstname
- *   - lastname
+ *   - username
  *   - email (optional)
  *   - access_token
  *   - pw_hash: password hash
@@ -224,12 +223,11 @@ class User {
     return $users;
   }
 
-  public static function create($userid,$password,$firstname,$lastname,$email=null)
+  public static function create($userid,$password,$username,$email=null)
   {
     $content = array(
       'pw_hash' => password_hash($password,PASSWORD_DEFAULT),
-      'firstname' => $firstname,
-      'lastname' => $lastname,
+      'username' => $username,
       'access_token' => gen_access_token(),
     );
     if($email) { $content['email'] = $email; }
@@ -258,20 +256,10 @@ class User {
 
   public function userid()       { return $this->_userid;                       }
   public function post_id()      { return $this->_post_id;                      }
-  public function first_name()   { return $this->_data['firstname']    ?? null; }
-  public function last_name()    { return $this->_data['lastname']     ?? null; }
+  public function username()     { return $this->_data['username']     ?? null; }
   public function email()        { return $this->_data['email']        ?? null; }
   public function access_token() { return $this->_data['access_token'] ?? null; }
   
-  public function display_name() {
-    $first = $this->first_name();
-    $last = $this->last_name();
-    if($first && $last) {
-      return implode(' ',array($first,$last));
-    }
-    return null;
-  }
-
   /**
    * Validation
    **/
@@ -318,26 +306,21 @@ class User {
    * Setters
    **/
 
-  public function set_name($firstname,$lastname) 
+  public function set_username($username) 
   {
-    log_dev("User::set_name($firstname,$lastname)");
-    if(!adjust_and_validate_login_input('name',$firstname)) {
-      log_warning("Cannot update name for $this->_userid: invalid first name ($firstname)");
+    log_dev("User::set_name($username)");
+    if(!adjust_and_validate_login_input('username',$username)) {
+      log_warning("Cannot update name for $this->_userid: invalid name ($username)");
       return false;
     }
-    if(!adjust_and_validate_login_input('name',$lastname)) {
-      log_warning("Cannot update name for $this->_userid: invalid last name ($lastname)");
-      return false;
-    }
-    $this->_data['firstname'] = $firstname;
-    $this->_data['lastname'] = $lastname;
+    $this->_data['username'] = $username;
     $this->commit();
     return true;
   }
 
   public function set_email($email)
   {
-    log_dev("User::set_email($firstname,$email)");
+    log_dev("User::set_email($email)");
     if(!adjust_and_validate_login_input('email',$email) ) {
       log_warning("Cannot update email for $this->_userid: invalid email ($email)");
       return false;
