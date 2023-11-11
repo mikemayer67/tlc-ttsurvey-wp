@@ -28,7 +28,7 @@ echo "<div style='margin-top:1em; margin-left:2em;'>";
 foreach($keys as $key=>$info)
 {
   echo "<div style='margin:15px 0;'>";
-  echo "<div><b>" . $info['name'] . "</b></div>";
+  echo "<div><b>" . $info['username'] . "</b></div>";
 
   echo "<div style='margin-left:8px;'>Userid: <b>";
   echo $info['userid'];

@@ -32,7 +32,7 @@ function validate_login_input($key,$value,&$error=null)
 {
   $error = '';
 
-  if($key=='name')
+  if($key=='username')
   {
     $invalid_end = "'~-";
     $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
@@ -47,6 +47,9 @@ function validate_login_input($key,$value,&$error=null)
     }
     elseif(strlen($value)<2) {
       $error = "no initials, please";
+    }
+    elseif(!str_contains($value,' ')) {
+      $error = "full name, please";
     }
   }
   elseif($key=='userid')

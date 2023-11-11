@@ -242,8 +242,7 @@ function register_new_user(&$error=null)
   $userid = adjust_login_input('userid',$_POST['userid']);
   $password1 = adjust_login_input('password',$_POST['password']);
   $password2 = adjust_login_input('password',$_POST['password-confirm']);
-  $firstname = adjust_login_input('name',$_POST['name-first']);
-  $lastname = adjust_login_input('name',$_POST['name-last']);
+  $username = adjust_login_input('username',$_POST['username']);
   $email = adjust_login_input('email',$_POST['email']);
 
   $remember = $_POST['remember'] ?? False;
@@ -257,12 +256,8 @@ function register_new_user(&$error=null)
     $error = "Failed registration. Invalid password: $error";
     return false;
   }
-  if(!validate_login_input('name',$firstname,$error)) {
-    $error = "Failed registration. Invalid first name";
-    return false;
-  }
-  if(!validate_login_input('name',$lastname,$error)) {
-    $error = "Failed registration. Invalid last name: $error";
+  if(!validate_login_input('username',$username,$error)) {
+    $error = "Failed registration. Invalid name";
     return false;
   }
   if(!validate_login_input('email',$email,$error)) {
@@ -280,10 +275,10 @@ function register_new_user(&$error=null)
     return false;
   }
 
-  $user = User::create($userid,$password1,$firstname,$lastname,$email);
+  $user = User::create($userid,$password1,$username,$email);
   $token = $user->access_token();
 
-  log_info("Registered new user $firstname $lastname with userid $userid and token $token");
+  log_info("Registered new user $username with userid $userid and token $token");
 
   start_survey_as($userid);
 
@@ -291,7 +286,7 @@ function register_new_user(&$error=null)
 
   if($email) { 
     require_once plugin_path('include/sendmail.php');
-    sendmail_welcome($email, $userid, $firstname, $lastname, $token); 
+    sendmail_welcome($email, $userid, $username, $token); 
   }
 
   $error = '';

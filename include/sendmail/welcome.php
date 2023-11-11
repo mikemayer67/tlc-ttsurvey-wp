@@ -6,7 +6,7 @@ require_once plugin_path('include/users.php');
 
 $email = $message_data['email'];
 $userid = $message_data['userid'];
-$name = $message_data['name'];
+$name = $message_data['username'];
 
 echo $custom_content;
 ?>

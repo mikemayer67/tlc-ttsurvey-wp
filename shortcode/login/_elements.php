@@ -108,12 +108,10 @@ function add_login_input($type,$kwargs=array())
 
     switch($type) {
     case 'userid':
+    case 'username':
       $type = "text";
-      if($value) { $extra = "value='$value' $extra"; }
-      $input_attrs = array("class='$classes' name='$name' $extra");
-      break;
-
-    case 'email':
+      // fallthrough is intentional
+    case 'email';
       if($value) { $extra = "value='$value' $extra"; }
       $input_attrs = array("class='$classes' name='$name' $extra");
       break;
@@ -129,20 +127,6 @@ function add_login_input($type,$kwargs=array())
       } else {
         $input_attrs = array("class='$classes' name='$name' $extra");
       }
-      break;
-
-    case 'username':
-      $type = "text";
-      $extra = $optional ? '' : 'required';
-      if($value) { 
-        [$first,$last] = $value;
-        $extra1 = "value='$first' $extra";
-        $extra2 = "value='$last' $extra";
-      }
-      $input_attrs = array(
-       "class='$classes first' name='$name-first' placeholder='First' $extra1",
-       "class='$classes last' name='$name-last' placeholder='Last' $extra2",
-      );
       break;
 
     default:
