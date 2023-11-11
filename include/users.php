@@ -257,7 +257,6 @@ class User {
   public function userid()       { return $this->_userid;                       }
   public function post_id()      { return $this->_post_id;                      }
   public function username()     { return $this->_data['username']     ?? null; }
-  public function display_name() { return $this->_data['username']     ?? null; }
   public function email()        { return $this->_data['email']        ?? null; }
   public function access_token() { return $this->_data['access_token'] ?? null; }
   

@@ -24,7 +24,7 @@ $others = array();
 foreach($users_with_email as $user) {
   $id = $user->userid();
   if($id != $userid) { 
-    $name = $user->display_name();
+    $name = $user->username();
     $others[] = "$name ($id)";
   }
 }
