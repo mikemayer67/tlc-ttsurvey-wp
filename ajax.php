@@ -3,8 +3,11 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/logger.php');
+
 function ajax_wrapper()
 {
+  log_dev("ajax_wrapper POST:".print_r($_POST,true));
   [$key,$nonce] = $_POST['nonce'];
   if(!wp_verify_nonce($nonce,$key)) {
     log_error("Bad nonce ".__FILE__.':'.__LINE__);

@@ -7,6 +7,9 @@ var ce = {};
 function login_form_setup()
 {
   ce.login_inputs = ce.login_form.find('input');
+  ce.login_userid = ce.login_inputs.filter('[name=userid]');
+  ce.login_password = ce.login_inputs.filter('[name=password]');
+  ce.login_remember = ce.login_inputs.filter('[name=remember]');
 
   ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
   ce.login_recovery_link.show();
@@ -14,6 +17,47 @@ function login_form_setup()
   ce.login_inputs.on('input',function() {
     ce.status_message.hide(400,'linear');
   });
+
+  ce.login_form.on('submit',attempt_logging_in);
+}
+
+function attempt_logging_in(event)
+{
+  event.preventDefault();
+
+  const data = {
+    action:'tlc_ttsurvey',
+    nonce:login_vars['nonce'],
+    query:'shortcode/attempt_login',
+    userid:ce.login_userid.val(),
+    password:ce.login_password.val(),
+    remember:ce.login_remember.is(':checked'),
+  };
+  jQuery.post(
+    login_vars['ajaxurl'],
+    data,
+    function(response) {
+      if(response.success) {
+        response.cookies.forEach(function(cookie) {
+          console.log(cookie);
+          const key = cookie[0];
+          const value = cookie[1];
+          const expires = 1000*cookie[2];
+          var new_cookie = key + '=' + value;
+          if(expires > 0) {
+            new_cookie += '; ' + (new Date(expires)).toUTCString();
+          }
+          document.cookie = new_cookie;
+        });
+        window.location.href = login_vars.survey_url;
+      } else {
+        ce.status_message.removeClass(['info','warning']).addClass('error');
+        ce.status_message.html(response.error);
+        ce.status_message.show(200,'linear');
+      }
+    },
+    'json',
+  );
 }
 
 //----------------------------------------

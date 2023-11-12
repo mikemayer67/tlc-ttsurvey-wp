@@ -11,19 +11,42 @@ require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/users.php');
 require_once plugin_path('include/validation.php');
+require_once plugin_path('shortcode/setup.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
 const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
 
+/**
+ * CookieJar is used to manage the login cookies.
+ *
+ * CookieJar supports both AJAX and noscript scenarios.
+ *   In both cases, it is instantiated with the browser's current cookies
+ *   For noscript:
+ *   - any changes to the browser cookies are handled immediately
+ *   - this must happen before any html is written to standard out
+ *   For ajax:
+ *   - any changes to the cookies are returned in an array
+ *   - these will be passed back in the ajax response
+ *   - the javascript that invoked ajax must set the cookies on the browser
+ *
+ * CookieJar is a singleton class accessed via the instance() method.
+ *   To support ajax, instance() should be passed a truthy value.
+ **/
 class CookieJar
 {
   private static $_instance = null;
+  private $_ajax = false;
   private $_active_userid = null;
   private $_access_tokens = null;
 
-  public static function instance()
+  public static function instance($ajax=false)
   {
     if(!self::$_instance) { self::$_instance = new CookieJar(); }
+
+    if($ajax) {
+      self::$_instance->_ajax = true;
+    }
+
     return self::$_instance;
   }
 
@@ -52,15 +75,26 @@ class CookieJar
     return $this->_active_userid;
   }
 
+  private function _set_cookie($key,$value,$expires)
+  {
+    if($this->_ajax) {
+      return array($key,$value,$expires);
+    } else {
+      setcookie($key,$value,$expires);
+    }
+    return true;
+  }
+
   public function set_active_userid($userid)
   {
+    log_dev("set_active_userid($userid)");
     $this->_active_userid = $userid;
-    setcookie( ACTIVE_USER_COOKIE, $userid, 0 );
+    return $this->_set_cookie(ACTIVE_USER_COOKIE,$userid,0);
   }
 
   public function clear_active_userid()
   {
-    $this->set_active_userid(null);
+    return $this->set_active_userid(null);
   }
 
   public function get_access_token($userid)
@@ -71,12 +105,16 @@ class CookieJar
   public function set_access_token($userid,$token)
   {
     $this->_access_tokens[$userid] = $token;
-    setcookie( ACCESS_TOKEN_COOKIE, json_encode($this->_access_tokens), time() + 86400*365);
+    return $this->_set_cookie( 
+      ACCESS_TOKEN_COOKIE, 
+      json_encode($this->_access_tokens), 
+      time() + 86400*365,
+    );
   }
 
   public function clear_access_token($userid)
   {
-    $this->set_access_token($userid,null);
+    return $this->set_access_token($userid,null);
   }
 
   public function access_tokens()
@@ -104,21 +142,20 @@ function cookie_tokens()
 function logout_active_user()
 {
   log_dev("logout_active_user()");
-  CookieJar::instance()->clear_active_userid();
+  return CookieJar::instance()->clear_active_userid();
 }
 
 function start_survey_as($userid)
 {
   log_dev("start_survey_as($userid)");
-  CookieJar::instance()->set_active_userid($userid);
+  return CookieJar::instance()->set_active_userid($userid);
 }
 
 function resume_survey_as($userid,$token)
 {
   log_dev("resume_survey_as($userid,$token)");
   if( validate_user_access_token($userid,$token) ) { 
-    CookieJar::instance()->set_active_userid($userid);
-    return true;
+    return CookieJar::instance()->set_active_userid($userid);
   }
   return false;
 }
@@ -126,18 +163,19 @@ function resume_survey_as($userid,$token)
 function remember_user_token($userid,$token)
 {
   log_dev("remember_user_token($userid,$token)");
-  CookieJar::instance()->set_access_token($userid,$token);
+  return CookieJar::instance()->set_access_token($userid,$token);
 }
 
 function forget_user_token($userid)
 {
   log_dev("forget_user_token($userid)");
-  CookieJar::instance()->clear_access_token($userid);
+  return CookieJar::instance()->clear_access_token($userid);
 }
 
 
 function login_init()
 {
+  log_dev("login_init");
   $nonce = $_POST['_wpnonce'] ?? '';
 
   # need to instantiate the cookie jar during the init phase before
@@ -154,7 +192,10 @@ function login_init()
   {
     require_once plugin_path('include/users.php');
 
-    switch($_POST['action'] ?? null)
+    $action = $_POST['action'] ?? null;
+    log_dev("login_init: $action");
+
+    switch($action)
     {
     case 'login':    handle_login();          break;
     case 'resume':   handle_login_resume();   break;
@@ -169,26 +210,40 @@ add_action('init',ns('login_init'));
 
 function handle_login()
 {
-  log_dev("handle_login");
   $userid = $_POST['userid'];
-  $user = User::from_userid($userid);
-  if($user) {
-    login_dev("valid user($userid)");
-    $password = $_POST['password'];
-    if($user->verify_password($password)) {
-      login_dev("valid password");
-      CookieJar::instance()->set_active_userid($userid);
-      if($_POST['remember'] ?? null) {
-        $token = $user->access_token();
-        remember_user_token($userid,$token);
-      } else {
-        forget_user_token($userid);
-      }
-      clear_status();
-      return;
-    }
+  $password = $_POST['password'];
+  $remember = $_POST['remember'] ?? false;
+  log_dev("handle_login($userid,$password,$remember)");
+
+  $result = attempt_login($userid,$password,$remember);
+  // cookies were handled in attempt_login, simply need to update status
+  if($result['success']) {
+    clear_status();
+    return true;
+  } else {
+    set_status_warning($result['error']);
+    return false;
   }
-  set_status_warning("Invalid userid or password");
+}
+
+function attempt_login($userid,$password,$remember)
+{
+  $user = User::from_userid($userid);
+  if(!$user) {
+    return array('success'=>false, 'error'=>'Invalid userid');
+  }
+  if(!$user->verify_password($password)) {
+    return array('success'=>false, 'error'=>'Incorrect password');
+  }
+  $jar = CookieJar::instance();
+  $cookies = array( $jar->set_active_userid($userid) );
+  if($remember) {
+    $token = $user->access_token();
+    $cookies[] = remember_user_token($userid,$token);
+  } else {
+    $cookies[] = forget_user_token($userid);
+  }
+  return array('success'=>true, 'cookies'=>$cookies);
 }
 
 function handle_login_resume()
