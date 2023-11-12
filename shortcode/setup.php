@@ -12,6 +12,8 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/login.php');
 
+const NOSCRIPT_COOKIE = 'tlc-ttsurve-noscript';
+
 /**
  * handle the plugin shortcode
  *
@@ -90,6 +92,12 @@ function handle_shortcode($attr,$content=null,$tag=null)
 {
   if(!is_first_survey_on_page()) { return; }
 
+  if($_POST['ack_nojs'] ?? false) {
+    log_dev("Set nojs cookie");
+    setcookie(NOSCRIPT_COOKIE,1,0);
+    $_COOKIE[NOSCRIPT_COOKIE] = true;
+  }
+
   ob_start();
 
   echo "<div id='tlc-ttsurvey'>";
@@ -104,18 +112,30 @@ function handle_shortcode($attr,$content=null,$tag=null)
 function add_javascript_recommended()
 {
   $pdf_uri = survey_pdf_uri();
-  echo "<noscript><div>";
-  echo "<div class='noscript header'>";
-  echo "This survey works best with Javascript enabled";
-  echo "</div>";
-  echo "<p>If you cannot turn on Javascript, you may want to complete a ";
-  echo "paper copy of the survey.";
-  if($pdf_uri) {
-    echo "You can download a PDF version ";
-    echo "<a target='_blank' href='$pdf_uri'>here</a>.";
+  $noscript_acknowleged = $_COOKIE[NOSCRIPT_COOKIE] ?? false;
+
+  if($noscript_acknowleged) {
+    if($pdf_uri) {
+      echo "<p class='noscript'>You can download a PDF version of the survey ";
+      echo "<a target='_blank' href='$pdf_uri'>here</a>.<p>";
+    }
+  } else {
+    echo "<noscript><div>";
+    $url = $_SERVER['REQUEST_URI'];
+    echo "<form method='post' action='$url'>";
+    echo "<input type=hidden name='ack_nojs' value=1>";
+    echo "<div class='noscript header'>";
+    echo "This survey works best with Javascript enabled";
+    echo "<input type='submit' value='acknowleged'>";
+    echo "</div>";
+    if($pdf_uri) {
+      echo "<p>You can download a PDF version of the survey ";
+      echo "<a target='_blank' href='$pdf_uri'>here</a>.<p>";
+    }
+    echo "</form>";
+    echo "</div>";
+    echo "</noscript>";
   }
-  echo "</p>";
-  echo "</div></noscript>";
 }
 
 function start_javascript_required($page)
