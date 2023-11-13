@@ -48,6 +48,7 @@ INFO
 ));
 
 add_login_input("username",array(
+  "label" => 'Name',
   "value" => $username,
   "info" => <<<INFO
 How your name will appear on the survey summary report

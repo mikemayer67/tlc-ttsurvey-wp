@@ -41,27 +41,30 @@ function attempt_login(event)
       password:ce.login_password.val(),
       remember:ce.login_remember.is(':checked'),
     },
-    function(response) {
-      if(response.success) {
-        response.cookies.forEach(function(cookie) {
-          console.log(cookie);
-          const key = cookie[0];
-          const value = cookie[1];
-          const expires = 1000*cookie[2];
-          var new_cookie = key + '=' + value;
-          if(expires > 0) {
-            new_cookie += '; ' + (new Date(expires)).toUTCString();
-          }
-          document.cookie = new_cookie;
-        });
-        window.location.href = login_vars.survey_url;
-      } else {
-        ce.status_message.removeClass(['info','warning']).addClass('error');
-        ce.status_message.html(response.error);
-        ce.status_message.show(200,'linear');
-      }
-    }
+    login_response_handler,
   );
+}
+
+function login_response_handler(response)
+{
+  if(response.success) {
+    response.cookies.forEach(function(cookie) {
+      console.log(cookie);
+      const key = cookie[0];
+      const value = cookie[1];
+      const expires = 1000*cookie[2];
+      var new_cookie = key + '=' + value;
+      if(expires > 0) {
+        new_cookie += '; ' + (new Date(expires)).toUTCString();
+      }
+      document.cookie = new_cookie;
+    });
+    window.location.href = login_vars.survey_url;
+  } else {
+    ce.status_message.removeClass(['info','warning']).addClass('error');
+    ce.status_message.html(response.error);
+    ce.status_message.show(200,'linear');
+  }
 }
 
 //----------------------------------------
@@ -72,6 +75,11 @@ function register_setup()
 {
   var keyup_timer = null;
 
+  ce.register_userid = ce.register_form.find('.input.userid input');
+  ce.register_password = ce.register_form.find('.input.password input.primary');
+  ce.register_pwconfirm = ce.register_form.find('.input.password input.confirm');
+  ce.register_username = ce.register_form.find('.input.username input');
+  ce.register_email = ce.register_form.find('.input.email input');
   ce.register_submit = ce.register_form.find('button.submit');
   ce.register_error = ce.register_form.find('.error');
 
@@ -90,27 +98,27 @@ function register_setup()
       500,
     );
   });
+
+  ce.register_form.on('submit',attempt_login_register);
 }
 
 function evaluate_register_inputs()
 {
-  const form = ce.register_form;
-
   ajax_query(
     'validate_register_form', 
     {
-      username:form.find('.input.username input').val(),
-      userid:form.find('.input.userid input').val(),
-      password:form.find('.input.password input.primary').val(),
-      pwconfirm:form.find('.input.password input.confirm').val(),
-      email:form.find('.input.email input').val(),
+      userid:ce.register_userid.val(),
+      password:ce.register_password.val(),
+      pwconfirm:ce.register_pwconfirm.val(),
+      username:ce.register_username.val(),
+      email:ce.register_email.val(),
     },
     function(response) {
       let keys = ['userid','password','username','email'];
       var all_ok = true;
       keys.forEach( function(key) {
-        var error_box = form.find('.input .error.'+key);
-        var input = form.find('.input.'+key+' input');
+        var error_box = ce.register_form.find('.input .error.'+key);
+        var input = ce.register_form.find('.input.'+key+' input');
         input.removeClass(['invalid','empty']);
         if( key in response ) {
           all_ok = false;
@@ -130,6 +138,23 @@ function evaluate_register_inputs()
       });
       ce.register_submit.prop("disabled",!all_ok);
     }
+  );
+}
+
+function attempt_login_register(event)
+{
+  event.preventDefault();
+
+  ajax_query(
+    'register_new_user',
+    {
+      userid:ce.register_userid.val(),
+      password:ce.register_password.val(),
+      pwconfirm:ce.register_pwconfirm.val(),
+      username:ce.register_username.val(),
+      email:ce.register_email.val(),
+    },
+    login_response_handler,
   );
 }
 
