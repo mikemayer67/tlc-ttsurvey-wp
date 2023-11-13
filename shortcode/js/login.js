@@ -1,5 +1,14 @@
 var ce = {};
 
+function ajax_query( query, data, response_handler )
+{
+  data.action = 'tlc_ttsurvey';
+  data.nonce = login_vars.nonce;
+  data.query = 'shortcode/' + query;
+
+  jQuery.post(login_vars.ajaxurl, data, response_handler, 'json');
+}
+
 //----------------------------------------
 // Userid/Password Login Form
 //----------------------------------------
@@ -18,24 +27,20 @@ function login_form_setup()
     ce.status_message.hide(400,'linear');
   });
 
-  ce.login_form.on('submit',attempt_logging_in);
+  ce.login_form.on('submit',attempt_login);
 }
 
-function attempt_logging_in(event)
+function attempt_login(event)
 {
   event.preventDefault();
 
-  const data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/attempt_login',
-    userid:ce.login_userid.val(),
-    password:ce.login_password.val(),
-    remember:ce.login_remember.is(':checked'),
-  };
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  ajax_query(
+    'attempt_login',
+    {
+      userid:ce.login_userid.val(),
+      password:ce.login_password.val(),
+      remember:ce.login_remember.is(':checked'),
+    },
     function(response) {
       if(response.success) {
         response.cookies.forEach(function(cookie) {
@@ -55,8 +60,7 @@ function attempt_logging_in(event)
         ce.status_message.html(response.error);
         ce.status_message.show(200,'linear');
       }
-    },
-    'json',
+    }
   );
 }
 
@@ -92,20 +96,15 @@ function evaluate_register_inputs()
 {
   const form = ce.register_form;
 
-  data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/validate_register_form',
-    username:form.find('.input.username input').val(),
-    userid:form.find('.input.userid input').val(),
-    password:form.find('.input.password input.primary').val(),
-    pwconfirm:form.find('.input.password input.confirm').val(),
-    email:form.find('.input.email input').val(),
-  };
-
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  ajax_query(
+    'validate_register_form', 
+    {
+      username:form.find('.input.username input').val(),
+      userid:form.find('.input.userid input').val(),
+      password:form.find('.input.password input.primary').val(),
+      pwconfirm:form.find('.input.password input.confirm').val(),
+      email:form.find('.input.email input').val(),
+    },
     function(response) {
       let keys = ['userid','password','username','email'];
       var all_ok = true;
@@ -130,8 +129,7 @@ function evaluate_register_inputs()
         }
       });
       ce.register_submit.prop("disabled",!all_ok);
-    },
-    'json',
+    }
   );
 }
 
@@ -171,16 +169,13 @@ function send_recovery_email(event)
 
   localStorage.removeItem('pwreset');
 
-  const email = ce.recovery_email.val();
-  const data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/send_recovery_email',
-    email:email,
-  };
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  const email = ce.recovery_email.val()
+
+  ajax_query(
+    'send_recovery_email', 
+    {
+      email:email,
+    },
     function(response) {
       if(response.ok) {
         pwreset = {
@@ -197,8 +192,7 @@ function send_recovery_email(event)
         ce.status_message.removeClass(['info','warning','error'])
         ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
-    },
-    'json',
+    }
   );
 }
 
@@ -284,30 +278,26 @@ function send_pwreset(event)
     return;
   }
 
-  const data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/reset_password',
-    userid:userid,
-    token:pwreset_user_info.reset,
-    password:ce.pwreset_password.val(),
-  };
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  ajax_query(
+    'reset_password',
+    {
+      userid:userid,
+      token:pwreset_user_info.reset,
+      password:ce.pwreset_password.val(),
+    },
     function(response) {
       localStorage.removeItem('pwreset');
-      const username = pwreset_user_info.username;
+    
       var status = '';
       if(response.ok) {
+        const username = pwreset_user_info.username;
         status = encodeURIComponent('info::password updated for '+username);
       } else {
         status = encodeURIComponent('warning::'+response.error);
       }
-      const new_url = login_vars.survey_url+'&status='+status;
-      window.location.href = new_url;
-    },
-    'json',
+    
+      window.location.href = login_vars.survey_url+'&status='+status;
+    }
   );
 }
 
