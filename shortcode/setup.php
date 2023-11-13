@@ -118,7 +118,7 @@ function add_javascript_recommended()
     if($pdf_uri) {
       echo "<noscript>";
       echo "<p class='noscript'>You can download a PDF version of the survey ";
-      echo "<a target='_blank' href='$pdf_uri'>here</a>.<p>";
+      echo "<a target='_blank' href='$pdf_uri'>here</a>.</p>";
       echo "</noscript>";
     }
   } else {
