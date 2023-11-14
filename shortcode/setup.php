@@ -127,7 +127,7 @@ function add_javascript_recommended()
     echo "<input type=hidden name='ack_nojs' value=1>";
     echo "<div class='noscript header'>";
     echo "This survey works best with Javascript enabled";
-    echo "<input type='submit' value='acknowleged'>";
+    echo "<input type='submit' value='x'>";
     echo "</div>";
     if($pdf_uri) {
       echo "<p>You can download a PDF version of the survey ";
