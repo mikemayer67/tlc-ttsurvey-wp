@@ -65,7 +65,7 @@ function status_message($msg=null,$level=INFO_STATUS)
 function set_status_info($msg) { status_message($msg,INFO_STATUS); }
 function set_status_warning($msg) { status_message($msg,WARNING_STATUS); }
 function set_status_error($msg) { status_message($msg,ERROR_STATUS); }
-function clear_status() { log_dev("clear_status"); status_message(null); }
+function clear_status() { status_message(null); }
 
 
 function _shortcode_page($action,$page=null)
@@ -93,7 +93,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
   if(!is_first_survey_on_page()) { return; }
 
   if($_POST['ack_nojs'] ?? false) {
-    log_dev("Set nojs cookie");
     setcookie(NOSCRIPT_COOKIE,1,0);
     $_COOKIE[NOSCRIPT_COOKIE] = true;
   }

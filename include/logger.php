@@ -37,7 +37,6 @@ function logger($create=true)
 function clear_logger()
 {
   global $_logger_fp;
-  log_dev("clear_logger: $_logger_fp");
 
   $file = plugin_path(PLUGIN_LOG_FILE);
   if($_logger_fp) { 

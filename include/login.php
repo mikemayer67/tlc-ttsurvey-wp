@@ -127,27 +127,23 @@ class CookieJar
 function active_userid()
 {
   $rval = CookieJar::instance()->get_active_userid();
-  log_dev("active_userid() => $rval");
   return $rval;
 }
 
 function cookie_tokens()
 {
   $rval = CookieJar::instance()->access_tokens();
-  log_dev("access_tokens() => ".print_r($rval,true));
   return $rval;
 }
 
 
 function logout_active_user()
 {
-  log_dev("logout_active_user()");
   return CookieJar::instance()->clear_active_userid();
 }
 
 function start_survey_as($userid)
 {
-  log_dev("start_survey_as($userid)");
   return CookieJar::instance()->set_active_userid($userid);
 }
 
@@ -162,20 +158,17 @@ function resume_survey_as($userid,$token)
 
 function remember_user_token($userid,$token)
 {
-  log_dev("remember_user_token($userid,$token)");
   return CookieJar::instance()->set_access_token($userid,$token);
 }
 
 function forget_user_token($userid)
 {
-  log_dev("forget_user_token($userid)");
   return CookieJar::instance()->clear_access_token($userid);
 }
 
 
 function login_init()
 {
-  log_dev("login_init: POST=".print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   # need to instantiate the cookie jar during the init phase before
@@ -260,8 +253,6 @@ function handle_login_resume()
 
 function handle_login_register()
 {
-  log_dev("handle_login_register()");
-
   $result = register_new_user(
     adjust_user_input('userid',$_POST['userid']),
     adjust_user_input('password',$_POST['password']),
@@ -329,7 +320,6 @@ function register_new_user($userid, $password, $pwconfirm, $username, $email, $r
 
   $cookies = array( start_survey_as($userid) );
   if($remember) {
-    log_dev("remember $userid token $token");
     $cookies[] = remember_user_token($userid,$token); 
   }
 
@@ -344,7 +334,6 @@ function register_new_user($userid, $password, $pwconfirm, $username, $email, $r
 
 function handle_logout()
 {
-  log_dev("handle_logout()");
   logout_active_user();
 }
 

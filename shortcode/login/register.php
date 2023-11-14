@@ -7,10 +7,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
-require_once plugin_path('include/logger.php');
 require_once plugin_path('shortcode/login/_elements.php');
 
-log_dev("register POST:".print_r($_POST,true));
 add_javascript_recommended();
 add_status_message();
 
