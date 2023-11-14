@@ -40,22 +40,22 @@ require_once plugin_path('include/validation.php');
  *     - unique ID associated with each survey participant
  *     - selected by the participant when they registered for the survey
  *     - stored in the title attribute of wp_post table
- *   user post id:
- *     - the index of the the user's entry in the wp_post table
- *     - used internal to wordpress and the plugin
- *   user name:
+ *   username:
  *     - the participant's full name as it will appear on the survey
  *       summary report.
  *     - provided by the participant when they register for the survey
  *     - may be modified by the participant once they have logged in
  *     - stored as wordpress post metadata
- *   user email:
+ *   post id:
+ *     - the index of the the user's entry in the wp_post table
+ *     - used internal to wordpress and the plugin
+ *   email:
  *     - the participant's email address (optional)
  *     - provided by the participant when they register for the survey
  *     - may be added/modified by the participant once they have logged in
  *     - may be removed by the participant once they have logged in
  *     - stored as wordpress post metadata
- *   user password:
+ *   password:
  *     - the participant's password for logging into the survey
  *     - provided by the participant when they register for the survey
  *     - may be modified by the participant once they have logged in
