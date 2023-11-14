@@ -27,15 +27,15 @@ function login_form_setup()
     ce.status_message.hide(400,'linear');
   });
 
-  ce.login_form.on('submit',attempt_login);
+  ce.login_form.on('submit',login_with_userid);
 }
 
-function attempt_login(event)
+function login_with_userid(event)
 {
   event.preventDefault();
 
   ajax_query(
-    'attempt_login',
+    'login_with_userid',
     {
       userid:ce.login_userid.val(),
       password:ce.login_password.val(),
@@ -80,6 +80,7 @@ function register_setup()
   ce.register_pwconfirm = ce.register_form.find('.input.password input.confirm');
   ce.register_username = ce.register_form.find('.input.username input');
   ce.register_email = ce.register_form.find('.input.email input');
+  ce.register_remember = ce.login_inputs.filter('[name=remember]');
   ce.register_submit = ce.register_form.find('button.submit');
   ce.register_error = ce.register_form.find('.error');
 
@@ -99,7 +100,7 @@ function register_setup()
     );
   });
 
-  ce.register_form.on('submit',attempt_login_register);
+  ce.register_form.on('submit',register_new_user);
 }
 
 function evaluate_register_inputs()
@@ -141,7 +142,7 @@ function evaluate_register_inputs()
   );
 }
 
-function attempt_login_register(event)
+function register_new_user(event)
 {
   event.preventDefault();
 
@@ -153,6 +154,7 @@ function attempt_login_register(event)
       pwconfirm:ce.register_pwconfirm.val(),
       username:ce.register_username.val(),
       email:ce.register_email.val(),
+      remember:ce.register_remember.is(':checked'),
     },
     login_response_handler,
   );

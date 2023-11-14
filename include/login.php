@@ -215,8 +215,8 @@ function handle_login()
   $remember = $_POST['remember'] ?? false;
   log_dev("handle_login($userid,$password,$remember)");
 
-  $result = attempt_login($userid,$password,$remember);
-  // cookies were handled in attempt_login, simply need to update status
+  $result = login_with_userid($userid,$password,$remember);
+  // cookies were handled in login_with_userid, simply need to update status
   if($result['success']) {
     clear_status();
     return true;
@@ -226,7 +226,7 @@ function handle_login()
   }
 }
 
-function attempt_login($userid,$password,$remember)
+function login_with_userid($userid,$password,$remember)
 {
   $user = User::from_userid($userid);
   if(!$user) {
@@ -262,23 +262,92 @@ function handle_login_resume()
 function handle_login_register()
 {
   log_dev("handle_login_register()");
-  $error = '';
-  if(register_new_user($error))
-  {
+
+  $result = register_new_user(
+    adjust_login_input('userid',$_POST['userid']),
+    adjust_login_input('password',$_POST['password']),
+    adjust_login_input('password',$_POST['password-confirm']),
+    adjust_login_input('username',$_POST['username']),
+    adjust_login_input('email',$_POST['email']),
+    $_POST['remember'] ?? False,
+  );
+
+  // cookies were handled in register_new_user, simply need to update status
+  if($result['success']) {
     log_dev("where to go now that I have a new user registered?");
-  }
-  else
-  {
-    set_status_warning($error);
+  } else {
+    set_status_warning($result['error']);
     set_current_shortcode_page('register');
   }
 }
+
+function register_new_user(
+  $userid, $password, $pwconfirm, $username, $email, $remmber
+) {
+  $error='';
+  if(!validate_login_input('userid',$userid,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid userid: $error",
+    );
+  }
+  if(!validate_login_input('password',$password,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid password: $error",
+    );
+  }
+  if(!validate_login_input('username',$username,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid name: $error",
+    );
+  }
+  if(!validate_login_input('email',$email,$error)) {
+    return array(
+      'success'=>false,
+      'error'=>"Invalid email: $error",
+    );
+  }
+  if($password1 != $password2)
+  {
+    return array(
+      'success'=>false,
+      'error'=>'Password did not match its confirmation',
+    );
+  }
+
+  if(!is_userid_available($userid)) {
+    return array(
+      'success'=>false,
+      'error'=>"Userid '$userid' is already in use",
+    );
+  }
+
+  $user = User::create($userid,$password,$username,$email);
+  $token = $user->access_token();
+
+  log_info("Registered new user $username with userid $userid and token $token");
+
+  $cookies = array( start_survey_as($userid) );
+
+  if($remember) { $cookies[] = remember_user_token($userid,$token); }
+
+  if($email) { 
+    require_once plugin_path('include/sendmail.php');
+    sendmail_welcome($email, $userid, $username, $token); 
+  }
+
+  return array('success'=>true, 'cookies'=>$cookies);
+}
+
 
 function handle_logout()
 {
   log_dev("handle_logout()");
   logout_active_user();
 }
+
 
 function handle_login_recovery()
 {
@@ -292,58 +361,3 @@ function handle_login_recovery()
 }
 
 
-function register_new_user(&$error=null)
-{
-  $userid = adjust_login_input('userid',$_POST['userid']);
-  $password1 = adjust_login_input('password',$_POST['password']);
-  $password2 = adjust_login_input('password',$_POST['password-confirm']);
-  $username = adjust_login_input('username',$_POST['username']);
-  $email = adjust_login_input('email',$_POST['email']);
-
-  $remember = $_POST['remember'] ?? False;
-
-  $error='';
-  if(!validate_login_input('userid',$userid,$error)) {
-    $error = "Failed registration. Invalid userid: $error";
-    return false;
-  }
-  if(!validate_login_input('password',$password1,$error)) {
-    $error = "Failed registration. Invalid password: $error";
-    return false;
-  }
-  if(!validate_login_input('username',$username,$error)) {
-    $error = "Failed registration. Invalid name";
-    return false;
-  }
-  if(!validate_login_input('email',$email,$error)) {
-    $error = "Failed registration. Invalid email: $error";
-    return false;
-  }
-  if($password1 != $password2)
-  {
-    $error = "Failed registration. Password did not match its confirmation";
-    return false;
-  }
-
-  if(!is_userid_available($userid)) {
-    $error = "Userid '$userid' is already in use";
-    return false;
-  }
-
-  $user = User::create($userid,$password1,$username,$email);
-  $token = $user->access_token();
-
-  log_info("Registered new user $username with userid $userid and token $token");
-
-  start_survey_as($userid);
-
-  if($remember) { remember_user_token($userid,$token); }
-
-  if($email) { 
-    require_once plugin_path('include/sendmail.php');
-    sendmail_welcome($email, $userid, $username, $token); 
-  }
-
-  $error = '';
-  return true;
-}
