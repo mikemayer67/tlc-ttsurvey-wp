@@ -175,7 +175,7 @@ function forget_user_token($userid)
 
 function login_init()
 {
-  log_dev("login_init");
+  log_dev("login_init: POST=".print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   # need to instantiate the cookie jar during the init phase before
@@ -210,12 +210,11 @@ add_action('init',ns('login_init'));
 
 function handle_login()
 {
-  $userid = $_POST['userid'];
-  $password = $_POST['password'];
-  $remember = $_POST['remember'] ?? false;
-  log_dev("handle_login($userid,$password,$remember)");
-
-  $result = login_with_userid($userid,$password,$remember);
+  $result = login_with_userid(
+    adjust_user_input('userid',$_POST['userid']),
+    adjust_user_input('password',$_POST['password']),
+    filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
+  );
   // cookies were handled in login_with_userid, simply need to update status
   if($result['success']) {
     clear_status();
@@ -264,12 +263,12 @@ function handle_login_register()
   log_dev("handle_login_register()");
 
   $result = register_new_user(
-    adjust_login_input('userid',$_POST['userid']),
-    adjust_login_input('password',$_POST['password']),
-    adjust_login_input('password',$_POST['password-confirm']),
-    adjust_login_input('username',$_POST['username']),
-    adjust_login_input('email',$_POST['email']),
-    $_POST['remember'] ?? False,
+    adjust_user_input('userid',$_POST['userid']),
+    adjust_user_input('password',$_POST['password']),
+    adjust_user_input('password',$_POST['password-confirm']),
+    adjust_user_input('username',$_POST['username']),
+    adjust_user_input('email',$_POST['email']),
+    filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
   );
 
   // cookies were handled in register_new_user, simply need to update status
@@ -281,35 +280,34 @@ function handle_login_register()
   }
 }
 
-function register_new_user(
-  $userid, $password, $pwconfirm, $username, $email, $remmber
-) {
+function register_new_user($userid, $password, $pwconfirm, $username, $email, $remember) 
+{
   $error='';
-  if(!validate_login_input('userid',$userid,$error)) {
+  if(!validate_user_input('userid',$userid,$error)) {
     return array(
       'success'=>false, 
       'error'=>"Invalid userid: $error",
     );
   }
-  if(!validate_login_input('password',$password,$error)) {
+  if(!validate_user_input('password',$password,$error)) {
     return array(
       'success'=>false, 
       'error'=>"Invalid password: $error",
     );
   }
-  if(!validate_login_input('username',$username,$error)) {
+  if(!validate_user_input('username',$username,$error)) {
     return array(
       'success'=>false, 
       'error'=>"Invalid name: $error",
     );
   }
-  if(!validate_login_input('email',$email,$error)) {
+  if(!validate_user_input('email',$email,$error)) {
     return array(
       'success'=>false,
       'error'=>"Invalid email: $error",
     );
   }
-  if($password1 != $password2)
+  if($password != $pwconfirm)
   {
     return array(
       'success'=>false,
@@ -330,8 +328,10 @@ function register_new_user(
   log_info("Registered new user $username with userid $userid and token $token");
 
   $cookies = array( start_survey_as($userid) );
-
-  if($remember) { $cookies[] = remember_user_token($userid,$token); }
+  if($remember) {
+    log_dev("remember $userid token $token");
+    $cookies[] = remember_user_token($userid,$token); 
+  }
 
   if($email) { 
     require_once plugin_path('include/sendmail.php');

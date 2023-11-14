@@ -12,7 +12,7 @@ require_once plugin_path('include/settings.php');
 require_once plugin_path('include/surveys.php');
 require_once plugin_path('include/login.php');
 
-const NOSCRIPT_COOKIE = 'tlc-ttsurve-noscript';
+const NOSCRIPT_COOKIE = 'tlc-ttsurvey-noscript';
 
 /**
  * handle the plugin shortcode

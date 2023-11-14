@@ -308,7 +308,7 @@ class User {
 
   public function set_username($username) 
   {
-    if(!adjust_and_validate_login_input('username',$username)) {
+    if(!adjust_and_validate_user_input('username',$username)) {
       log_warning("Cannot update name for $this->_userid: invalid name ($username)");
       return false;
     }
@@ -319,7 +319,7 @@ class User {
 
   public function set_email($email)
   {
-    if(!adjust_and_validate_login_input('email',$email) ) {
+    if(!adjust_and_validate_user_input('email',$email) ) {
       log_warning("Cannot update email for $this->_userid: invalid email ($email)");
       return false;
     }
@@ -339,7 +339,7 @@ class User {
 
   public function set_password($password)
   {
-    if(!adjust_and_validate_login_input('password',$password) ) {
+    if(!adjust_and_validate_user_input('password',$password) ) {
       log_warning("Cannot update password for $this->_userid: invalid password");
       return false;
     }

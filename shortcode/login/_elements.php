@@ -110,6 +110,7 @@ function add_login_input($type,$kwargs=array())
     case 'userid':
     case 'username':
       $type = "text";
+      log_dev("Adding $type: <<$value>>");
       // fallthrough is intentional
     case 'email';
       if($value) { $extra = "value='$value' $extra"; }

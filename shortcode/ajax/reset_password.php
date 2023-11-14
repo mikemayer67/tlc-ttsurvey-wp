@@ -9,8 +9,8 @@ require_once plugin_path('include/validation.php');
 
 $response = array();
 $token = $_POST['token'];
-$userid = adjust_login_input('userid',$_POST['userid']);
-$password = adjust_login_input('password',$_POST['password']); 
+$userid = adjust_user_input('userid',$_POST['userid']);
+$password = adjust_user_input('password',$_POST['password']); 
 
 $user = User::from_userid($userid);
 if(!$user) {

@@ -3,13 +3,13 @@ namespace TLC\TTSurvey;
 
 require_once plugin_path('include/users.php');
 
-function adjust_and_validate_login_input($key,&$value,&$error=null)
+function adjust_and_validate_user_input($key,&$value,&$error=null)
 {
-  $value = adjust_login_input($key,$value);
-  return validate_login_input($key,$value,$error);
+  $value = adjust_user_input($key,$value);
+  return validate_user_input($key,$value,$error);
 }
 
-function adjust_login_input($key,$value)
+function adjust_user_input($key,$value)
 {
   $value = trim(stripslashes($value??''));
 
@@ -28,7 +28,7 @@ function adjust_login_input($key,$value)
   return $value;
 }
 
-function validate_login_input($key,$value,&$error=null)
+function validate_user_input($key,$value,&$error=null)
 {
   $error = '';
 

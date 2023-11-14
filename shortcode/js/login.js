@@ -80,7 +80,7 @@ function register_setup()
   ce.register_pwconfirm = ce.register_form.find('.input.password input.confirm');
   ce.register_username = ce.register_form.find('.input.username input');
   ce.register_email = ce.register_form.find('.input.email input');
-  ce.register_remember = ce.login_inputs.filter('[name=remember]');
+  ce.register_remember = ce.register_form.find('input[name=remember]');
   ce.register_submit = ce.register_form.find('button.submit');
   ce.register_error = ce.register_form.find('.error');
 

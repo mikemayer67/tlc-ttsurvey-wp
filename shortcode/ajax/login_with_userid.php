@@ -5,9 +5,9 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/login.php');
 
-$userid = adjust_login_input('userid',$_POST['userid']);
-$password = adjust_login_input('password',$_POST['password']);
-$remember = $_POST['remember'] ?? false;
+$userid = adjust_user_input('userid',$_POST['userid']);
+$password = adjust_user_input('password',$_POST['password']);
+$remember = filter_var($_POST['remember']??false, FILTER_VALIDATE_BOOLEAN);
 
 // Let CookieJar know this is an ajax call.
 //   This modifies how login_with_userid handles cookies 

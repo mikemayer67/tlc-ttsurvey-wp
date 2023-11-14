@@ -7,8 +7,10 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/logger.php');
 require_once plugin_path('shortcode/login/_elements.php');
 
+log_dev("register POST:".print_r($_POST,true));
 add_javascript_recommended();
 add_status_message();
 
@@ -18,7 +20,7 @@ if( $_POST['refresh'] ?? False ) {
   $userid = $_POST['userid'] ?? null;
   $username = $_POST['username'] ?? null;
   $email = $_POST['email'] ?? null;
-  $remember = $_POST['remember'] ?? False;
+  $remember = filter_var($_POST['remember']??false, FILTER_VALIDATE_BOOLEAN);
 } else {
   $userid = null;
   $username = null;

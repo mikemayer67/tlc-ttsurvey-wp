@@ -10,7 +10,7 @@ require_once plugin_path('include/sendmail.php');
 require_once plugin_path('include/validation.php');
 require_once plugin_path('shortcode/login.php');
 
-$email = adjust_login_input('email',$_POST['email']);
+$email = adjust_user_input('email',$_POST['email']);
 if(!$email) { 
   echo json_encode(array('ok'=>false));
   wp_die();
