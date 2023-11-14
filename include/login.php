@@ -171,6 +171,7 @@ function forget_user_token($userid)
 
 function login_init()
 {
+  log_dev("login_init POST=".print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   # need to instantiate the cookie jar during the init phase before
@@ -188,15 +189,20 @@ function login_init()
     require_once plugin_path('include/users.php');
 
     $action = $_POST['action'] ?? null;
-    log_dev("login_init: $action");
+
+    if(str_starts_with($action,'resume:'))
+    {
+      list($action,$userid,$token) = explode(':',$action);
+      handle_login_resume($userid,$token);
+      return;
+    }
 
     switch($action)
     {
-    case 'login':    handle_login();          break;
-    case 'resume':   handle_login_resume();   break;
-    case 'register': handle_login_register(); break;
-    case 'logout':   handle_logout();         break;
-    case 'recovery': handle_login_recovery(); break;
+    case 'login':    handle_login();               break;
+    case 'register': handle_login_register();      break;
+    case 'logout':   handle_logout();              break;
+    case 'recovery': handle_login_recovery();      break;
     }
   }
 }
@@ -205,12 +211,12 @@ add_action('init',ns('login_init'));
 
 function handle_login()
 {
-  $result = login_with_userid(
+  $result = login_with_password(
     adjust_user_input('userid',$_POST['userid']),
     adjust_user_input('password',$_POST['password']),
     filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
   );
-  // cookies were handled in login_with_userid, simply need to update status
+  // cookies were handled in login_with_password, simply need to update status
   if($result['success']) {
     clear_status();
     return true;
@@ -220,7 +226,7 @@ function handle_login()
   }
 }
 
-function login_with_userid($userid,$password,$remember)
+function login_with_password($userid,$password,$remember)
 {
   $user = User::from_userid($userid);
   if(!$user) {
@@ -240,16 +246,37 @@ function login_with_userid($userid,$password,$remember)
   return array('success'=>true, 'cookies'=>$cookies);
 }
 
-function handle_login_resume()
+function handle_login_resume($userid,$token)
 {
-  log_dev("handle_login_resume()");
-  $userid = $_POST['userid'];
-  $token = $_POST['access_token'];
-  if( resume_survey_as($userid,$token) ) {
+  $result = login_with_token($userid,$token);
+  if($result['success']) {
+    clear_status();
+    return true;
+  } else {
+    set_status_warning($result['error']);
+    return false;
+  }
+}
+
+function login_with_token($userid,$token)
+{
+  log_dev("handle_login_resume($userid,$token)");
+
+  $cookie = resume_survey_as($userid,$token);
+  if($cookie) {
     log_dev("resuming survey as $userid");
+    return array(
+      'success'=>true,
+      'cookies'=>array($cookie),
+    );
   } else {
     log_dev("invalid access token, removing $userid from cookie");
-    forget_user_token($userid);
+    $cookie = forget_user_token($userid);
+    return array(
+      'success'=>false,
+      'error'=>"expired user token",
+      'cookies'=>array($cookie),
+    );
   }
 }
 

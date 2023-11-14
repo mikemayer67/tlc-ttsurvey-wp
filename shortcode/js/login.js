@@ -27,15 +27,15 @@ function login_form_setup()
     ce.status_message.hide(400,'linear');
   });
 
-  ce.login_form.on('submit',login_with_userid);
+  ce.login_form.on('submit',login_with_password);
 }
 
-function login_with_userid(event)
+function login_with_password(event)
 {
   event.preventDefault();
 
   ajax_query(
-    'login_with_userid',
+    'login_with_password',
     {
       userid:ce.login_userid.val(),
       password:ce.login_password.val(),

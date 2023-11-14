@@ -5,6 +5,7 @@ if(!defined('WPINC')) { die; }
 
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
+require_once plugin_path('include/login.php');
 
 wp_enqueue_style('tlc-ttsurvey-login', plugin_url('shortcode/css/login.css'));
 
@@ -146,6 +147,20 @@ function add_login_input($type,$kwargs=array())
   }
 
   echo "</div>";  // input
+}
+
+function add_resume_buttons()
+{
+  foreach(cookie_tokens() as $userid=>$token) {
+    $user = User::from_userid($userid);
+    if($user) {
+      $username = $user->username();
+      $value = "resume:$userid:$token";
+      log_dev("Add button for $username");
+      $class = 'submit resume token';
+      echo "<button class='$class' name='action' value='$value' formnovalidate>$username</button>";
+    }
+  }
 }
 
 function add_login_submit($label,$action,$cancel=False)
