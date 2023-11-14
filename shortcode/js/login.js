@@ -49,11 +49,11 @@ function login_response_handler(response)
 {
   if(response.success) {
     response.cookies.forEach(function(cookie) {
-      console.log(cookie);
       const key = cookie[0];
       const value = cookie[1];
       const expires = 1000*cookie[2];
-      var new_cookie = key + '=' + value;
+      const path = cookie[3];
+      var new_cookie = key + '=' + value + '; path=' + path;
       if(expires > 0) {
         new_cookie += '; ' + (new Date(expires)).toUTCString();
       }

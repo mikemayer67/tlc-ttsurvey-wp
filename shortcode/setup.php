@@ -191,21 +191,19 @@ function add_shortcode_content()
   $content_loaded = false;
   if($userid && !$page) {
     require_once plugin_path("shortcode/survey.php");
-    $content_loaded = add_survey_content($userid);
-    if($content_loaded) {
+    if(add_survey_content($userid)) {
       enqueue_survey_script();
+      return;
     }
   }
-  if(!$content_loaded) {
-    require_once plugin_path("shortcode/login.php");
-    $content_loaded = add_login_content($page);
-    if($content_loaded) {
-      enqueue_login_script();
-    }
+
+  require_once plugin_path("shortcode/login.php");
+  if(add_login_content($page)) {
+    enqueue_login_script();
+    return;
   }
-  if(!$content_loaded) {
-    require plugin_path("shortcode/bad_page.php");
-  }
+
+  require plugin_path("shortcode/bad_page.php");
 }
 
 function enqueue_shortcode_style()
