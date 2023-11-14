@@ -16,12 +16,26 @@
   color: white;
   background-color: brown;
   padding: 5px 10px;
+  position: relative;
+}
+
+#tlc-ttsurvey noscript div.noscript.header input {
+  font-size:smaller;
+  font-weight:100;
+  position:absolute;
+  right:5px;
+  padding:0 5px;
 }
 
 #tlc-ttsurvey noscript div p {
   color: brown;
   margin: 15px 1em;
 }
+
+#tlc-ttsurvey p.noscript {
+  color:brown;
+}
+
 
 #tlc-ttsurvey div.javascript-required {
   display: none;

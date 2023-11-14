@@ -69,7 +69,7 @@ function add_login_input($type,$kwargs=array())
 {
   $name = $kwargs['name'] ?? $type;
   $label = $kwargs['label'] ?? ucwords($name);
-  $value = $kwargs['value'] ?? null;
+  $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
   $confirm = $kwargs['confirm'] ?? False;
 
@@ -107,17 +107,16 @@ function add_login_input($type,$kwargs=array())
     }
 
     switch($type) {
-    case 'userid':
     case 'username':
+    case 'userid':
       $type = "text";
-      // fallthrough is intentional
     case 'email';
-      if($value) { $extra = "value='$value' $extra"; }
+      if($value) { $extra = "value=\"$value\" $extra"; }
       $input_attrs = array("class='$classes' name='$name' $extra");
       break;
 
     case 'password':
-      if($value) { $extra = "value='$value' $extra"; }
+      if($value) { $extra = "value=\"$value\" $extra"; }
       if($confirm) {
         # confirm overrides the optional parameter ... always required
         $input_attrs = array(

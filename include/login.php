@@ -11,19 +11,42 @@ require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/users.php');
 require_once plugin_path('include/validation.php');
+require_once plugin_path('shortcode/setup.php');
 
 const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
 const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
 
+/**
+ * CookieJar is used to manage the login cookies.
+ *
+ * CookieJar supports both AJAX and noscript scenarios.
+ *   In both cases, it is instantiated with the browser's current cookies
+ *   For noscript:
+ *   - any changes to the browser cookies are handled immediately
+ *   - this must happen before any html is written to standard out
+ *   For ajax:
+ *   - any changes to the cookies are returned in an array
+ *   - these will be passed back in the ajax response
+ *   - the javascript that invoked ajax must set the cookies on the browser
+ *
+ * CookieJar is a singleton class accessed via the instance() method.
+ *   To support ajax, instance() should be passed a truthy value.
+ **/
 class CookieJar
 {
   private static $_instance = null;
+  private $_ajax = false;
   private $_active_userid = null;
   private $_access_tokens = null;
 
-  public static function instance()
+  public static function instance($ajax=false)
   {
     if(!self::$_instance) { self::$_instance = new CookieJar(); }
+
+    if($ajax) {
+      self::$_instance->_ajax = true;
+    }
+
     return self::$_instance;
   }
 
@@ -52,15 +75,26 @@ class CookieJar
     return $this->_active_userid;
   }
 
+  private function _set_cookie($key,$value,$expires)
+  {
+    if($this->_ajax) {
+      return array($key,$value,$expires);
+    } else {
+      setcookie($key,$value,$expires);
+    }
+    return true;
+  }
+
   public function set_active_userid($userid)
   {
+    log_dev("set_active_userid($userid)");
     $this->_active_userid = $userid;
-    setcookie( ACTIVE_USER_COOKIE, $userid, 0 );
+    return $this->_set_cookie(ACTIVE_USER_COOKIE,$userid,0);
   }
 
   public function clear_active_userid()
   {
-    $this->set_active_userid(null);
+    return $this->set_active_userid(null);
   }
 
   public function get_access_token($userid)
@@ -71,12 +105,16 @@ class CookieJar
   public function set_access_token($userid,$token)
   {
     $this->_access_tokens[$userid] = $token;
-    setcookie( ACCESS_TOKEN_COOKIE, json_encode($this->_access_tokens), time() + 86400*365);
+    return $this->_set_cookie( 
+      ACCESS_TOKEN_COOKIE, 
+      json_encode($this->_access_tokens), 
+      time() + 86400*365,
+    );
   }
 
   public function clear_access_token($userid)
   {
-    $this->set_access_token($userid,null);
+    return $this->set_access_token($userid,null);
   }
 
   public function access_tokens()
@@ -89,50 +127,43 @@ class CookieJar
 function active_userid()
 {
   $rval = CookieJar::instance()->get_active_userid();
-  log_dev("active_userid() => $rval");
   return $rval;
 }
 
 function cookie_tokens()
 {
   $rval = CookieJar::instance()->access_tokens();
-  log_dev("access_tokens() => ".print_r($rval,true));
   return $rval;
 }
 
 
 function logout_active_user()
 {
-  log_dev("logout_active_user()");
-  CookieJar::instance()->clear_active_userid();
+  return CookieJar::instance()->clear_active_userid();
 }
 
 function start_survey_as($userid)
 {
-  log_dev("start_survey_as($userid)");
-  CookieJar::instance()->set_active_userid($userid);
+  return CookieJar::instance()->set_active_userid($userid);
 }
 
 function resume_survey_as($userid,$token)
 {
   log_dev("resume_survey_as($userid,$token)");
   if( validate_user_access_token($userid,$token) ) { 
-    CookieJar::instance()->set_active_userid($userid);
-    return true;
+    return CookieJar::instance()->set_active_userid($userid);
   }
   return false;
 }
 
 function remember_user_token($userid,$token)
 {
-  log_dev("remember_user_token($userid,$token)");
-  CookieJar::instance()->set_access_token($userid,$token);
+  return CookieJar::instance()->set_access_token($userid,$token);
 }
 
 function forget_user_token($userid)
 {
-  log_dev("forget_user_token($userid)");
-  CookieJar::instance()->clear_access_token($userid);
+  return CookieJar::instance()->clear_access_token($userid);
 }
 
 
@@ -154,7 +185,10 @@ function login_init()
   {
     require_once plugin_path('include/users.php');
 
-    switch($_POST['action'] ?? null)
+    $action = $_POST['action'] ?? null;
+    log_dev("login_init: $action");
+
+    switch($action)
     {
     case 'login':    handle_login();          break;
     case 'resume':   handle_login_resume();   break;
@@ -169,26 +203,39 @@ add_action('init',ns('login_init'));
 
 function handle_login()
 {
-  log_dev("handle_login");
-  $userid = $_POST['userid'];
-  $user = User::from_userid($userid);
-  if($user) {
-    login_dev("valid user($userid)");
-    $password = $_POST['password'];
-    if($user->verify_password($password)) {
-      login_dev("valid password");
-      CookieJar::instance()->set_active_userid($userid);
-      if($_POST['remember'] ?? null) {
-        $token = $user->access_token();
-        remember_user_token($userid,$token);
-      } else {
-        forget_user_token($userid);
-      }
-      clear_status();
-      return;
-    }
+  $result = login_with_userid(
+    adjust_user_input('userid',$_POST['userid']),
+    adjust_user_input('password',$_POST['password']),
+    filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
+  );
+  // cookies were handled in login_with_userid, simply need to update status
+  if($result['success']) {
+    clear_status();
+    return true;
+  } else {
+    set_status_warning($result['error']);
+    return false;
   }
-  set_status_warning("Invalid userid or password");
+}
+
+function login_with_userid($userid,$password,$remember)
+{
+  $user = User::from_userid($userid);
+  if(!$user) {
+    return array('success'=>false, 'error'=>'Invalid userid');
+  }
+  if(!$user->verify_password($password)) {
+    return array('success'=>false, 'error'=>'Incorrect password');
+  }
+  $jar = CookieJar::instance();
+  $cookies = array( $jar->set_active_userid($userid) );
+  if($remember) {
+    $token = $user->access_token();
+    $cookies[] = remember_user_token($userid,$token);
+  } else {
+    $cookies[] = forget_user_token($userid);
+  }
+  return array('success'=>true, 'cookies'=>$cookies);
 }
 
 function handle_login_resume()
@@ -206,24 +253,90 @@ function handle_login_resume()
 
 function handle_login_register()
 {
-  log_dev("handle_login_register()");
-  $error = '';
-  if(register_new_user($error))
-  {
+  $result = register_new_user(
+    adjust_user_input('userid',$_POST['userid']),
+    adjust_user_input('password',$_POST['password']),
+    adjust_user_input('password',$_POST['password-confirm']),
+    adjust_user_input('username',$_POST['username']),
+    adjust_user_input('email',$_POST['email']),
+    filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
+  );
+
+  // cookies were handled in register_new_user, simply need to update status
+  if($result['success']) {
     log_dev("where to go now that I have a new user registered?");
-  }
-  else
-  {
-    set_status_warning($error);
+  } else {
+    set_status_warning($result['error']);
     set_current_shortcode_page('register');
   }
 }
 
+function register_new_user($userid, $password, $pwconfirm, $username, $email, $remember) 
+{
+  $error='';
+  if(!validate_user_input('userid',$userid,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid userid: $error",
+    );
+  }
+  if(!validate_user_input('password',$password,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid password: $error",
+    );
+  }
+  if(!validate_user_input('username',$username,$error)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid name: $error",
+    );
+  }
+  if(!validate_user_input('email',$email,$error)) {
+    return array(
+      'success'=>false,
+      'error'=>"Invalid email: $error",
+    );
+  }
+  if($password != $pwconfirm)
+  {
+    return array(
+      'success'=>false,
+      'error'=>'Password did not match its confirmation',
+    );
+  }
+
+  if(!is_userid_available($userid)) {
+    return array(
+      'success'=>false,
+      'error'=>"Userid '$userid' is already in use",
+    );
+  }
+
+  $user = User::create($userid,$password,$username,$email);
+  $token = $user->access_token();
+
+  log_info("Registered new user $username with userid $userid and token $token");
+
+  $cookies = array( start_survey_as($userid) );
+  if($remember) {
+    $cookies[] = remember_user_token($userid,$token); 
+  }
+
+  if($email) { 
+    require_once plugin_path('include/sendmail.php');
+    sendmail_welcome($email, $userid, $username, $token); 
+  }
+
+  return array('success'=>true, 'cookies'=>$cookies);
+}
+
+
 function handle_logout()
 {
-  log_dev("handle_logout()");
   logout_active_user();
 }
+
 
 function handle_login_recovery()
 {
@@ -237,58 +350,3 @@ function handle_login_recovery()
 }
 
 
-function register_new_user(&$error=null)
-{
-  $userid = adjust_login_input('userid',$_POST['userid']);
-  $password1 = adjust_login_input('password',$_POST['password']);
-  $password2 = adjust_login_input('password',$_POST['password-confirm']);
-  $username = adjust_login_input('username',$_POST['username']);
-  $email = adjust_login_input('email',$_POST['email']);
-
-  $remember = $_POST['remember'] ?? False;
-
-  $error='';
-  if(!validate_login_input('userid',$userid,$error)) {
-    $error = "Failed registration. Invalid userid: $error";
-    return false;
-  }
-  if(!validate_login_input('password',$password1,$error)) {
-    $error = "Failed registration. Invalid password: $error";
-    return false;
-  }
-  if(!validate_login_input('username',$username,$error)) {
-    $error = "Failed registration. Invalid name";
-    return false;
-  }
-  if(!validate_login_input('email',$email,$error)) {
-    $error = "Failed registration. Invalid email: $error";
-    return false;
-  }
-  if($password1 != $password2)
-  {
-    $error = "Failed registration. Password did not match its confirmation";
-    return false;
-  }
-
-  if(!is_userid_available($userid)) {
-    $error = "Userid '$userid' is already in use";
-    return false;
-  }
-
-  $user = User::create($userid,$password1,$username,$email);
-  $token = $user->access_token();
-
-  log_info("Registered new user $username with userid $userid and token $token");
-
-  start_survey_as($userid);
-
-  if($remember) { remember_user_token($userid,$token); }
-
-  if($email) { 
-    require_once plugin_path('include/sendmail.php');
-    sendmail_welcome($email, $userid, $username, $token); 
-  }
-
-  $error = '';
-  return true;
-}

@@ -18,7 +18,7 @@ if( $_POST['refresh'] ?? False ) {
   $userid = $_POST['userid'] ?? null;
   $username = $_POST['username'] ?? null;
   $email = $_POST['email'] ?? null;
-  $remember = $_POST['remember'] ?? False;
+  $remember = filter_var($_POST['remember']??false, FILTER_VALIDATE_BOOLEAN);
 } else {
   $userid = null;
   $username = null;
@@ -48,6 +48,7 @@ INFO
 ));
 
 add_login_input("username",array(
+  "label" => 'Name',
   "value" => $username,
   "info" => <<<INFO
 How your name will appear on the survey summary report

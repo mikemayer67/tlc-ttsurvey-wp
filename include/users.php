@@ -308,8 +308,7 @@ class User {
 
   public function set_username($username) 
   {
-    log_dev("User::set_name($username)");
-    if(!adjust_and_validate_login_input('username',$username)) {
+    if(!adjust_and_validate_user_input('username',$username)) {
       log_warning("Cannot update name for $this->_userid: invalid name ($username)");
       return false;
     }
@@ -320,8 +319,7 @@ class User {
 
   public function set_email($email)
   {
-    log_dev("User::set_email($email)");
-    if(!adjust_and_validate_login_input('email',$email) ) {
+    if(!adjust_and_validate_user_input('email',$email) ) {
       log_warning("Cannot update email for $this->_userid: invalid email ($email)");
       return false;
     }
@@ -341,8 +339,7 @@ class User {
 
   public function set_password($password)
   {
-    log_dev("User::set_password($password)");
-    if(!adjust_and_validate_login_input('password',$password) ) {
+    if(!adjust_and_validate_user_input('password',$password) ) {
       log_warning("Cannot update password for $this->_userid: invalid password");
       return false;
     }
@@ -353,17 +350,14 @@ class User {
 
   public function regenerate_access_token()
   {
-    log_dev("User::regenerate_access_token()");
     $new_token = gen_access_token();
     $this->_data['access_token'] = $new_token;
     $this->commit();
-    log_dev("   token=$new_token");
     return $new_token;
   }
 
   private function commit()
   {
-    log_dev("User::commit()");
     wp_update_post(array(
       'ID' => $this->_post_id,
       'post_content' => wp_slash(json_encode($this->_data)),
@@ -384,7 +378,6 @@ class User {
       return null;
     }
 
-    log_dev("User::anon_proxy()");
     $anonids = get_post_meta($this->_post_id,'anonid');
 
     if(count($anonids) > 1) {
@@ -449,7 +442,6 @@ function gen_access_token($token_length=25)
 
 function validate_user_password($userid,$password)
 {
-  log_dev("validate_user_password($userid,*****);");
   $user = User::from_userid($userid);
   if(!$user) { 
     log_info("Failed to validate password:: Invalid userid $userid");
@@ -459,13 +451,11 @@ function validate_user_password($userid,$password)
     log_info("Failed to validate password:: Incorrect password for $userid");
     return false;
   }
-  log_dev(" => password validated for $userid");
   return true;
 }
 
 function validate_user_access_token($userid,$token)
 {
-  log_dev("validate_user_access_token($userid,$token)");
   $user = User::from_userid($userid);
   if(!$user) { return false; }
   return $token == $user->access_token();

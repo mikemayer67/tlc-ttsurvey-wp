@@ -3,6 +3,8 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+require_once plugin_path('include/logger.php');
+
 function ajax_wrapper()
 {
   [$key,$nonce] = $_POST['nonce'];

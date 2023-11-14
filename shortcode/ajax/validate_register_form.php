@@ -10,10 +10,10 @@ $response = array();
 $keys = array("userid","password","username","email");
 foreach( $keys as $key )
 {
-  $value = adjust_login_input($key,$_POST[$key]);
+  $value = adjust_user_input($key,$_POST[$key]);
   if($value) {
     $error = '';
-    if(!validate_login_input($key,$value,$error)) {
+    if(!validate_user_input($key,$value,$error)) {
       $response[$key] = $error;
     }
   } elseif($key != "email") {
@@ -23,9 +23,9 @@ foreach( $keys as $key )
 
 if(!key_exists('password',$response))
 {
-  $confirm = adjust_login_input('password',$_POST['pwconfirm']);
+  $confirm = adjust_user_input('password',$_POST['pwconfirm']);
   if($confirm) {
-    $password = adjust_login_input('password',$_POST['password']);
+    $password = adjust_user_input('password',$_POST['password']);
     if($confirm!=$password) {
       $response['password'] = 'does not match confirmation';
     }

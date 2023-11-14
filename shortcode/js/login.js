@@ -1,5 +1,14 @@
 var ce = {};
 
+function ajax_query( query, data, response_handler )
+{
+  data.action = 'tlc_ttsurvey';
+  data.nonce = login_vars.nonce;
+  data.query = 'shortcode/' + query;
+
+  jQuery.post(login_vars.ajaxurl, data, response_handler, 'json');
+}
+
 //----------------------------------------
 // Userid/Password Login Form
 //----------------------------------------
@@ -7,6 +16,9 @@ var ce = {};
 function login_form_setup()
 {
   ce.login_inputs = ce.login_form.find('input');
+  ce.login_userid = ce.login_inputs.filter('[name=userid]');
+  ce.login_password = ce.login_inputs.filter('[name=password]');
+  ce.login_remember = ce.login_inputs.filter('[name=remember]');
 
   ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
   ce.login_recovery_link.show();
@@ -14,6 +26,45 @@ function login_form_setup()
   ce.login_inputs.on('input',function() {
     ce.status_message.hide(400,'linear');
   });
+
+  ce.login_form.on('submit',login_with_userid);
+}
+
+function login_with_userid(event)
+{
+  event.preventDefault();
+
+  ajax_query(
+    'login_with_userid',
+    {
+      userid:ce.login_userid.val(),
+      password:ce.login_password.val(),
+      remember:ce.login_remember.is(':checked'),
+    },
+    login_response_handler,
+  );
+}
+
+function login_response_handler(response)
+{
+  if(response.success) {
+    response.cookies.forEach(function(cookie) {
+      console.log(cookie);
+      const key = cookie[0];
+      const value = cookie[1];
+      const expires = 1000*cookie[2];
+      var new_cookie = key + '=' + value;
+      if(expires > 0) {
+        new_cookie += '; ' + (new Date(expires)).toUTCString();
+      }
+      document.cookie = new_cookie;
+    });
+    window.location.href = login_vars.survey_url;
+  } else {
+    ce.status_message.removeClass(['info','warning']).addClass('error');
+    ce.status_message.html(response.error);
+    ce.status_message.show(200,'linear');
+  }
 }
 
 //----------------------------------------
@@ -24,6 +75,12 @@ function register_setup()
 {
   var keyup_timer = null;
 
+  ce.register_userid = ce.register_form.find('.input.userid input');
+  ce.register_password = ce.register_form.find('.input.password input.primary');
+  ce.register_pwconfirm = ce.register_form.find('.input.password input.confirm');
+  ce.register_username = ce.register_form.find('.input.username input');
+  ce.register_email = ce.register_form.find('.input.email input');
+  ce.register_remember = ce.register_form.find('input[name=remember]');
   ce.register_submit = ce.register_form.find('button.submit');
   ce.register_error = ce.register_form.find('.error');
 
@@ -42,32 +99,27 @@ function register_setup()
       500,
     );
   });
+
+  ce.register_form.on('submit',register_new_user);
 }
 
 function evaluate_register_inputs()
 {
-  const form = ce.register_form;
-
-  data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/validate_register_form',
-    username:form.find('.input.username input').val(),
-    userid:form.find('.input.userid input').val(),
-    password:form.find('.input.password input.primary').val(),
-    pwconfirm:form.find('.input.password input.confirm').val(),
-    email:form.find('.input.email input').val(),
-  };
-
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  ajax_query(
+    'validate_register_form', 
+    {
+      userid:ce.register_userid.val(),
+      password:ce.register_password.val(),
+      pwconfirm:ce.register_pwconfirm.val(),
+      username:ce.register_username.val(),
+      email:ce.register_email.val(),
+    },
     function(response) {
       let keys = ['userid','password','username','email'];
       var all_ok = true;
       keys.forEach( function(key) {
-        var error_box = form.find('.input .error.'+key);
-        var input = form.find('.input.'+key+' input');
+        var error_box = ce.register_form.find('.input .error.'+key);
+        var input = ce.register_form.find('.input.'+key+' input');
         input.removeClass(['invalid','empty']);
         if( key in response ) {
           all_ok = false;
@@ -86,8 +138,25 @@ function evaluate_register_inputs()
         }
       });
       ce.register_submit.prop("disabled",!all_ok);
+    }
+  );
+}
+
+function register_new_user(event)
+{
+  event.preventDefault();
+
+  ajax_query(
+    'register_new_user',
+    {
+      userid:ce.register_userid.val(),
+      password:ce.register_password.val(),
+      pwconfirm:ce.register_pwconfirm.val(),
+      username:ce.register_username.val(),
+      email:ce.register_email.val(),
+      remember:ce.register_remember.is(':checked'),
     },
-    'json',
+    login_response_handler,
   );
 }
 
@@ -127,16 +196,13 @@ function send_recovery_email(event)
 
   localStorage.removeItem('pwreset');
 
-  const email = ce.recovery_email.val();
-  const data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/send_recovery_email',
-    email:email,
-  };
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  const email = ce.recovery_email.val()
+
+  ajax_query(
+    'send_recovery_email', 
+    {
+      email:email,
+    },
     function(response) {
       if(response.ok) {
         pwreset = {
@@ -153,8 +219,7 @@ function send_recovery_email(event)
         ce.status_message.removeClass(['info','warning','error'])
         ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
-    },
-    'json',
+    }
   );
 }
 
@@ -240,30 +305,26 @@ function send_pwreset(event)
     return;
   }
 
-  const data = {
-    action:'tlc_ttsurvey',
-    nonce:login_vars['nonce'],
-    query:'shortcode/reset_password',
-    userid:userid,
-    token:pwreset_user_info.reset,
-    password:ce.pwreset_password.val(),
-  };
-  jQuery.post(
-    login_vars['ajaxurl'],
-    data,
+  ajax_query(
+    'reset_password',
+    {
+      userid:userid,
+      token:pwreset_user_info.reset,
+      password:ce.pwreset_password.val(),
+    },
     function(response) {
       localStorage.removeItem('pwreset');
-      const username = pwreset_user_info.username;
+    
       var status = '';
       if(response.ok) {
+        const username = pwreset_user_info.username;
         status = encodeURIComponent('info::password updated for '+username);
       } else {
         status = encodeURIComponent('warning::'+response.error);
       }
-      const new_url = login_vars.survey_url+'&status='+status;
-      window.location.href = new_url;
-    },
-    'json',
+    
+      window.location.href = login_vars.survey_url+'&status='+status;
+    }
   );
 }
 
