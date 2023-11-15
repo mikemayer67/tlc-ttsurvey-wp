@@ -164,12 +164,14 @@ function add_resume_buttons()
     if($user) {
       $username = $user->username();
       $value = "resume:$userid:$token";
+      echo "<div class='button-box'>";
       echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>";
       echo "<div class='username'>$username</div>";
       echo "<div class='userid'>$userid</div>";
+      echo "</button>";
       $forget_url = "http://vmwishes.com";
       echo "<div class='forget'><a href='$forget_url'><img src='$icon'></a></div>";
-      echo "</button>";
+      echo "</div>";
     }
   }
   echo "</div>";

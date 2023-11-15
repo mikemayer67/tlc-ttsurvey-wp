@@ -87,41 +87,45 @@ div#tlc-ttsurvey-login form.login div.recovery {
  * Login Form
  **/
 
-div#tlc-ttsurvey-login.login div.resume-label {
+div#tlc-ttsurvey-login.login .resume-label {
   margin-top:1em;
   font-weight:bold;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box {
+div#tlc-ttsurvey-login.login .resume-box {
   margin:1em;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box button {
+div#tlc-ttsurvey-login.login .resume-box .button-box{
   width:100%;
   position:relative;
   margin-bottom:3px;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box button div.username {
+div#tlc-ttsurvey-login.login .resume-box button {
+  width:100%;
+}
+
+div#tlc-ttsurvey-login.login .resume-box button .username {
   font-weight:bold;
   text-align:left;
   margin:5px 0 0 8px;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box button div.userid {
+div#tlc-ttsurvey-login.login .resume-box button .userid {
   font-size:small;
   text-align:left;
   margin:-3px 0 5px 8px;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box button div.forget {
+div#tlc-ttsurvey-login.login .resume-box div.forget {
   position:absolute;
   top:5px;
   right:5px;
   font-size:small;
 }
 
-div#tlc-ttsurvey-login.login div.resume-box button div.forget img {
+div#tlc-ttsurvey-login.login .resume-box div.forget img {
   height:12px;
   width:12px;
 }
