@@ -104,6 +104,7 @@ div#tlc-ttsurvey-login.login .resume-box .button-box{
 
 div#tlc-ttsurvey-login.login .resume-box button {
   width:100%;
+  z-index:1;
 }
 
 div#tlc-ttsurvey-login.login .resume-box button .username {
@@ -123,6 +124,7 @@ div#tlc-ttsurvey-login.login .resume-box div.forget {
   top:5px;
   right:5px;
   font-size:small;
+  z-index:2;
 }
 
 div#tlc-ttsurvey-login.login .resume-box div.forget img {
