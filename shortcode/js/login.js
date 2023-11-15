@@ -106,6 +106,7 @@ function register_setup()
   ce.register_email = ce.register_form.find('.input.email input');
   ce.register_remember = ce.register_form.find('input[name=remember]');
   ce.register_submit = ce.register_form.find('button.submit');
+  ce.register_cancel = ce.register_form.find('button.cancel');
   ce.register_error = ce.register_form.find('.error');
 
   ce.register_submit.prop('disabled',true);
@@ -124,8 +125,16 @@ function register_setup()
     );
   });
 
+  ce.register_cancel.on('click',cancel_register);
   ce.register_form.on('submit',register_new_user);
 }
+
+function cancel_register(event)
+{
+  event.preventDefault();
+  window.location.href = login_vars.survey_url;
+}
+
 
 function evaluate_register_inputs()
 {
