@@ -57,7 +57,8 @@ class CookieJar
     $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
 
     #reset cookie timeout
-    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365);
+    $site_path = parse_url(get_site_url(),PHP_URL_PATH);
+    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365, $site_path);
 
     $tokens = json_decode($tokens,true);
     if($tokens) {
@@ -76,11 +77,12 @@ class CookieJar
   }
 
   private function _set_cookie($key,$value,$expires)
-  {
+  {  
+    $site_path = parse_url(get_site_url(),PHP_URL_PATH);
     if($this->_ajax) {
-      return array($key,$value,$expires);
+      return array($key,$value,$expires,$site_path);
     } else {
-      setcookie($key,$value,$expires);
+      setcookie($key,$value,$expires,$site_path);
     }
     return true;
   }
@@ -104,7 +106,11 @@ class CookieJar
 
   public function set_access_token($userid,$token)
   {
-    $this->_access_tokens[$userid] = $token;
+    if($token) {
+      $this->_access_tokens[$userid] = $token;
+    } else {
+      unset($this->_access_tokens[$userid]);
+    }
     return $this->_set_cookie( 
       ACCESS_TOKEN_COOKIE, 
       json_encode($this->_access_tokens), 
@@ -181,20 +187,30 @@ function login_init()
     status_message($msg,$level);
   }
 
+  if(array_key_exists('forget',$_REQUEST)) {
+    $userid = $_REQUEST['forget'];
+    log_dev("login_init:: forget $userid");
+    forget_user_token($userid);
+  }
+
+
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
     require_once plugin_path('include/users.php');
 
-    $action = $_POST['action'] ?? null;
-    log_dev("login_init: $action");
+    if(array_key_exists('resume',$_POST)) {
+      if( handle_login_resume($_POST['resume']) ) { 
+        return;
+      }
+    }
 
+    $action = $_POST['action'] ?? null;
     switch($action)
     {
-    case 'login':    handle_login();          break;
-    case 'resume':   handle_login_resume();   break;
-    case 'register': handle_login_register(); break;
-    case 'logout':   handle_logout();         break;
-    case 'recovery': handle_login_recovery(); break;
+    case 'login':    handle_login();               break;
+    case 'register': handle_login_register();      break;
+    case 'logout':   handle_logout();              break;
+    case 'recovery': handle_login_recovery();      break;
     }
   }
 }
@@ -203,12 +219,12 @@ add_action('init',ns('login_init'));
 
 function handle_login()
 {
-  $result = login_with_userid(
+  $result = login_with_password(
     adjust_user_input('userid',$_POST['userid']),
     adjust_user_input('password',$_POST['password']),
     filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
   );
-  // cookies were handled in login_with_userid, simply need to update status
+  // cookies were handled in login_with_password, simply need to update status
   if($result['success']) {
     clear_status();
     return true;
@@ -218,7 +234,7 @@ function handle_login()
   }
 }
 
-function login_with_userid($userid,$password,$remember)
+function login_with_password($userid,$password,$remember)
 {
   $user = User::from_userid($userid);
   if(!$user) {
@@ -238,16 +254,35 @@ function login_with_userid($userid,$password,$remember)
   return array('success'=>true, 'cookies'=>$cookies);
 }
 
-function handle_login_resume()
+function handle_login_resume($userid_token)
 {
-  log_dev("handle_login_resume()");
-  $userid = $_POST['userid'];
-  $token = $_POST['access_token'];
-  if( resume_survey_as($userid,$token) ) {
-    log_dev("resuming survey as $userid");
+  $result = login_with_token($userid_token);
+  if($result['success']) {
+    clear_status();
+    return true;
   } else {
-    log_dev("invalid access token, removing $userid from cookie");
-    forget_user_token($userid);
+    set_status_warning($result['error']);
+    return false;
+  }
+}
+
+function login_with_token($userid_token)
+{
+  list($userid,$token) = explode(':',$userid_token);
+
+  $cookie = resume_survey_as($userid,$token);
+  if($cookie) {
+    return array(
+      'success'=>true,
+      'cookies'=>array($cookie),
+    );
+  } else {
+    $cookie = forget_user_token($userid);
+    return array(
+      'success'=>false,
+      'error'=>"expired user token",
+      'cookies'=>array($cookie),
+    );
   }
 }
 

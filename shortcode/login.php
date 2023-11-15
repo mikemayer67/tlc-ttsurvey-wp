@@ -17,19 +17,15 @@ require_once plugin_path('include/login.php');
 
 function add_login_content($page=null)
 {
-  if(!$page) {
-    $tokens = cookie_tokens();
-    if($tokens) { $page = 'resume'; }
-    else        { $page = 'userid';  }
-  }
+  if(!$page) {$page = 'userid';}
   $page = plugin_path("shortcode/login/$page.php");
-  if(!file_exists($page)) {
+  if(file_exists($page)) {
+    require $page;
+    return true;
+  } else {
     require plugin_path("shortcode/bad_page.php");
     return false;
   }
-
-  require $page;
-  return true;
 }
 
 

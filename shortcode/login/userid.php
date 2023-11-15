@@ -14,6 +14,8 @@ add_status_message();
 
 start_login_form("Survey Login","login");
 
+add_resume_buttons();
+
 add_login_input("userid");
 add_login_input("password");
 

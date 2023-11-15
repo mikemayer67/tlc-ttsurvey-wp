@@ -16,6 +16,9 @@ function ajax_query( query, data, response_handler )
 function login_form_setup()
 {
   ce.login_inputs = ce.login_form.find('input');
+  ce.login_resume_buttons = ce.login_form.find('button.resume');
+  ce.login_forget = ce.login_form.find('.forget a');
+
   ce.login_userid = ce.login_inputs.filter('[name=userid]');
   ce.login_password = ce.login_inputs.filter('[name=password]');
   ce.login_remember = ce.login_inputs.filter('[name=remember]');
@@ -27,15 +30,26 @@ function login_form_setup()
     ce.status_message.hide(400,'linear');
   });
 
-  ce.login_form.on('submit',login_with_userid);
+  ce.login_resume_buttons.on('click',login_with_token);
+  ce.login_form.on('submit',login_with_password);
+  ce.login_forget.on('click',forget_userid);
 }
 
-function login_with_userid(event)
+function login_with_token(event)
+{
+  event.preventDefault();
+  ajax_query( 'login_with_token',
+    { 'token':jQuery(this).val() },
+    login_response_handler,
+  );
+}
+
+function login_with_password(event)
 {
   event.preventDefault();
 
   ajax_query(
-    'login_with_userid',
+    'login_with_password',
     {
       userid:ce.login_userid.val(),
       password:ce.login_password.val(),
@@ -49,11 +63,11 @@ function login_response_handler(response)
 {
   if(response.success) {
     response.cookies.forEach(function(cookie) {
-      console.log(cookie);
       const key = cookie[0];
       const value = cookie[1];
       const expires = 1000*cookie[2];
-      var new_cookie = key + '=' + value;
+      const path = cookie[3];
+      var new_cookie = key + '=' + value + '; path=' + path;
       if(expires > 0) {
         new_cookie += '; ' + (new Date(expires)).toUTCString();
       }
@@ -65,6 +79,16 @@ function login_response_handler(response)
     ce.status_message.html(response.error);
     ce.status_message.show(200,'linear');
   }
+}
+
+function forget_userid(event)
+{
+  event.preventDefault();
+  ajax_query(
+    'forget_userid',
+    { userid:this.dataset.userid },
+    login_response_handler,
+  );
 }
 
 //----------------------------------------
