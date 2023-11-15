@@ -106,7 +106,11 @@ class CookieJar
 
   public function set_access_token($userid,$token)
   {
-    $this->_access_tokens[$userid] = $token;
+    if($token) {
+      $this->_access_tokens[$userid] = $token;
+    } else {
+      unset($this->_access_tokens[$userid]);
+    }
     return $this->_set_cookie( 
       ACCESS_TOKEN_COOKIE, 
       json_encode($this->_access_tokens), 
@@ -182,6 +186,13 @@ function login_init()
     list($level,$msg) = explode("::",$status);
     status_message($msg,$level);
   }
+
+  if(array_key_exists('forget',$_REQUEST)) {
+    $userid = $_REQUEST['forget'];
+    log_dev("login_init:: forget $userid");
+    forget_user_token($userid);
+  }
+
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {

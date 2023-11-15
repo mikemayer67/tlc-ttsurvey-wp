@@ -169,7 +169,7 @@ function add_resume_buttons()
       echo "<div class='username'>$username</div>";
       echo "<div class='userid'>$userid</div>";
       echo "</button>";
-      $forget_url = "http://vmwishes.com";
+      $forget_url = survey_url() . "&forget=$userid";
       echo "<div class='forget'><a href='$forget_url'><img src='$icon'></a></div>";
       echo "</div>";
     }
