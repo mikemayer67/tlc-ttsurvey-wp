@@ -156,9 +156,8 @@ function add_resume_buttons()
     if($user) {
       $username = $user->username();
       $value = "resume:$userid:$token";
-      log_dev("Add button for $username");
       $class = 'submit resume token';
-      echo "<button class='$class' name='action' value='$value' formnovalidate>$username</button>";
+      echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>$username</button>";
     }
   }
 }

@@ -16,6 +16,8 @@ function ajax_query( query, data, response_handler )
 function login_form_setup()
 {
   ce.login_inputs = ce.login_form.find('input');
+  ce.login_resume_buttons = ce.login_form.find('button.resume');
+
   ce.login_userid = ce.login_inputs.filter('[name=userid]');
   ce.login_password = ce.login_inputs.filter('[name=password]');
   ce.login_remember = ce.login_inputs.filter('[name=remember]');
@@ -27,7 +29,17 @@ function login_form_setup()
     ce.status_message.hide(400,'linear');
   });
 
+  ce.login_resume_buttons.on('click',login_with_token);
   ce.login_form.on('submit',login_with_password);
+}
+
+function login_with_token(event)
+{
+  event.preventDefault();
+  ajax_query( 'login_with_token',
+    { 'token':jQuery(this).val() },
+    login_response_handler,
+  );
 }
 
 function login_with_password(event)

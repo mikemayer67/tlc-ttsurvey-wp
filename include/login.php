@@ -171,7 +171,6 @@ function forget_user_token($userid)
 
 function login_init()
 {
-  log_dev("login_init POST=".print_r($_POST,true));
   $nonce = $_POST['_wpnonce'] ?? '';
 
   # need to instantiate the cookie jar during the init phase before
@@ -188,15 +187,13 @@ function login_init()
   {
     require_once plugin_path('include/users.php');
 
-    $action = $_POST['action'] ?? null;
-
-    if(str_starts_with($action,'resume:'))
-    {
-      list($action,$userid,$token) = explode(':',$action);
-      handle_login_resume($userid,$token);
-      return;
+    if(array_key_exists('resume',$_POST)) {
+      if( handle_login_resume($_POST['resume']) ) { 
+        return;
+      }
     }
 
+    $action = $_POST['action'] ?? null;
     switch($action)
     {
     case 'login':    handle_login();               break;
@@ -246,9 +243,9 @@ function login_with_password($userid,$password,$remember)
   return array('success'=>true, 'cookies'=>$cookies);
 }
 
-function handle_login_resume($userid,$token)
+function handle_login_resume($userid_token)
 {
-  $result = login_with_token($userid,$token);
+  $result = login_with_token($userid_token);
   if($result['success']) {
     clear_status();
     return true;
@@ -258,19 +255,17 @@ function handle_login_resume($userid,$token)
   }
 }
 
-function login_with_token($userid,$token)
+function login_with_token($userid_token)
 {
-  log_dev("handle_login_resume($userid,$token)");
+  list($userid,$token) = explode(':',$userid_token);
 
   $cookie = resume_survey_as($userid,$token);
   if($cookie) {
-    log_dev("resuming survey as $userid");
     return array(
       'success'=>true,
       'cookies'=>array($cookie),
     );
   } else {
-    log_dev("invalid access token, removing $userid from cookie");
     $cookie = forget_user_token($userid);
     return array(
       'success'=>false,
