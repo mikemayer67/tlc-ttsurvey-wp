@@ -151,15 +151,29 @@ function add_login_input($type,$kwargs=array())
 
 function add_resume_buttons()
 {
-  foreach(cookie_tokens() as $userid=>$token) {
+  $tokens = cookie_tokens();
+  if(!$tokens) { return; }
+
+  $icon = plugin_url('img/icons8-delete_sign.png');
+  $class = 'submit resume token';
+
+  echo "<div class='resume-label'>Resume Survey as:</div>";
+  echo "<div class='resume-box'>";
+  foreach($tokens as $userid=>$token) {
     $user = User::from_userid($userid);
     if($user) {
       $username = $user->username();
       $value = "resume:$userid:$token";
-      $class = 'submit resume token';
-      echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>$username</button>";
+      echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>";
+      echo "<div class='username'>$username</div>";
+      echo "<div class='userid'>$userid</div>";
+      $forget_url = "http://vmwishes.com";
+      echo "<div class='forget'><a href='$forget_url'><img src='$icon'></a></div>";
+      echo "</button>";
     }
   }
+  echo "</div>";
+  echo "<div class='resume-label'>Or Login as:</div>";
 }
 
 function add_login_submit($label,$action,$cancel=False)

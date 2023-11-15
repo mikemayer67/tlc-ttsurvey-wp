@@ -41,7 +41,9 @@ div#tlc-ttsurvey-login form
  **/
 
 div#tlc-ttsurvey-login form div.input {
-  margin-top:16px;
+  margin-top:8px;
+  margin-left:1em;
+  margin-right:1em;
 }
 
 div#tlc-ttsurvey-login form div.input div.label {
@@ -82,8 +84,47 @@ div#tlc-ttsurvey-login form.login div.recovery {
 }
 
 /**
- * Register Form
+ * Login Form
  **/
+
+div#tlc-ttsurvey-login.login div.resume-label {
+  margin-top:1em;
+  font-weight:bold;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box {
+  margin:1em;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box button {
+  width:100%;
+  position:relative;
+  margin-bottom:3px;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box button div.username {
+  font-weight:bold;
+  text-align:left;
+  margin:5px 0 0 8px;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box button div.userid {
+  font-size:small;
+  text-align:left;
+  margin:-3px 0 5px 8px;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box button div.forget {
+  position:absolute;
+  top:5px;
+  right:5px;
+  font-size:small;
+}
+
+div#tlc-ttsurvey-login.login div.resume-box button div.forget img {
+  height:12px;
+  width:12px;
+}
 
 /**
  * Recovery Form
