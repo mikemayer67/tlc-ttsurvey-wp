@@ -17,6 +17,7 @@ function login_form_setup()
 {
   ce.login_inputs = ce.login_form.find('input');
   ce.login_resume_buttons = ce.login_form.find('button.resume');
+  ce.login_forget = ce.login_form.find('.forget a');
 
   ce.login_userid = ce.login_inputs.filter('[name=userid]');
   ce.login_password = ce.login_inputs.filter('[name=password]');
@@ -31,6 +32,7 @@ function login_form_setup()
 
   ce.login_resume_buttons.on('click',login_with_token);
   ce.login_form.on('submit',login_with_password);
+  ce.login_forget.on('click',forget_userid);
 }
 
 function login_with_token(event)
@@ -77,6 +79,16 @@ function login_response_handler(response)
     ce.status_message.html(response.error);
     ce.status_message.show(200,'linear');
   }
+}
+
+function forget_userid(event)
+{
+  event.preventDefault();
+  ajax_query(
+    'forget_userid',
+    { userid:this.dataset.userid },
+    login_response_handler,
+  );
 }
 
 //----------------------------------------

@@ -170,8 +170,10 @@ function add_resume_buttons()
       echo "<div class='userid'>$userid</div>";
       echo "</button>";
       $forget_url = survey_url() . "&forget=$userid";
-      echo "<div class='forget'><a href='$forget_url'><img src='$icon'></a></div>";
-      echo "</div>";
+      echo "<div class='forget'>";
+      echo "<a href='$forget_url' data-userid='$userid'><img src='$icon'></a>";
+      echo "</div>"; // forget
+      echo "</div>"; // button-box
     }
   }
   echo "</div>";
