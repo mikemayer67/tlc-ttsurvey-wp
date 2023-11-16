@@ -88,7 +88,8 @@ function survey_capabilities() {
   return get_survey_option(CAPS_KEY);
 }
 
-function survey_admins($role) {
+function survey_admins($role) 
+{
   $caps = survey_capabilities();
   $users = $caps[$role] ?? array();
   $rval = array_keys($users);
@@ -105,6 +106,36 @@ function survey_admins($role) {
     }
   }
   return $rval;
+}
+
+function survey_admin_contacts($role) 
+{
+  if($role === 'general') {
+    $primary = survey_primary_admin();
+    $contacts = array($primary);
+    foreach(survey_admins('responses') as $uid) {
+      if($uid != $primary) { $contacts[] = $uid; }
+    }
+  } 
+  else 
+  {
+    $contacts = survey_admins($role);
+  }
+
+  $rval = array();
+  foreach($contacts as $id) {
+    $user = get_user_by('ID',$id);
+    $name = $user->display_name;
+    $email = $user->user_email;
+    $rval[] = "<a href='mailto:$email?subject=Time and Talent Survey'>$name</a>";
+  }
+
+  if(count($rval) == 0) { return ""; }
+  if(count($rval) == 1) { return $rval[0]; }
+  if(count($rval) == 2) { return "$rval[0] or $rval[1]"; }
+
+  $last = array_pop($rval);
+  return implode(', ',$rval) . ", or $last";
 }
 
 /**

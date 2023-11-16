@@ -39,10 +39,21 @@ const SENDMAIL_TEMPLATES = array(
   'welcome' => array(
     'label' => 'Welcome',
     'when' => 'a user registers for the survey',
+    'demo_data' => array(
+      'email' => 't.smith@t3mail.net',
+      'userid' => 'tsmith13',
+      'username' => 'Thomas Smith',
+    ),
   ),
   'recovery' => array(
     'label' => 'Login Recovery',
     'when' => 'a user requests help logging in',
+    'demo_data' => array(
+      'keys' => array(
+        'hiskey' => array('username'=>'Thomas Smith', 'userid'=>'tsmith13'),
+        'herkey' => array('username'=>'Theresa Smith', 'userid'=>'thsmith28'),
+      ),
+    ),
   ),
 );
 

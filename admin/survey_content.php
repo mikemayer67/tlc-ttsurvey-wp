@@ -267,7 +267,6 @@ function add_survey_content($survey,$editable=false)
   if($editable)
   {
     echo "<form class='content edit'>";
-    echo "<input type='hidden' name='lock' value=$lock>";
   } else {
     echo "<form class='content no-edit'>";
   }

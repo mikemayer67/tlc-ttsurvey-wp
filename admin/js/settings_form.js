@@ -63,7 +63,7 @@ function update_primary(event)
 function handle_clear_log(event)
 {
   event.preventDefault()
-  if( confirm('Purse all plugin log data') ) {
+  if( confirm('Purge all plugin log data') ) {
     jQuery.post(
       form_vars['ajaxurl'],
       {

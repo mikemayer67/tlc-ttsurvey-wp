@@ -24,20 +24,15 @@ $survey = $content['survey'] ?? '';
 
 $sendmail = array();
 $preview = array();
-foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
-  # note... the field data should be same as that used in
-  #   admin/ajax/render_sendmail_preview.php
+foreach( SENDMAIL_TEMPLATES as $key=>$template ) {
   $custom_content = $content['sendmail'][$key] ?? '';
   $sendmail[$key] = $custom_content;
+  $message_data = $template['demo_data'];
+  $message_data['title'] = get_post($pid)->post_title;
   $preview[$key] = sendmail_render_message(
     $key,
     stripslashes($custom_content),
-    array(
-      'title' => get_post($pid)->post_title,
-      'email' => 't.smith@t3mail.net',
-      'userid' => 'tsmith13',
-      'name' => 'Thomas Smith',
-    ),
+    $message_data,
   );
 }
 
