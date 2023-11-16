@@ -41,8 +41,8 @@ function clear_logger()
   $file = plugin_path(PLUGIN_LOG_FILE);
   if($_logger_fp) { 
     fclose($_logger_fp); 
-    unlink($file);
   }
+  unlink($file);
   $_logger_fp = fopen($file,"a");
   log_info("log cleared");
 }
