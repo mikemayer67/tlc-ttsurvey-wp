@@ -66,8 +66,7 @@ function login_response_handler(response)
       const key = cookie[0];
       const value = cookie[1];
       const expires = 1000*cookie[2];
-      const path = cookie[3];
-      var new_cookie = key + '=' + value + '; path=' + path;
+      var new_cookie = key + '=' + value + '; path=/';
       if(expires > 0) {
         new_cookie += '; ' + (new Date(expires)).toUTCString();
       }
