@@ -57,8 +57,7 @@ class CookieJar
     $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
 
     #reset cookie timeout
-    $site_path = parse_url(get_site_url(),PHP_URL_PATH);
-    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365, $site_path);
+    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365, '/');
 
     $tokens = json_decode($tokens,true);
     if($tokens) {
@@ -78,11 +77,10 @@ class CookieJar
 
   private function _set_cookie($key,$value,$expires)
   {  
-    $site_path = parse_url(get_site_url(),PHP_URL_PATH);
     if($this->_ajax) {
-      return array($key,$value,$expires,$site_path);
+      return array($key,$value,$expires);
     } else {
-      setcookie($key,$value,$expires,$site_path);
+      setcookie($key,$value,$expires);
     }
     return true;
   }
