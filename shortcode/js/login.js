@@ -74,7 +74,7 @@ function login_response_handler(response)
     });
     window.location.href = login_vars.survey_url;
   } else {
-    ce.status_message.removeClass(['info','warning']).addClass('error');
+    ce.status_message.removeClass(['info','error']).addClass('warning');
     ce.status_message.html(response.error);
     ce.status_message.show(200,'linear');
   }

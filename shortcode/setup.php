@@ -159,16 +159,13 @@ function end_javascript_required()
 function add_status_message()
 {
   $status = status_message();
-  $class = "status w3-panel w3-card w3-border w3-leftbar";
   if($status) {
     [$level,$msg] = $status;
-    $class = "$class $level";
-    $hidden = '';
   } else {
-    $hidden = "style='display:none'";
+    $level = 'none';
     $msg = "";
   }
-  echo "<div id='status-message' class='$class' $hidden>$msg</div>";
+  echo "<div id='status-message' class='status $level'>$msg</div>";
 }
 
 /**

@@ -9,7 +9,7 @@ if( ! defined('WPINC') ) { die; }
 $icon = plugin_url('img/icons8-error.png');
 ?>
 
-<div class="status warning card">
+<div id='status-message' class="warning card">
   <img src="<?=$icon?>" width=64 height=64>
   <span>Invalid Survey Page</span>
 </div>
