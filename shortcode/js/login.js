@@ -444,7 +444,7 @@ function setup_elements()
 
   // populate the elements
   ce.status_message = jQuery('#tlc-ttsurvey #status-message');
-  ce.container = jQuery('#tlc-ttsurvey-login');
+  ce.container = jQuery('#tlc-ttsurvey #login');
   ce.form = ce.container.find('form.login');
   ce.input_status = ce.form.find('input[name=status]');
 

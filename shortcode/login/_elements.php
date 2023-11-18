@@ -19,10 +19,9 @@ function start_login_form($header,$name)
 {
   $form_uri = survey_url();
 
-  $w3_card = 'w3-container w3-card-4 w3-border w3-border-blue-gray';
-  echo "<div id='tlc-ttsurvey-login' class='card $name $w3_card'>";
-  echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
-  echo "<form class='login w3-container' method='post' action='$form_uri'>";
+  echo "<div id='login' class='$name'>";
+  echo "<header>$header</header>";
+  echo "<form class='login' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
   add_hidden_input('refresh',1);
   add_hidden_input('status','');
