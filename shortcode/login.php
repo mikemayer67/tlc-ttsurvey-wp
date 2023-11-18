@@ -23,7 +23,6 @@ function add_login_content($page=null)
     require $page;
     return true;
   } else {
-    require plugin_path("shortcode/bad_page.php");
     return false;
   }
 }
