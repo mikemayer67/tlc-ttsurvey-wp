@@ -128,12 +128,12 @@
 #tlc-ttsurvey div.status.card {
   padding: 0 16px;
   box-shadow:0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-  width:75%;
 }
 
 #tlc-ttsurvey div.status.warning {
   color:#000!important;
   background-color:#fcdbbb;
+  border:1px solid;
   border-left:6px solid;
   border-color:#ff9800;
 }
@@ -142,11 +142,10 @@
   margin:16px;
 }
 
-#tlc-ttsurvey div.warning.card span {
+#tlc-ttsurvey div.warning.card span,
+#tlc-ttsurvey div.warning.card p {
   font-weight:500;
   font-size:x-large;
   margin:16px;
 }
-  
-
 

@@ -206,6 +206,13 @@ function current_survey()
   return $rval;
 }
 
+function active_survey()
+{
+  $rval = current_survey();
+  if($rval && $rval['status']==SURVEY_IS_ACTIVE) { return $rval; }
+  return null;
+}
+
 function survey_response_count($post_id)
 {
   return get_post_meta($post_id,'responses') ?? 0;
