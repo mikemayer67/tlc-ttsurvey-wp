@@ -181,25 +181,18 @@ function add_resume_buttons()
 
 function add_login_submit($label,$action,$cancel=False)
 {
-  $btn_classes = 'w3-button w3-section w3-ripple w3-right w3-margin-left';
-  $submit_classes = "submit $btn_classes w3-blue-gray";
-  $cancel_classes = "cancel $btn_classes w3-light-gray";
-
-  $action = "name='action' value='$action'";
-
   echo "<!-- Button bar-->";
   if($cancel)
   {
-    $cancel_attr= "name='action' value='cancel' formnovalidate";
-    echo "<div class='w3-bar'>";
-    echo "<button class='$submit_classes' $action>$label</button>";
-    echo "<button class='$cancel_classes' $cancel_attr>Cancel</button>";
+    echo "<div class='submit-bar'>";
+    echo "<button class='submit right' name='action' value='$action'>$label</button>";
+    echo "<button class='cancel right' name='action' value='cancel' formnovalidate>Cancel</button>";
     echo "</div>";
   }
   else
   {
-    echo "<div>";
-    echo "<button class='$submit_classes w3-block' $action>$label</button>";
+    echo "<div class='submit-bar'>";
+    echo "<button class='submit full' name='action' value='$action'>$label</button>";
     echo "</div>";
   }
 }
