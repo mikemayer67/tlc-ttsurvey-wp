@@ -56,9 +56,19 @@
   margin-right:1em;
 }
 
-#tlc-ttsurvey #login form div.input div.label {
+#tlc-ttsurvey #login form .input div.info {
+  margin-left:2em;
+  margin-right:2em;
+  width:calc(100% - 4em);
+}
+
+#tlc-ttsurvey #login form .input div.label {
   padding:0;
   position:relative;
+}
+
+#tlc-ttsurvey #login form .input div.error {
+  float:right;
 }
 
 #tlc-ttsurvey #login form input.invalid {
@@ -82,11 +92,14 @@
   box-sizing: border-box;
 }
 
-#tlc-ttsurvey #login form input.w3-input {
-  width:calc(100% - 16px);
-  border-left:none;
-  border-right:none;
-  border-top:none;
+#tlc-ttsurvey #login form input.text-entry {
+  display:block;
+  padding:8px;
+  margin-left:1em;
+  width:calc(100% - 2em);
+
+  border:none;
+  border-bottom:1px solid #ccc;
 }
 
 #tlc-ttsurvey #login form.login div.recovery {

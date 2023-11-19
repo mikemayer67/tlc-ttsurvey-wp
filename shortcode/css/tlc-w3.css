@@ -1,11 +1,10 @@
-﻿p**
+﻿/**
  * This stylesheet contains a modification of the w3.css file (https://www.w3schools.com/w3css/4/w3.css).
  *
  * This contains the selectors that ARE tied to w3 classes.
  * 
  * Each of the selectors is modified such that its effect is limited to DOM elements
  *   within the container (probably a div) with the #tlc-ttsurvey id.
- 8
  **/
 
 /** 

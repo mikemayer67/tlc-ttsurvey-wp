@@ -87,22 +87,22 @@ function add_login_input($type,$kwargs=array())
   if( $type == 'remember' )
   {
     $checked = $value ? 'checked' : '';
-    echo "<input type='checkbox' class='w3-check' name='$name' $checked>";
+    echo "<input type='checkbox' name='$name' $checked>";
     echo "<label>$label</label>";
     if($info) { echo($info_trigger); }
   }
   else
   {
-    echo "<div class='label w3-container'><label>$label</label>";
+    echo "<div class='label'><label>$label</label>";
     if($info) { echo($info_trigger); }
-    echo "<div class='w3-right error $name'></div>";
+    echo "<div class='error $name'></div>";
     echo "</div>"; // ends label div
 
     if($optional) {
-      $classes = 'w3-input';
+      $classes = 'text-entry';
       $extra = "placeholder='[optional]'";
     } else {
-      $classes = "w3-input empty";
+      $classes = "text-entry empty";
       $extra = 'required';
     }
 
@@ -120,8 +120,8 @@ function add_login_input($type,$kwargs=array())
       if($confirm) {
         # confirm overrides the optional parameter ... always required
         $input_attrs = array(
-          "class='w3-input empty primary' name='$name' required",
-          "class='w3-input empty confirm' name='$name-confirm' required",
+          "class='text-entry entry empty primary' name='$name' required",
+          "class='text-entry entry empty confirm' name='$name-confirm' required",
         );
       } else {
         $input_attrs = array("class='$classes' name='$name' $extra");
@@ -137,15 +137,15 @@ function add_login_input($type,$kwargs=array())
       echo "<input type='$type' $attr>";
     }
   }
-
   if($info)
   {
-    echo "<div id='$info_link' class='info-box w3-container'>";
-    echo "<div class='info w3-panel w3-card'><p>$info</p></div>";
+    echo "<div id='$info_link' class='info-box'>";
+    echo "<div class='info'><p>$info</p></div>";
     echo "</div>";
   }
-
   echo "</div>";  // input
+
+
 }
 
 function add_resume_buttons()
