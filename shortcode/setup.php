@@ -206,7 +206,6 @@ function add_shortcode_content()
 function enqueue_shortcode_style()
 {
   wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
-  wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
 
   wp_register_script(
     'tlc_ttsurvey_shortcode',
