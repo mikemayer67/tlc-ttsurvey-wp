@@ -102,6 +102,8 @@
   border:none;
   display:inline-block;
   padding:8px 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
   vertical-align:middle;
   overflow:hidden;
   text-decoration:none;
@@ -152,6 +154,23 @@
   opacity:0.3;
 }
 
+#tlc-ttsurvey #login .links-bar {
+  padding:0 16px;
+  margin-top: 8px;
+  margin-bottom:0;
+}
+
+#tlc-ttsurvey #login .links-bar:after,
+#tlc-ttsurvey #login .links-bar:before {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+#tlc-ttsurvey #login .links-bar div.left { float:left; }
+#tlc-ttsurvey #login .links-bar div.right { float:right; }
+  
+
 
 #tlc-ttsurvey #login form.login div.recovery {
   display:none;
@@ -162,7 +181,7 @@
  **/
 
 #tlc-ttsurvey #login.login .resume-label {
-  margin-top:1em;
+  margin-top:0;
   font-weight:bold;
 }
 

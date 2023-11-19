@@ -23,7 +23,7 @@ function login_form_setup()
   ce.login_password = ce.login_inputs.filter('[name=password]');
   ce.login_remember = ce.login_inputs.filter('[name=remember]');
 
-  ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
+  ce.login_recovery_link = ce.login_form.find('div.links-bar div.recovery');
   ce.login_recovery_link.show();
 
   ce.login_inputs.on('input',function() {

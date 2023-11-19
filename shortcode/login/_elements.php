@@ -201,12 +201,12 @@ function add_login_links($links)
 {
   $form_uri = survey_url();
 
-  echo "<div class='links w3-panel'>";
+  echo "<div class='links-bar'>";
   foreach($links as $link)
   {
     [$label,$page,$side] = $link;
     $page_uri = "$form_uri&tlcpage=$page";
-    echo "<div class='w3-$side $page'><a href='$page_uri'>$label</a></div>";
+    echo "<div class='$side $page'><a href='$page_uri'>$label</a></div>";
   }
   echo "</div>";
 }
