@@ -80,7 +80,7 @@ class CookieJar
     if($this->_ajax) {
       return array($key,$value,$expires);
     } else {
-      setcookie($key,$value,$expires);
+      setcookie($key,$value,$expires,'/');
     }
     return true;
   }

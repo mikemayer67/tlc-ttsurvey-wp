@@ -93,7 +93,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   if(!is_first_survey_on_page()) { return; }
 
   if($_POST['ack_nojs'] ?? false) {
-    setcookie(NOSCRIPT_COOKIE,1,0);
+    setcookie(NOSCRIPT_COOKIE,1,0,'/');
     $_COOKIE[NOSCRIPT_COOKIE] = true;
   }
 
