@@ -259,6 +259,10 @@
   padding:0;
 }
 
+#tlc-ttsurvey [type=checkbox] {
+  margin-right:5px;
+}
+
 #tlc-ttsurvey [type=number]::-webkit-inner-spin-button,
 #tlc-ttsurvey [type=number]::-webkit-outer-spin-button
 {

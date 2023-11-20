@@ -51,15 +51,25 @@
  **/
 
 #tlc-ttsurvey #login form div.input {
+  position:relative;
   margin-top:8px;
   margin-left:1em;
   margin-right:1em;
 }
 
-#tlc-ttsurvey #login form .input div.info {
-  margin-left:2em;
+#tlc-ttsurvey #login form div.input.remember {
+  display:flex;
+  align-items:center;
+}
+
+#tlc-ttsurvey #login form div.info-box {
+  width:80%;
+}
+
+#tlc-ttsurvey #login form div.info {
+  margin-left:3em;
   margin-right:2em;
-  width:calc(100% - 4em);
+  width:100%;
 }
 
 #tlc-ttsurvey #login form .input div.label {

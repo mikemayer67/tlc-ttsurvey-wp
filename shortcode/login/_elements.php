@@ -137,16 +137,15 @@ function add_login_input($type,$kwargs=array())
       echo "<input type='$type' $attr>";
     }
   }
+  echo "</div>";  // input
   if($info)
   {
     echo "<div id='$info_link' class='info-box'>";
     echo "<div class='info'><p>$info</p></div>";
     echo "</div>";
   }
-  echo "</div>";  // input
-
-
 }
+
 
 function add_resume_buttons()
 {
