@@ -105,8 +105,7 @@
   margin-left:1em;
   width:calc(100% - 2em);
 
-  border:none;
-  border-bottom:1px solid #ccc;
+  border:1px inset #ccc;
 }
 
 #tlc-ttsurvey #login form input.invalid {
@@ -118,23 +117,12 @@
 }
 
 #tlc-ttsurvey #login .submit-bar button {
-  box-sizing: border-box;
-
   border:none;
-  display:inline-block;
   padding:8px 16px;
   margin-top: 8px;
   margin-bottom: 8px;
-  vertical-align:middle;
-  overflow:hidden;
-  text-decoration:none;
-  color:inherit;
-  background-color:inherit;
   text-align:center;
   cursor:pointer;
-  white-space:nowrap;
-
-  transition:opacity 0s;
 }
 
 #tlc-ttsurvey #login .submit-bar button.right {
@@ -218,42 +206,33 @@
 }
 
 #tlc-ttsurvey #login.login .resume-box button {
+  background-color:#f8f8f8;
   width:100%;
+  border-style: outset;
+  border-width: 1px;
+  border-color: #777777;
   z-index:1;
+  cursor:pointer;
+}
+
+#tlc-ttsurvey #login.login .resume-box button:hover {
+  background-color:#ffffff;
+  border-width:2px;
 }
 
 #tlc-ttsurvey #login.login .resume-box button .fullname {
   font-weight:bold;
   text-align:left;
   margin:5px 0 0 8px;
+  height:25px;
 }
 
 #tlc-ttsurvey #login.login .resume-box button .userid {
   font-size:small;
   text-align:left;
-  margin:-3px 0 5px 8px;
+  margin: 0 0 5px 8px;
+  height:20px;
 }
-
-/*
-#tlc-ttsurvey #login.login .resume-box button {
-  border-bottom-style:none;
-  border-bottom-width:0;
-  border-image-outset:0;
-  border-image-repeat:stretch;
-  border-image-slice:100%;
-  border-image-source:none;
-  border-image-width:1;
-  border-left-color:#c0c0c0;
-  border-left-style:outset;
-  border-left-width:1.5px;
-  border-right-color:#c0c0c0;
-  border-right-style:outset;
-  border-right-width:1.5px;
-  border-top-color:black;
-  border-top-style:none;
-  border-top-width:0;
-}
-*/
 
 #tlc-ttsurvey #login.login .resume-box div.forget {
   position:absolute;
