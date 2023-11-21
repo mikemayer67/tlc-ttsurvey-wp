@@ -33,11 +33,11 @@ foreach($users as $user) {
   $user->set_password_reset_token($reset_token,$expires);
   $userid = $user->userid();
   $post_id = $user->post_id();
-  $username = $user->username();
+  $fullname = $user->fullname();
   $tokens[$email_token] = array(
     'reset'=>$reset_token,
     'userid'=>$userid,
-    'username'=>$username,
+    'fullname'=>$fullname,
   );
 }
 

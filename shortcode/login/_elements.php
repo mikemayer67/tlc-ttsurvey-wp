@@ -53,7 +53,8 @@ function add_login_instructions($instructions)
  * Recognized input types:
  *   userid 
  *   password
- *   username
+ *   new-password
+ *   fullname
  *   email
  *   remember
  *
@@ -62,7 +63,6 @@ function add_login_instructions($instructions)
  *   label: defaults to ucfirst of name
  *   value: defaults to null
  *   optional: defaults to false
- *   confirm: defaults to false (only applies to password)
  *   info: defaults to null
  **/
 function add_login_input($type,$kwargs=array())
@@ -71,7 +71,6 @@ function add_login_input($type,$kwargs=array())
   $label = $kwargs['label'] ?? ucwords($name);
   $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
-  $confirm = $kwargs['confirm'] ?? False;
   $info = $kwargs['info'] ?? null;
 
   echo "<!-- $label -->";
@@ -97,19 +96,18 @@ function add_login_input($type,$kwargs=array())
   $empty = $optional ? '' : 'empty';
   $required = $optional ? "placeholder='[optional]'" : 'required';
   
-  if($type=='password') 
+  if($type=='new-password') 
   {
-    // special handling here
-    if($confirm) {
-      echo "<input type='password' class='text-entry entry empty primary' name='$name' required>";
-      echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required>";
-    } else {
-      echo "<input type='password' class='text-entry $empty' name='$name' $required>";
-    }
+    echo "<input type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
+    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required autocomplete='new-password'>";
   }
   else
   {
-    if($type != 'email') { $type = 'text'; }
+    switch($type) {
+    case 'password': $value = '';    break;
+    case 'email':                    break;
+    default:         $type = 'text'; break;
+    }
     echo "<input type='$type' class='text-entry $empty' name='$name' $value $required>";
   }
 
@@ -173,11 +171,11 @@ function add_resume_buttons()
   foreach($tokens as $userid=>$token) {
     $user = User::from_userid($userid);
     if($user) {
-      $username = $user->username();
+      $fullname = $user->fullname();
       $value = "resume:$userid:$token";
       echo "<div class='button-box'>";
       echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>";
-      echo "<div class='username'>$username</div>";
+      echo "<div class='fullname'>$fullname</div>";
       echo "<div class='userid'>$userid</div>";
       echo "</button>";
       $forget_url = survey_url() . "&forget=$userid";

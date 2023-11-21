@@ -60,7 +60,7 @@ function sendmail_login_recovery($email,$keys)
 
 }
 
-function sendmail_welcome($email, $userid, $username)
+function sendmail_welcome($email, $userid, $fullname)
 {
   log_info("Send welcome email to $userid: $email");
 
@@ -70,7 +70,7 @@ function sendmail_welcome($email, $userid, $username)
     array(
       'email'=>$email,
       'userid'=>$userid,
-      'username'=>$username,
+      'fullname'=>$fullname,
     ),
   );
 }

@@ -7,7 +7,7 @@ require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
 $response = array();
-$keys = array("userid","password","username","email");
+$keys = array("userid","password","fullname","email");
 foreach( $keys as $key )
 {
   $value = adjust_user_input($key,$_POST[$key]);
