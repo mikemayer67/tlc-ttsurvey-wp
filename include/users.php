@@ -21,7 +21,7 @@ require_once plugin_path('include/validation.php');
  * The post content is a JSON string with the following fields:
  *
  *   Participant Entries:
- *   - username
+ *   - fullname
  *   - email (optional)
  *   - access_token
  *   - pw_hash: password hash
@@ -40,7 +40,7 @@ require_once plugin_path('include/validation.php');
  *     - unique ID associated with each survey participant
  *     - selected by the participant when they registered for the survey
  *     - stored in the title attribute of wp_post table
- *   username:
+ *   fullname:
  *     - the participant's full name as it will appear on the survey
  *       summary report.
  *     - provided by the participant when they register for the survey
@@ -223,11 +223,11 @@ class User {
     return $users;
   }
 
-  public static function create($userid,$password,$username,$email=null)
+  public static function create($userid,$password,$fullname,$email=null)
   {
     $content = array(
       'pw_hash' => password_hash($password,PASSWORD_DEFAULT),
-      'username' => $username,
+      'fullname' => $fullname,
       'access_token' => gen_access_token(),
     );
     if($email) { $content['email'] = $email; }
@@ -256,7 +256,7 @@ class User {
 
   public function userid()       { return $this->_userid;                       }
   public function post_id()      { return $this->_post_id;                      }
-  public function username()     { return $this->_data['username']     ?? null; }
+  public function fullname()     { return $this->_data['fullname']     ?? null; }
   public function email()        { return $this->_data['email']        ?? null; }
   public function access_token() { return $this->_data['access_token'] ?? null; }
   
@@ -306,13 +306,13 @@ class User {
    * Setters
    **/
 
-  public function set_username($username) 
+  public function set_fullname($fullname) 
   {
-    if(!adjust_and_validate_user_input('username',$username)) {
-      log_warning("Cannot update name for $this->_userid: invalid name ($username)");
+    if(!adjust_and_validate_user_input('fullname',$fullname)) {
+      log_warning("Cannot update name for $this->_userid: invalid name ($fullname)");
       return false;
     }
-    $this->_data['username'] = $username;
+    $this->_data['fullname'] = $fullname;
     $this->commit();
     return true;
   }
