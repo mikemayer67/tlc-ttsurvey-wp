@@ -23,7 +23,7 @@ function login_form_setup()
   ce.login_password = ce.login_inputs.filter('[name=password]');
   ce.login_remember = ce.login_inputs.filter('[name=remember]');
 
-  ce.login_recovery_link = ce.login_form.find('div.links div.recovery');
+  ce.login_recovery_link = ce.login_form.find('div.links-bar div.recovery');
   ce.login_recovery_link.show();
 
   ce.login_inputs.on('input',function() {
@@ -74,7 +74,7 @@ function login_response_handler(response)
     });
     window.location.href = login_vars.survey_url;
   } else {
-    ce.status_message.removeClass(['info','warning']).addClass('error');
+    ce.status_message.removeClass(['info','error']).addClass('warning');
     ce.status_message.html(response.error);
     ce.status_message.show(200,'linear');
   }
@@ -101,7 +101,7 @@ function register_setup()
   ce.register_userid = ce.register_form.find('.input.userid input');
   ce.register_password = ce.register_form.find('.input.password input.primary');
   ce.register_pwconfirm = ce.register_form.find('.input.password input.confirm');
-  ce.register_username = ce.register_form.find('.input.username input');
+  ce.register_fullname = ce.register_form.find('.input.fullname input');
   ce.register_email = ce.register_form.find('.input.email input');
   ce.register_remember = ce.register_form.find('input[name=remember]');
   ce.register_submit = ce.register_form.find('button.submit');
@@ -112,6 +112,7 @@ function register_setup()
   ce.register_error.hide();
 
   ce.register_inputs = ce.register_form.find('input').not('input[type=checkbox]');
+  ce.register_inputs.val('');
 
   ce.register_inputs.on('input',function() {
     ce.register_submit.prop('disabled',true);
@@ -126,6 +127,7 @@ function register_setup()
 
   ce.register_cancel.on('click',cancel_register);
   ce.register_form.on('submit',register_new_user);
+  ce.register_inputs.val('');
 }
 
 function cancel_register(event)
@@ -143,11 +145,11 @@ function evaluate_register_inputs()
       userid:ce.register_userid.val(),
       password:ce.register_password.val(),
       pwconfirm:ce.register_pwconfirm.val(),
-      username:ce.register_username.val(),
+      fullname:ce.register_fullname.val(),
       email:ce.register_email.val(),
     },
     function(response) {
-      let keys = ['userid','password','username','email'];
+      let keys = ['userid','password','fullname','email'];
       var all_ok = true;
       keys.forEach( function(key) {
         var error_box = ce.register_form.find('.input .error.'+key);
@@ -184,7 +186,7 @@ function register_new_user(event)
       userid:ce.register_userid.val(),
       password:ce.register_password.val(),
       pwconfirm:ce.register_pwconfirm.val(),
-      username:ce.register_username.val(),
+      fullname:ce.register_fullname.val(),
       email:ce.register_email.val(),
       remember:ce.register_remember.is(':checked'),
     },
@@ -349,8 +351,8 @@ function send_pwreset(event)
     
       var status = '';
       if(response.ok) {
-        const username = pwreset_user_info.username;
-        status = encodeURIComponent('info::password updated for '+username);
+        const fullname = pwreset_user_info.fullname;
+        status = encodeURIComponent('info::password updated for '+fullname);
       } else {
         status = encodeURIComponent('warning::'+response.error);
       }
@@ -444,7 +446,7 @@ function setup_elements()
 
   // populate the elements
   ce.status_message = jQuery('#tlc-ttsurvey #status-message');
-  ce.container = jQuery('#tlc-ttsurvey-login');
+  ce.container = jQuery('#tlc-ttsurvey #login');
   ce.form = ce.container.find('form.login');
   ce.input_status = ce.form.find('input[name=status]');
 

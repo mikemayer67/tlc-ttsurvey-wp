@@ -80,7 +80,7 @@ class CookieJar
     if($this->_ajax) {
       return array($key,$value,$expires);
     } else {
-      setcookie($key,$value,$expires);
+      setcookie($key,$value,$expires,'/');
     }
     return true;
   }
@@ -290,7 +290,7 @@ function handle_login_register()
     adjust_user_input('userid',$_POST['userid']),
     adjust_user_input('password',$_POST['password']),
     adjust_user_input('password',$_POST['password-confirm']),
-    adjust_user_input('username',$_POST['username']),
+    adjust_user_input('fullname',$_POST['fullname']),
     adjust_user_input('email',$_POST['email']),
     filter_var($_POST['remember'] ?? false, FILTER_VALIDATE_BOOLEAN),
   );
@@ -304,7 +304,7 @@ function handle_login_register()
   }
 }
 
-function register_new_user($userid, $password, $pwconfirm, $username, $email, $remember) 
+function register_new_user($userid, $password, $pwconfirm, $fullname, $email, $remember) 
 {
   $error='';
   if(!validate_user_input('userid',$userid,$error)) {
@@ -319,7 +319,7 @@ function register_new_user($userid, $password, $pwconfirm, $username, $email, $r
       'error'=>"Invalid password: $error",
     );
   }
-  if(!validate_user_input('username',$username,$error)) {
+  if(!validate_user_input('fullname',$fullname,$error)) {
     return array(
       'success'=>false, 
       'error'=>"Invalid name: $error",
@@ -346,10 +346,10 @@ function register_new_user($userid, $password, $pwconfirm, $username, $email, $r
     );
   }
 
-  $user = User::create($userid,$password,$username,$email);
+  $user = User::create($userid,$password,$fullname,$email);
   $token = $user->access_token();
 
-  log_info("Registered new user $username with userid $userid and token $token");
+  log_info("Registered new user $fullname with userid $userid and token $token");
 
   $cookies = array( start_survey_as($userid) );
   if($remember) {
@@ -358,7 +358,7 @@ function register_new_user($userid, $password, $pwconfirm, $username, $email, $r
 
   if($email) { 
     require_once plugin_path('include/sendmail.php');
-    sendmail_welcome($email, $userid, $username, $token); 
+    sendmail_welcome($email, $userid, $fullname, $token); 
   }
 
   return array('success'=>true, 'cookies'=>$cookies);

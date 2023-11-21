@@ -42,7 +42,7 @@ const SENDMAIL_TEMPLATES = array(
     'demo_data' => array(
       'email' => 't.smith@t3mail.net',
       'userid' => 'tsmith13',
-      'username' => 'Thomas Smith',
+      'fullname' => 'Thomas Smith',
     ),
   ),
   'recovery' => array(
@@ -50,8 +50,8 @@ const SENDMAIL_TEMPLATES = array(
     'when' => 'a user requests help logging in',
     'demo_data' => array(
       'keys' => array(
-        'hiskey' => array('username'=>'Thomas Smith', 'userid'=>'tsmith13'),
-        'herkey' => array('username'=>'Theresa Smith', 'userid'=>'thsmith28'),
+        'hiskey' => array('fullname'=>'Thomas Smith', 'userid'=>'tsmith13'),
+        'herkey' => array('fullname'=>'Theresa Smith', 'userid'=>'thsmith28'),
       ),
     ),
   ),

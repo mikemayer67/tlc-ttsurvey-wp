@@ -15,7 +15,7 @@ function adjust_user_input($key,$value)
 
   switch($key)
   {
-  case 'username':
+  case 'fullname':
     $value = preg_replace('/\'+/',"'",$value);  // condense multiple apostrophes
     $value = preg_replace('/-+/',"-",$value);   // condense multiple hyphens
     $value = preg_replace('/~+/',"~",$value);   // consense multiple tildes
@@ -32,12 +32,15 @@ function validate_user_input($key,$value,&$error=null)
 {
   $error = '';
 
-  if($key=='username')
+  if($key=='fullname')
   {
     $invalid_end = "'~-";
-    $valid = "A-Za-z\x{00C0}-\x{00FF} '~-";
+    $valid = "A-Za-z\x{00C0}-\x{00FF} .'~-";
     if(preg_match("/([^$valid])/",$value,$m)) {
       $error = "names cannot contain $m[1]";
+    }
+    elseif(preg_match("/\.\S/",$value,$m)) {
+      $error = "name cannot contain period";
     }
     elseif(preg_match("/(?:^|\s)([$invalid_end])/",$value,$m)) {
       $error = "names cannot start with $m[1]";

@@ -93,7 +93,7 @@ function handle_shortcode($attr,$content=null,$tag=null)
   if(!is_first_survey_on_page()) { return; }
 
   if($_POST['ack_nojs'] ?? false) {
-    setcookie(NOSCRIPT_COOKIE,1,0);
+    setcookie(NOSCRIPT_COOKIE,1,0,'/');
     $_COOKIE[NOSCRIPT_COOKIE] = true;
   }
 
@@ -159,16 +159,13 @@ function end_javascript_required()
 function add_status_message()
 {
   $status = status_message();
-  $class = "status w3-panel w3-card w3-border w3-leftbar";
   if($status) {
     [$level,$msg] = $status;
-    $class = "$class $level";
-    $hidden = '';
   } else {
-    $hidden = "style='display:none'";
+    $level = 'none';
     $msg = "";
   }
-  echo "<div id='status-message' class='$class' $hidden>$msg</div>";
+  echo "<div id='status-message' class='status $level'>$msg</div>";
 }
 
 /**
@@ -177,8 +174,8 @@ function add_status_message()
  **/
 function add_shortcode_content()
 {
-  $current_survey = current_survey();
-  if(!$current_survey) {
+  $active_survey = active_survey();
+  if(!$active_survey) {
     require plugin_path('shortcode/inactive_survey.php');
     return;
   }
@@ -209,7 +206,7 @@ function add_shortcode_content()
 function enqueue_shortcode_style()
 {
   wp_enqueue_style('tlc-ttsurvey', plugin_url('shortcode/css/shortcode.css'));
-  wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/tlc-w3.css'));
+  wp_enqueue_style('wp-w3-css',plugin_url('shortcode/css/core.css'));
 
   wp_register_script(
     'tlc_ttsurvey_shortcode',

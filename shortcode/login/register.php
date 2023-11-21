@@ -16,17 +16,18 @@ start_login_form("Register for the Survey","register");
 
 if( $_POST['refresh'] ?? False ) {
   $userid = $_POST['userid'] ?? null;
-  $username = $_POST['username'] ?? null;
+  $fullname = $_POST['fullname'] ?? null;
   $email = $_POST['email'] ?? null;
   $remember = filter_var($_POST['remember']??false, FILTER_VALIDATE_BOOLEAN);
 } else {
   $userid = null;
-  $username = null;
+  $fullname = null;
   $email = null;
   $remember = True;
 }
 
 add_login_input("userid",array(
+  "label" => "Userid",
   "value" => $userid,
   "info" => <<<INFO
 Used to log into the survey
@@ -36,8 +37,8 @@ Used to log into the survey
 INFO
 ));
 
-add_login_input("password",array(
-  "confirm" => true,
+add_login_input("new-password",array(
+  "name" => "password",
   "info" => <<<INFO
 Used to log into the survey
 <p class=info-list><b>must</b> be between 8 and 128 characters</p>
@@ -47,9 +48,9 @@ Used to log into the survey
 INFO
 ));
 
-add_login_input("username",array(
+add_login_input("fullname",array(
   "label" => 'Name',
-  "value" => $username,
+  "value" => $fullname,
   "info" => <<<INFO
 How your name will appear on the survey summary report
 <p class=info-list><b>must</b> contain a valid full name</p>
@@ -73,7 +74,7 @@ INFO
 
 # default to true on blank form
 # otherwise set to true if currently checked
-add_login_input("remember",array(
+add_login_checkbox("remember", array(
   "label" => "Remember Me",
   "value" => $remember,
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",

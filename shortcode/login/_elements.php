@@ -19,10 +19,9 @@ function start_login_form($header,$name)
 {
   $form_uri = survey_url();
 
-  $w3_card = 'w3-container w3-card-4 w3-border w3-border-blue-gray';
-  echo "<div id='tlc-ttsurvey-login' class='card $name $w3_card'>";
-  echo "<header class='w3-container w3-blue-gray'><h3>$header</h3></header>";
-  echo "<form class='login w3-container' method='post' action='$form_uri'>";
+  echo "<div id='login' class='$name'>";
+  echo "<header>$header</header>";
+  echo "<form class='login' method='post' action='$form_uri'>";
   wp_nonce_field(LOGIN_FORM_NONCE);
   add_hidden_input('refresh',1);
   add_hidden_input('status','');
@@ -54,7 +53,8 @@ function add_login_instructions($instructions)
  * Recognized input types:
  *   userid 
  *   password
- *   username
+ *   new-password
+ *   fullname
  *   email
  *   remember
  *
@@ -63,7 +63,6 @@ function add_login_instructions($instructions)
  *   label: defaults to ucfirst of name
  *   value: defaults to null
  *   optional: defaults to false
- *   confirm: defaults to false (only applies to password)
  *   info: defaults to null
  **/
 function add_login_input($type,$kwargs=array())
@@ -72,82 +71,92 @@ function add_login_input($type,$kwargs=array())
   $label = $kwargs['label'] ?? ucwords($name);
   $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
-  $confirm = $kwargs['confirm'] ?? False;
-
   $info = $kwargs['info'] ?? null;
-  if($info) {
-    $info_link = "tlc-ttsurvey-$name-info";
-    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
-    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
-  }
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
 
-  # add label unless type is 'remember
-  if( $type == 'remember' )
+  # add label box
+
+  echo "<div class='label-box'>";
+  echo "<label>$label</label>";
+  if($info) { 
+    $info_link = "tlc-ttsurvey-$name-info";
+    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+    echo($info_trigger); 
+  }
+  echo "<div class='error $name'></div>";
+  echo "</div>"; // label-box
+
+  # add input fields
+  
+  $value = $value ? "value=\"$value\"" : "";
+
+  $empty = $optional ? '' : 'empty';
+  $required = $optional ? "placeholder='[optional]'" : 'required';
+  
+  if($type=='new-password') 
   {
-    $checked = $value ? 'checked' : '';
-    echo "<input type='checkbox' class='w3-check' name='$name' $checked>";
-    echo "<label>$label</label>";
-    if($info) { echo($info_trigger); }
+    echo "<input type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
+    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required autocomplete='new-password'>";
   }
   else
   {
-    echo "<div class='label w3-container'><label>$label</label>";
-    if($info) { echo($info_trigger); }
-    echo "<div class='w3-right error $name'></div>";
-    echo "</div>"; // ends label div
-
-    if($optional) {
-      $classes = 'w3-input';
-      $extra = "placeholder='[optional]'";
-    } else {
-      $classes = "w3-input empty";
-      $extra = 'required';
-    }
-
     switch($type) {
-    case 'username':
-    case 'userid':
-      $type = "text";
-    case 'email';
-      if($value) { $extra = "value=\"$value\" $extra"; }
-      $input_attrs = array("class='$classes' name='$name' $extra");
-      break;
-
-    case 'password':
-      if($value) { $extra = "value=\"$value\" $extra"; }
-      if($confirm) {
-        # confirm overrides the optional parameter ... always required
-        $input_attrs = array(
-          "class='w3-input empty primary' name='$name' required",
-          "class='w3-input empty confirm' name='$name-confirm' required",
-        );
-      } else {
-        $input_attrs = array("class='$classes' name='$name' $extra");
-      }
-      break;
-
-    default:
-      log_error("Unrecognized input type ($type) passed to add_login_name");
-      break;
+    case 'password': $value = '';    break;
+    case 'email':                    break;
+    default:         $type = 'text'; break;
     }
-
-    foreach( $input_attrs as $attr ) {
-      echo "<input type='$type' $attr>";
-    }
+    echo "<input type='$type' class='text-entry $empty' name='$name' $value $required>";
   }
+
+  # add info box
 
   if($info)
   {
-    echo "<div id='$info_link' class='info-box w3-container'>";
-    echo "<div class='info w3-panel w3-card'><p>$info</p></div>";
+    echo "<div id='$info_link' class='info-box'>";
+    echo "<div class='info'><p>$info</p></div>";
     echo "</div>";
   }
 
+  # close the input box
   echo "</div>";  // input
 }
+
+
+function add_login_checkbox($name, $kwargs=array())
+{
+  $label = $kwargs['label'] ?? ucwords($name);
+  $checked = stripslashes($kwargs['value'] ?? False) ? 'checked' : '';
+  $info = $kwargs['info'] ?? null;
+
+  echo "<!-- $label -->";
+  echo "<div class='input $name'>";
+  
+  echo "<div class='label-box'>";
+  echo "<input type='checkbox' name='$name' $checked>";
+  echo "<label>$label</label>";
+
+  if($info)
+  {
+    $info_link = "tlc-ttsurvey-$name-info";
+    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+    // close out the label-box with the info trigger
+    echo($info_trigger);
+    echo "</div>";
+
+    // start the info-box
+    echo "<div>";
+    echo "<div id='$info_link' class='info-box'>";
+    echo "<div class='info'><p>$info</p></div>";
+    echo "</div>";
+  }
+  echo "</div>"; // label-box (if no-info) or info-box (if info present)
+  echo "</div>"; // input box
+}
+
 
 function add_resume_buttons()
 {
@@ -162,11 +171,11 @@ function add_resume_buttons()
   foreach($tokens as $userid=>$token) {
     $user = User::from_userid($userid);
     if($user) {
-      $username = $user->username();
+      $fullname = $user->fullname();
       $value = "resume:$userid:$token";
       echo "<div class='button-box'>";
       echo "<button class='$class' name='resume' value='$userid:$token' formnovalidate>";
-      echo "<div class='username'>$username</div>";
+      echo "<div class='fullname'>$fullname</div>";
       echo "<div class='userid'>$userid</div>";
       echo "</button>";
       $forget_url = survey_url() . "&forget=$userid";
@@ -182,25 +191,18 @@ function add_resume_buttons()
 
 function add_login_submit($label,$action,$cancel=False)
 {
-  $btn_classes = 'w3-button w3-section w3-ripple w3-right w3-margin-left';
-  $submit_classes = "submit $btn_classes w3-blue-gray";
-  $cancel_classes = "cancel $btn_classes w3-light-gray";
-
-  $action = "name='action' value='$action'";
-
   echo "<!-- Button bar-->";
   if($cancel)
   {
-    $cancel_attr= "name='action' value='cancel' formnovalidate";
-    echo "<div class='w3-bar'>";
-    echo "<button class='$submit_classes' $action>$label</button>";
-    echo "<button class='$cancel_classes' $cancel_attr>Cancel</button>";
+    echo "<div class='submit-bar'>";
+    echo "<button class='submit right' name='action' value='$action'>$label</button>";
+    echo "<button class='cancel right' name='action' value='cancel' formnovalidate>Cancel</button>";
     echo "</div>";
   }
   else
   {
-    echo "<div>";
-    echo "<button class='$submit_classes w3-block' $action>$label</button>";
+    echo "<div class='submit-bar'>";
+    echo "<button class='submit full' name='action' value='$action'>$label</button>";
     echo "</div>";
   }
 }
@@ -209,12 +211,12 @@ function add_login_links($links)
 {
   $form_uri = survey_url();
 
-  echo "<div class='links w3-panel'>";
+  echo "<div class='links-bar'>";
   foreach($links as $link)
   {
     [$label,$page,$side] = $link;
     $page_uri = "$form_uri&tlcpage=$page";
-    echo "<div class='w3-$side $page'><a href='$page_uri'>$label</a></div>";
+    echo "<div class='$side $page'><a href='$page_uri'>$label</a></div>";
   }
   echo "</div>";
 }
