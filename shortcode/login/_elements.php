@@ -72,78 +72,91 @@ function add_login_input($type,$kwargs=array())
   $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
   $confirm = $kwargs['confirm'] ?? False;
-
   $info = $kwargs['info'] ?? null;
-  if($info) {
-    $info_link = "tlc-ttsurvey-$name-info";
-    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
-    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
-  }
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
 
-  # add label unless type is 'remember
-  if( $type == 'remember' )
+  # add label box
+
+  echo "<div class='label-box'>";
+  echo "<label>$label</label>";
+  if($info) { 
+    $info_link = "tlc-ttsurvey-$name-info";
+    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+    echo($info_trigger); 
+  }
+  echo "<div class='error $name'></div>";
+  echo "</div>"; // label-box
+
+  # add input fields
+  
+  $value = $value ? "value=\"$value\"" : "";
+
+  $empty = $optional ? '' : 'empty';
+  $required = $optional ? "placeholder='[optional]'" : 'required';
+  
+  if($type=='password') 
   {
-    $checked = $value ? 'checked' : '';
-    echo "<input type='checkbox' name='$name' $checked>";
-    echo "<label>$label</label>";
-    if($info) { echo($info_trigger); }
+    // special handling here
+    if($confirm) {
+      echo "<input type='password' class='text-entry entry empty primary' name='$name' required>";
+      echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required>";
+    } else {
+      echo "<input type='password' class='text-entry $empty' name='$name' $required>";
+    }
   }
   else
   {
-    echo "<div class='label'><label>$label</label>";
-    if($info) { echo($info_trigger); }
-    echo "<div class='error $name'></div>";
-    echo "</div>"; // ends label div
-
-    if($optional) {
-      $classes = 'text-entry';
-      $extra = "placeholder='[optional]'";
-    } else {
-      $classes = "text-entry empty";
-      $extra = 'required';
-    }
-
-    switch($type) {
-    case 'username':
-    case 'userid':
-      $type = "text";
-    case 'email';
-      if($value) { $extra = "value=\"$value\" $extra"; }
-      $input_attrs = array("class='$classes' name='$name' $extra");
-      break;
-
-    case 'password':
-      if($value) { $extra = "value=\"$value\" $extra"; }
-      if($confirm) {
-        # confirm overrides the optional parameter ... always required
-        $input_attrs = array(
-          "class='text-entry entry empty primary' name='$name' required",
-          "class='text-entry entry empty confirm' name='$name-confirm' required",
-        );
-      } else {
-        $input_attrs = array("class='$classes' name='$name' $extra");
-      }
-      break;
-
-    default:
-      log_error("Unrecognized input type ($type) passed to add_login_name");
-      break;
-    }
-
-    foreach( $input_attrs as $attr ) {
-      echo "<input type='$type' $attr>";
-    }
+    if($type != 'email') { $type = 'text'; }
+    echo "<input type='$type' class='text-entry $empty' name='$name' $value $required>";
   }
-  echo "</div>";  // input
+
+  # add info box
+
   if($info)
   {
     echo "<div id='$info_link' class='info-box'>";
     echo "<div class='info'><p>$info</p></div>";
     echo "</div>";
   }
+
+  # close the input box
+  echo "</div>";  // input
+}
+
+
+function add_login_checkbox($name, $kwargs=array())
+{
+  $label = $kwargs['label'] ?? ucwords($name);
+  $checked = stripslashes($kwargs['value'] ?? False) ? 'checked' : '';
+  $info = $kwargs['info'] ?? null;
+
+  echo "<!-- $label -->";
+  echo "<div class='input $name'>";
+  
+  echo "<div class='label-box'>";
+  echo "<input type='checkbox' name='$name' $checked>";
+  echo "<label>$label</label>";
+
+  if($info)
+  {
+    $info_link = "tlc-ttsurvey-$name-info";
+    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+    // close out the label-box with the info trigger
+    echo($info_trigger);
+    echo "</div>";
+
+    // start the info-box
+    echo "<div>";
+    echo "<div id='$info_link' class='info-box'>";
+    echo "<div class='info'><p>$info</p></div>";
+    echo "</div>";
+  }
+  echo "</div>"; // label-box (if no-info) or info-box (if info present)
+  echo "</div>"; // input box
 }
 
 

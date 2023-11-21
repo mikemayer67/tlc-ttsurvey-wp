@@ -73,7 +73,7 @@ INFO
 
 # default to true on blank form
 # otherwise set to true if currently checked
-add_login_input("remember",array(
+add_login_checkbox("remember", array(
   "label" => "Remember Me",
   "value" => $remember,
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",

@@ -19,7 +19,7 @@ add_resume_buttons();
 add_login_input("userid");
 add_login_input("password");
 
-add_login_input("remember",array(
+add_login_checkbox("remember", array(
   "label" => "Remember Me",
   "value" => True,
   'info' => "<p>Sets a cookie on your browser so that you need not enter your password on fugure logins</p>",
