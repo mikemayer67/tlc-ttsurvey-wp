@@ -91,6 +91,10 @@
   margin-left:10px;
 }
 
+#tlc-ttsurvey form .info-trigger img {
+  vertical-align:unset;
+}
+
 /**
  * status message
  **/
