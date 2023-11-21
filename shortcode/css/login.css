@@ -50,6 +50,19 @@
  * Form elements
  **/
 
+#tlc-ttsurvey #login a {
+  text-decoration:underline;
+}
+
+#tlc-ttsurvey #login a:hover {
+  text-decoration:none;
+}
+
+#tlc-ttsurvey #login a:active {
+  text-decoration:none;
+  color:#888;
+}
+
 #tlc-ttsurvey #login form div.input {
   position:relative;
   margin-top:8px;
@@ -140,8 +153,8 @@
 }
 
 #tlc-ttsurvey #login .submit-bar button.submit {
-  color:#fff!important;
-  background-color:#607d8b!important;
+  color:#fff;
+  background-color:#607d8b;
 }
 
 #tlc-ttsurvey #login .submit-bar button.cancel {
@@ -220,6 +233,27 @@
   text-align:left;
   margin:-3px 0 5px 8px;
 }
+
+/*
+#tlc-ttsurvey #login.login .resume-box button {
+  border-bottom-style:none;
+  border-bottom-width:0;
+  border-image-outset:0;
+  border-image-repeat:stretch;
+  border-image-slice:100%;
+  border-image-source:none;
+  border-image-width:1;
+  border-left-color:#c0c0c0;
+  border-left-style:outset;
+  border-left-width:1.5px;
+  border-right-color:#c0c0c0;
+  border-right-style:outset;
+  border-right-width:1.5px;
+  border-top-color:black;
+  border-top-style:none;
+  border-top-width:0;
+}
+*/
 
 #tlc-ttsurvey #login.login .resume-box div.forget {
   position:absolute;

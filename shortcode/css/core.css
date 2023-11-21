@@ -97,6 +97,7 @@
 #tlc-ttsurvey a
 {
   background-color:transparent;
+  text-decoration:underline;
 }
 
 #tlc-ttsurvey a:active,
@@ -311,7 +312,6 @@
 #tlc-ttsurvey h5,
 #tlc-ttsurvey h6
 {
-  font-family:"Segoe UI", Arial, sans-serif;
   font-weight:400;
   margin:10px 0;
 }
@@ -324,5 +324,3 @@
 }
 
 #tlc-ttsurvey img { vertical-align:middle; }
-
-#tlc-ttsurvey a { color:inherit; }
