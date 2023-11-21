@@ -208,6 +208,7 @@
 #tlc-ttsurvey #login.login .resume-box button {
   background-color:#f8f8f8;
   width:100%;
+  height:unset;
   border-style: outset;
   border-width: 1px;
   border-color: #777777;
