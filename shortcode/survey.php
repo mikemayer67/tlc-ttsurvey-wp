@@ -9,6 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
+require_once plugin_path('shortcode/survey/menubar.php');
 
 function add_survey_content($userid=null)
 {
@@ -25,6 +26,9 @@ function add_survey_content($userid=null)
 
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
+  echo "<div id='survey'>";
+  add_survey_menubar($userid);
+
   echo "<h2>Survey</h2>";
   echo "<form method='post' action='$form_uri'>";
   // Yes, we want the login nonce here as logout is a "login" action
@@ -33,9 +37,9 @@ function add_survey_content($userid=null)
   echo "  <input type='submit' value='Log Out'>";
   echo "</form>";
 
+  echo "</div>";
   return true;
 }
-
 
 function enqueue_survey_script()
 {
