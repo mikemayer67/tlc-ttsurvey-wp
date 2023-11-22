@@ -83,6 +83,9 @@
   margin-left:2em;
   margin-right:1em;
   width:100%;
+  border-style:inset;
+  border-radius:10px;
+  border-width:1px;
 }
 
 #tlc-ttsurvey #login form .input div.label {
@@ -119,30 +122,31 @@
 #tlc-ttsurvey #login .submit-bar button {
   border:none;
   padding:8px 16px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin:8px 0 8px 16px;
   text-align:center;
   cursor:pointer;
-}
-
-#tlc-ttsurvey #login .submit-bar button.right {
-  float:right;
-  margin-left:16px;
+  border-style:outset;
+  border-width:1px;
+  border-radius:5px;
 }
 
 #tlc-ttsurvey #login .submit-bar button.full {
   width:100%;
+  margin-left:0;
 }
 
 #tlc-ttsurvey #login .submit-bar {
   margin-top:10px;
   width:100%;
   overflow:hidden;
+  display:flex;
+  flex-direction:row-reverse;
 }
 
 #tlc-ttsurvey #login .submit-bar button.submit {
   color:#fff;
   background-color:#607d8b;
+  font-weight:bold;
 }
 
 #tlc-ttsurvey #login .submit-bar button.cancel {

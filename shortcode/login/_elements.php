@@ -195,8 +195,8 @@ function add_login_submit($label,$action,$cancel=False)
   if($cancel)
   {
     echo "<div class='submit-bar'>";
-    echo "<button class='submit right' name='action' value='$action'>$label</button>";
-    echo "<button class='cancel right' name='action' value='cancel' formnovalidate>Cancel</button>";
+    echo "<button class='submit' name='action' value='$action'>$label</button>";
+    echo "<button class='cancel' name='action' value='cancel' formnovalidate>Cancel</button>";
     echo "</div>";
   }
   else
