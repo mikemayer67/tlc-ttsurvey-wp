@@ -10,28 +10,40 @@
   border-style:solid;
   border-width:1px;
   background-color:white;
+  padding:8px;
 }
 
-#tlc-ttsurvey #survey div.menubar {
+#tlc-ttsurvey div.menubar {
   position:absolute;
   box-sizing:border-box;
   top:0;
   left:0;
   width:100%;
-  color:white;
-  background-color:black;
-  padding:3px 8px;
   z-index:2;
+  padding:3px 8px;
+  border-bottom-style: solid;
+  border-bottom-color: unset;
+  border-bottom-width: 5px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  background-color:black;
 }
 
-#tlc-ttsurvey #survey div.menubar.spacer {
+#tlc-ttsurvey #survey div.spacer {
   position:static;
   height:2em;
   z-index:1;
   background-color:unset;
 }
 
+#tlc-ttsurvey .menubar .menuitem {
+  color:white;
+}
 
+#tlc-ttsurvey .menubar .survey-name {
+  font-weight:bolder;
+}
 
 /* switch */
 
