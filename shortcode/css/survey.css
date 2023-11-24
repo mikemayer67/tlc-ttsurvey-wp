@@ -13,13 +13,17 @@
   padding:8px;
 }
 
-#tlc-ttsurvey div.menubar {
+#tlc-ttsurvey #tlc-ttsurvey-menu {
   position:absolute;
-  box-sizing:border-box;
   top:0;
   left:0;
   width:100%;
   z-index:2;
+}
+
+#tlc-ttsurvey div.menubar {
+  box-sizing:border-box;
+  width:100%;
   padding:3px 8px;
   border-bottom-style: solid;
   border-bottom-color: unset;
@@ -45,96 +49,37 @@
   font-weight:bolder;
 }
 
-/* switch */
+/*
+#tlc-ttsurvey-menu input.toggle {
+  display:none;
+}
+*/
 
-#tlc-ttsurvey .switch {
-  position: relative;
-  display: inline-block;
-}
-#tlc-ttsurvey .switch-input {
-  display: none;
-}
-#tlc-ttsurvey .switch-label {
-  display: block;
-  width: 48px;
-  height: 24px;
-  text-indent: -150%;
-  clip: rect(0 0 0 0);
-  color: transparent;
-  user-select: none;
-}
-#tlc-ttsurvey .switch-label::before,
-#tlc-ttsurvey .switch-label::after {
-  content: "";
-  display: block;
-  position: absolute;
-  cursor: pointer;
-}
-#tlc-ttsurvey .switch-label::before {
-  width: 100%;
-  height: 100%;
-  background-color: #dedede;
-  border-radius: 9999em;
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
-}
-#tlc-ttsurvey .switch-label::after {
-  top: 0;
-  left: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
-  -webkit-transition: left 0.25s ease;
-  transition: left 0.25s ease;
-}
-#tlc-ttsurvey .switch-input:checked + .switch-label::before {
-  background-color: #89c12d;
-}
-#tlc-ttsurvey .switch-input:checked + .switch-label::after {
-  left: 24px;
+#tlc-ttsurvey .menubar .user-menu {
+  padding-left:3px;
 }
 
-/* toggle */
-
-#tlc-ttsurvey .toggle {
-  margin-left:1em;
-  position:relative;
-  display: inline-block;
+#tlc-ttsurvey-menu .user-menu .menu {
+  display:none;
+  position:absolute;
+  right:0;
+  border-style:solid;
+  border-color:black;
+  border-width:1px;
+  padding:15px;
+  color:black;
+  background-color:white;
+  flex-direction:column;
 }
 
-#tlc-ttsurvey .toggle-input {
+#tlc-ttsurvey-menu #user-menu-toggle:checked ~ div.menu {
+  display:flex;
+}
+
+#tlc-ttsurvey-menu div.profile-editor {
   display:none;
 }
 
-#tlc-ttsurvey .toggle-label {
-  border-style:outset;
-  border-width:2;
-  padding:3px;
-  font-size:small;
+#tlc-ttsurvey-menu #profile-editor-toggle:checked ~ .profile_editor {
+  display:absolute;
 }
-
-#tlc-ttsurvey .toggle-label:hover {
-  background-color:pink;
-  cursor:pointer;
-}
-
-#tlc-ttsurvey .toggle-input:checked + .toggle-label {
-  background-color:yellow;
-  border-style:inset;
-}
-
-#tlc-ttsurvey .toggle-input:checked + .toggle-label:hover {
-  background-color:green;
-  cursor:pointer;
-}
-
-#tlc-ttsurvey .toggle-content {
-  display:none;
-}
-
-#tlc-ttsurvey .toggle-input:checked ~ .toggle-content {
-  display:block;
-}
-

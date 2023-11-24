@@ -29,27 +29,17 @@ function add_survey_content($userid=null)
   echo "<div id='survey'>";
   add_survey_menubar($userid);
 
-  echo "<form action='#'>";
-  echo "<div class='switch'>";
-  echo "<input id='switch-1' type='checkbox' class='switch-input' />";
-  echo "<label for='switch-1' class='switch-label'>edit profile</label>";
-  echo "</div>";
-  echo "<div class='toggle'>";
-  echo "<input id='toggle-1' type='checkbox' class='toggle-input' />";
-  echo "<label for='toggle-1' class='toggle-label'>edit profile</label>";
-  echo "<div class='toggle-content'>Now you see me</div>";
-  echo "</div>";
-  echo "</form>";
-
-  echo "<h2>Survey</h2>";
   echo "<form method='post' action='$form_uri'>";
   // Yes, we want the login nonce here as logout is a "login" action
   wp_nonce_field(LOGIN_FORM_NONCE);
   echo "  <input type='hidden' name='action' value='logout'>";
   echo "  <input type='submit' value='Log Out'>";
-  echo "</form>";
 
+  for($x=0; $x<=100; $x++) {
+    echo "<p>Line $x</p>";
+  }
   echo "</div>";
+  echo "</form>";
   return true;
 }
 
