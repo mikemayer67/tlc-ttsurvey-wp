@@ -18,15 +18,17 @@
  * Menubar
  **/
 
-#tlc-ttsurvey #survey .menubar {
+#tlc-ttsurvey #survey .menubar-box {
   position:absolute;
   box-sizing:border-box;
   top:0;
   left:0;
   width:100%;
-  padding:0 8px;
   z-index:3;
+}
 
+#tlc-ttsurvey #survey .menubar {
+  padding:0 8px;
   display:flex;
   flex-wrap:wrap;
   justify-content:space-between;
@@ -87,64 +89,34 @@
   color:#72aee6;
 }
 
-
-
-/*
-#tlc-ttsurvey div.menubar {
-  box-sizing:border-box;
-  width:100%;
-  padding:3px 8px;
-  border-bottom-style: solid;
-  border-bottom-color: unset;
-  border-bottom-width: 5px;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  background-color:black;
-}
-
-#tlc-ttsurvey .menubar .menuitem {
-  color:white;
-}
-
-#tlc-ttsurvey .menubar .survey-name {
-  font-weight:bolder;
-}
-
-#tlc-ttsurvey-menu input.toggle {
+#tlc-ttsurvey #survey #profile-editor-toggle {
   display:none;
 }
 
-#tlc-ttsurvey .menubar .user-menu {
-  padding-left:3px;
-}
-
-#tlc-ttsurvey-menu .user-menu .menu {
-  display:none;
+#tlc-ttsurvey #survey .profile-editor {
   position:absolute;
-  right:0;
-  border-style:solid;
-  border-color:black;
-  border-width:1px;
-  padding:15px;
-  color:black;
-  background-color:white;
-  flex-direction:column;
-}
-
-#tlc-ttsurvey .menubar .user-menu:hover div.menu {
-  display:flex;
-}
-
-#tlc-ttsurvey-menu #user-menu-toggle:checked ~ div.menu {
-  display:flex;
-}
-
-#tlc-ttsurvey-menu div.profile-editor {
   display:none;
+  flex-direction:column;
+  margin:0 5%;
+  width:90%;
+  padding:15px;
+  border-style:solid;
+  border-width:1px;
+  border-color:black;
+  background-color:white;
 }
 
-#tlc-ttsurvey-menu #profile-editor-toggle:checked ~ .profile_editor {
-  display:absolute;
+#tlc-ttsurvey #survey .profile-editor noscript p {
+  color:brown;
+  font-size:small;
 }
-*/
+
+#tlc-ttsurvey #survey .profile-editor label.cancel:hover {
+  color:#72aee6;
+}
+
+
+#tlc-ttsurvey #survey #profile-editor-toggle:checked ~ .profile-editor {
+  display:flex;
+}
+

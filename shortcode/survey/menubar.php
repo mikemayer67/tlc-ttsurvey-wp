@@ -18,6 +18,7 @@ function add_survey_menubar($userid)
 
   $status = "Status";
 
+  echo "<div class='menubar-box'>";
   echo "<div class='menubar'>";
   echo "<div class='menuitem survey'>$survey_name Time & Talent Survey</div>";
   echo "<div class='menuitem status'>$status</div>";
@@ -25,6 +26,8 @@ function add_survey_menubar($userid)
   add_user_menu($user);
 
   echo "</div>"; // menubar
+  add_profile_editor($user);
+  echo "</div>"; // menubar-box
   echo "<div class='spacer'></div>";
 }
 
@@ -37,7 +40,7 @@ function add_user_menu($user)
   echo "<span>$fullname</span>";
   echo "<div class='menu'>";
   echo "<ul>";
-  echo "<li>Edit Profile</li>";
+  echo "<li><label for='profile-editor-toggle'>Edit Profile</label></li>";
   echo "<li><a href='$form_uri?logout=1'>Log Out</a></li>";
   echo "</ul>";
   echo "</div>"; // menu
@@ -49,10 +52,14 @@ function add_profile_editor($user)
   $fullname = $user->fullname();
   $email = $user->email() ?? "";
 
-  echo "<input id='profile-editor-toggle' type='checkbox'>";
+  echo "<input id='profile-editor-toggle' type='checkbox' class='toggle'>";
 
   echo "<div class='profile-editor'>";
-  echo "<p>Profile Editor</p>";
-  // End of user menu
+  echo "<noscript>";
+  echo "<p>Javascript is disabled. Any unsaved changes to the survey will be ";
+  echo "lost when you update your profile.</p>";
+  echo "</noscript>";
+  echo "<p>Profile Editor for $fullname</p>";
+  echo "<div><label for='profile-editor-toggle' class='cancel'>Cancel</label></div>";
   echo "</div>";
 }
