@@ -71,8 +71,20 @@
   display:block;
 }
 
+#tlc-ttsurvey #survey .menubar .menuitem .menu a {
+  text-decoration:none;
+}
+
 #tlc-ttsurvey #survey .menubar .menuitem .menu ul {
   list-style-type: none;
+}
+
+#tlc-ttsurvey #survey .menubar .menuitem .menu li {
+  margin:5px 0;
+}
+
+#tlc-ttsurvey #survey .menubar .menuitem .menu li:hover {
+  color:#72aee6;
 }
 
 

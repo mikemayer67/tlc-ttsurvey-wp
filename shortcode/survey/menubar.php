@@ -31,34 +31,17 @@ function add_survey_menubar($userid)
 function add_user_menu($user)
 {
   $fullname = $user->fullname();
+  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+
   echo "<div class='menuitem user'>";
   echo "<span>$fullname</span>";
   echo "<div class='menu'>";
   echo "<ul>";
   echo "<li>Edit Profile</li>";
-  echo "<li>Log Out</li>";
+  echo "<li><a href='$form_uri?logout=1'>Log Out</a></li>";
   echo "</ul>";
   echo "</div>"; // menu
   echo "</div>"; // menuitem
-}
-
-function old_add_user_menu()
-{
-  echo "<span class='user-menu'>";
-
-  $icon = plugin_url('img/icons8-menu.png');
-  echo "<label for='user-menu-toggle'>";
-  echo "<img class='trigger' src='$icon' width=18 height=18>";
-  echo "</label>";
-
-  echo "<div class='menu'>";
-  echo "<div>hello</div>";
-  echo "<div>";
-  echo "<label for='profile-editor-toggle'>Log out</label>";
-  echo "</div>";
-  echo "</div>";
-
-  echo "</span>";
 }
 
 function add_profile_editor($user)

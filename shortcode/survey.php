@@ -29,12 +29,6 @@ function add_survey_content($userid=null)
   echo "<div id='survey'>";
   add_survey_menubar($userid);
 
-  echo "<form method='post' action='$form_uri'>";
-  // Yes, we want the login nonce here as logout is a "login" action
-  wp_nonce_field(LOGIN_FORM_NONCE);
-  echo "  <input type='hidden' name='action' value='logout'>";
-  echo "  <input type='submit' value='Log Out'>";
-
   for($x=0; $x<=100; $x++) {
     echo "<p>Line $x</p>";
   }
