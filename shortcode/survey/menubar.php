@@ -15,31 +15,36 @@ function add_survey_menubar($userid)
   $survey_name = $survey['name'];
 
   $user = User::from_userid($userid);
-  $fullname = $user->fullname();
 
   $status = "Status";
 
-  echo "<div id='tlc-ttsurvey-menu'>";
-
-  echo "<div id='tlc-ttsurvey-menubar' class='menubar'>";
-  echo "<div class='menuitem survey-name'>$survey_name Time & Talent Survey</div>";
+  echo "<div class='menubar'>";
+  echo "<div class='menuitem survey'>$survey_name Time & Talent Survey</div>";
   echo "<div class='menuitem status'>$status</div>";
 
-  echo "<div class='menuitem user'>";
-  echo "<span class='userid'>$fullname</span>";
-  add_user_menu();
-  echo "</div>"; // menuitem.user
+  add_user_menu($user);
+
   echo "</div>"; // menubar
-  add_profile_editor($user);
-  echo "</div>"; // menu
   echo "<div class='spacer'></div>";
 }
 
-function add_user_menu()
+function add_user_menu($user)
+{
+  $fullname = $user->fullname();
+  echo "<div class='menuitem user'>";
+  echo "<span>$fullname</span>";
+  echo "<div class='menu'>";
+  echo "<ul>";
+  echo "<li>Edit Profile</li>";
+  echo "<li>Log Out</li>";
+  echo "</ul>";
+  echo "</div>"; // menu
+  echo "</div>"; // menuitem
+}
+
+function old_add_user_menu()
 {
   echo "<span class='user-menu'>";
-
-  echo "<input id='user-menu-toggle' type='checkbox' class='trigger'>";
 
   $icon = plugin_url('img/icons8-menu.png');
   echo "<label for='user-menu-toggle'>";
