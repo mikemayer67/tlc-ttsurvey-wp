@@ -17,12 +17,6 @@
   padding:8px;
 }
 
-
-#tlc-ttsurvey #survey p.noscript {
-  font-size:small;
-  margin-bottom:8px;
-}
-
 /**
  * Menubar
  **/
@@ -115,15 +109,9 @@
   background-color:white;
 }
 
-#tlc-ttsurvey #survey .profile-editor noscript p {
-  color:var(--noscript-color);
-  font-size:small;
-}
-
 #tlc-ttsurvey #survey .profile-editor label.cancel:hover {
   color:var(--hover-color);
 }
-
 
 #tlc-ttsurvey #survey #profile-editor-toggle:checked ~ .profile-editor {
   display:flex;

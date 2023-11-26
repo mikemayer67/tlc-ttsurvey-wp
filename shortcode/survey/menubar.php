@@ -29,15 +29,8 @@ function add_survey_menubar($userid)
   add_profile_editor($user);
   echo "</div>"; // menubar-box
   echo "<div class='spacer'></div>";
-  echo "<noscript>";
-  echo "<p class='noscript'>This survey works best with Javascript enabled. ";
-  $pdf_uri = survey_pdf_uri();
-  if($pdf_uri) {
-    echo "You can download a PDF version of the survey ";
-    echo "<a target='_blank' href='$pdf_uri'>here</a>.";
-  }
-  echo "</p>";
-  echo "</noscript>";
+
+  add_javascript_recommended();
 }
 
 function add_user_menu($user)
@@ -65,8 +58,8 @@ function add_profile_editor($user)
 
   echo "<div class='profile-editor'>";
   echo "<noscript>";
-  echo "<p>Javascript is disabled. Any unsaved changes to the survey will be ";
-  echo "lost when you update your profile.</p>";
+  echo "<p class='noscript'>Because Javascript is disabled, your unsaved responses ";
+  echo "to the survey will be lost when you update your profile.</p>";
   echo "</noscript>";
   echo "<p>Profile Editor for $fullname</p>";
   echo "<div><label for='profile-editor-toggle' class='cancel'>Cancel</label></div>";
