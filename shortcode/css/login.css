@@ -19,7 +19,7 @@
   width:min(100%,480px);
   margin:0;
   padding:0;
-  border:1px solid #607d8b;
+  border:1px solid var(--ttsurvey-color);
   box-shadow:0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
@@ -34,7 +34,7 @@
 #tlc-ttsurvey #login header {
   padding:0;
   color:#fff;
-  background-color:#607d8b;
+  background-color:var(--ttsurvey-color);
   font-size:x-large;
   font-weight:700;
   padding:5px 16px;
@@ -145,7 +145,7 @@
 
 #tlc-ttsurvey #login .submit-bar button.submit {
   color:#fff;
-  background-color:#607d8b;
+  background-color:var(--ttsurvey-color);
   font-weight:bold;
 }
 

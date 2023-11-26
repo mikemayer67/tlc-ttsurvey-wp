@@ -6,6 +6,11 @@
   font-family:ui-sans-serif, Arial, Helvetica, sans-serif;
 }
 
+#tlc-ttsurvey {
+  --noscript-color:#800;
+  --ttsurvey-color:#006;
+}
+
 #tlc-ttsurvey noscript > div {
   background:white;
   border-width:1px;
@@ -18,7 +23,7 @@
   font-size: larger;
   font-weight: bold;
   color: white;
-  background-color: brown;
+  background-color: var(--noscript-color);
   padding: 5px 10px;
   position: relative;
 }
@@ -32,12 +37,12 @@
 }
 
 #tlc-ttsurvey noscript div p {
-  color: brown;
+  color: var(--noscript-color);
   margin: 15px 1em;
 }
 
 #tlc-ttsurvey p.noscript {
-  color:brown;
+  color:var(--noscript-color);
 }
 
 

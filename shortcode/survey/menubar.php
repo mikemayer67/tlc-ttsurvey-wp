@@ -29,6 +29,15 @@ function add_survey_menubar($userid)
   add_profile_editor($user);
   echo "</div>"; // menubar-box
   echo "<div class='spacer'></div>";
+  echo "<noscript>";
+  echo "<p class='noscript'>This survey works best with Javascript enabled. ";
+  $pdf_uri = survey_pdf_uri();
+  if($pdf_uri) {
+    echo "You can download a PDF version of the survey ";
+    echo "<a target='_blank' href='$pdf_uri'>here</a>.";
+  }
+  echo "</p>";
+  echo "</noscript>";
 }
 
 function add_user_menu($user)

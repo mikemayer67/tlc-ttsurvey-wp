@@ -131,7 +131,7 @@ function add_javascript_recommended()
     echo "</div>";
     if($pdf_uri) {
       echo "<p>You can download a PDF version of the survey ";
-      echo "<a target='_blank' href='$pdf_uri'>here</a>.<p>";
+      echo "<a target='_blank' href='$pdf_uri'>here</a>.</p>";
     }
     echo "</form>";
     echo "</div>";
