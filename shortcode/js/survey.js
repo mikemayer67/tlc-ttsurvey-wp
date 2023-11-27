@@ -1,6 +1,6 @@
 var ce = {};
 var page_top = 0;
-var margin_fixed = false;
+var menubar_fixed = false;
 
 function setup_menubar()
 {
@@ -12,8 +12,8 @@ function setup_menubar()
     var scroll_top = jQuery(window).scrollTop() + page_top;
 
     if( scroll_top > survey_bottom - menubar_height ) {
-      if(margin_fixed) {
-        margin_fixed = false;
+      if(menubar_fixed) {
+        menubar_fixed = false;
         ce.menubar_box.css({
           'position':'absolute',
           'top':(survey_height-menubar_height) + 'px',
@@ -22,10 +22,10 @@ function setup_menubar()
         });
       }
     } else if(scroll_top > survey_top ) {
-      if(!margin_fixed) {
+      if(!menubar_fixed) {
         var survey_left = ce.container.offset().left;
         var survey_width = ce.container.outerWidth();
-        margin_fixed = true;
+        menubar_fixed = true;
         ce.menubar_box.css({
           'position':'fixed',
           'top':page_top,
@@ -34,8 +34,8 @@ function setup_menubar()
         });
       }
     } else {
-      if(margin_fixed) {
-        margin_fixed = false;
+      if(menubar_fixed) {
+        menubar_fixed = false;
         ce.menubar_box.css({
           'position':'absolute',
           'top':0,
