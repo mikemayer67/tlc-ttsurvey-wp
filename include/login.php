@@ -191,6 +191,11 @@ function login_init()
     forget_user_token($userid);
   }
 
+  if(array_key_exists('logout',$_REQUEST)) {
+    log_dev("log out");
+    handle_logout();
+  }
+
 
   if( wp_verify_nonce($nonce,LOGIN_FORM_NONCE) )
   {
@@ -207,7 +212,6 @@ function login_init()
     {
     case 'login':    handle_login();               break;
     case 'register': handle_login_register();      break;
-    case 'logout':   handle_logout();              break;
     case 'recovery': handle_login_recovery();      break;
     }
   }

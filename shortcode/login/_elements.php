@@ -82,7 +82,8 @@ function add_login_input($type,$kwargs=array())
   echo "<label>$label</label>";
   if($info) { 
     $info_link = "tlc-ttsurvey-$name-info";
-    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $icon_url = plugin_url('img/icons8-info.png');
+    $info_icon = "<img src='$icon_url' width=18 height=18>";
     $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
     echo($info_trigger); 
   }
@@ -141,7 +142,8 @@ function add_login_checkbox($name, $kwargs=array())
   if($info)
   {
     $info_link = "tlc-ttsurvey-$name-info";
-    $info_icon = '<img src='.plugin_url('img/icons8-info.png').' width=18 height=18>';
+    $icon_url = plugin_url('img/icons8-info.png');
+    $info_icon = "<img src='$icon_url' width=18 height=18>";
     $info_trigger = "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
     // close out the label-box with the info trigger
     echo($info_trigger);
@@ -195,8 +197,8 @@ function add_login_submit($label,$action,$cancel=False)
   if($cancel)
   {
     echo "<div class='submit-bar'>";
-    echo "<button class='submit right' name='action' value='$action'>$label</button>";
-    echo "<button class='cancel right' name='action' value='cancel' formnovalidate>Cancel</button>";
+    echo "<button class='submit' name='action' value='$action'>$label</button>";
+    echo "<button class='cancel' name='action' value='cancel' formnovalidate>Cancel</button>";
     echo "</div>";
   }
   else

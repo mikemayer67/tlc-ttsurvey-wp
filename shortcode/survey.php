@@ -9,6 +9,7 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
+require_once plugin_path('shortcode/survey/menubar.php');
 
 function add_survey_content($userid=null)
 {
@@ -25,17 +26,21 @@ function add_survey_content($userid=null)
 
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-  echo "<h2>Survey</h2>";
-  echo "<form method='post' action='$form_uri'>";
-  // Yes, we want the login nonce here as logout is a "login" action
-  wp_nonce_field(LOGIN_FORM_NONCE);
-  echo "  <input type='hidden' name='action' value='logout'>";
-  echo "  <input type='submit' value='Log Out'>";
+  echo "<div id='survey'>";
+  add_survey_menubar($userid);
+
+  for($x=0; $x<=20; $x++) {
+    echo "<p>Line $x</p>";
+  }
+  echo "</div>";
   echo "</form>";
+
+  for($x=0; $x<=10; $x++) {
+    echo "<p>Post Line $x</p>";
+  }
 
   return true;
 }
-
 
 function enqueue_survey_script()
 {

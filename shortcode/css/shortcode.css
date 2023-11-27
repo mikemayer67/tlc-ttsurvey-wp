@@ -1,40 +1,22 @@
 #tlc-ttsurvey {
+  position:relative;
   color:black;
+  width:100%;
+  margin:0;
   font-family:ui-sans-serif, Arial, Helvetica, sans-serif;
 }
 
-#tlc-ttsurvey noscript > div {
-  background:white;
-  border-width:1px;
-  border-style:solid;
-  margin-bottom:2em;
-}
-
-#tlc-ttsurvey noscript div.noscript.header {
-  font-family: sans-serif;
-  font-size: larger;
-  font-weight: bold;
-  color: white;
-  background-color: brown;
-  padding: 5px 10px;
-  position: relative;
-}
-
-#tlc-ttsurvey noscript div.noscript.header input {
-  font-size:smaller;
-  font-weight:100;
-  position:absolute;
-  right:5px;
-  padding:0 5px;
-}
-
-#tlc-ttsurvey noscript div p {
-  color: brown;
-  margin: 15px 1em;
+#tlc-ttsurvey {
+  --noscript-color:#800;
+  --ttsurvey-color:#006;
 }
 
 #tlc-ttsurvey p.noscript {
-  color:brown;
+  color:var(--noscript-color);
+  background-color:white;
+  font-size:smaller;
+  margin-bottom:15px;
+  padding:0 10px;
 }
 
 
