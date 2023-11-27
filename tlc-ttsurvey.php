@@ -63,7 +63,7 @@ function plugin_icon() {
 function plugin_admin_access()
 {
   $access = array();
-  $caps = array('view','manage','content','responses');
+  $caps = array('view','manage','content','responses','tech','data');
   foreach($caps as $cap) {
     $access[$cap] = current_user_can("tlc-ttsurvey-$cap");
   }

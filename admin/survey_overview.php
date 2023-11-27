@@ -102,6 +102,7 @@ function add_admins_overview()
     if( $caps['content'][$id] ?? false ) { $user_caps[] = "Content"; }
     if( $caps['responses'][$id] ?? false ) { $user_caps[] = "Responses"; }
     if( $caps['tech'][$id] ?? false ) { $user_caps[] = "Tech"; }
+    if( $caps['data'][$id] ?? false ) { $user_caps[] = "Data"; }
     if( !empty($user_caps) ) {
       $user_caps = implode(", ",$user_caps);
       echo "<tr>";

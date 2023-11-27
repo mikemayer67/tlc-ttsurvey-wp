@@ -27,6 +27,7 @@ $tabs = [
 if(plugin_admin_can('manage')) { $tabs[] = ['settings','Settings']; }
 if(plugin_admin_can('content')) { $tabs[] = ['content','Content']; }
 if(plugin_admin_can('responses')) { $tabs[] = ['responses','Responses']; }
+if(plugin_admin_can('data')) { $tabs[] = ['data','Data']; }
 
 $cur_tab = $_GET['tab'] ?? 'overview';
 
