@@ -29,11 +29,16 @@ function add_survey_content($userid=null)
   echo "<div id='survey'>";
   add_survey_menubar($userid);
 
-  for($x=0; $x<=100; $x++) {
+  for($x=0; $x<=20; $x++) {
     echo "<p>Line $x</p>";
   }
   echo "</div>";
   echo "</form>";
+
+  for($x=0; $x<=10; $x++) {
+    echo "<p>Post Line $x</p>";
+  }
+
   return true;
 }
 
