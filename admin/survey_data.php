@@ -34,15 +34,16 @@ function add_data_dump()
 
   echo "<form class='data dump'>";
   echo "<div class='label'>Dump Survey Data</div>";
+  echo "<div class='form-body'>";
   echo "<div class='info'>";
-  echo "  Captures all user profile, survey content, and response data.";
-  echo "</div><div class='info'>";
+  echo "  Captures all user profile, survey content, and response data.<br>";
   echo "  Note that this does <b>not</b> preserve plugin settings.";
   echo "</div>";
   echo "<div class='link-buttons'>";
   echo "<div><a class='data' href='$href&pp=1' target='_blank'>View JSON data in new window</a></div>";
   echo "<div><a class='data' href='$href' download='$dumpfile'>Download JSON data</a></div>";
   echo "</div>";
+  echo "</div>"; // form-body
   echo "</form>";
 }
 
@@ -51,21 +52,25 @@ function add_data_load()
   echo "<form class='data upload'>";
   wp_nonce_field(DATA_NONCE);
   echo "<div class='label'>Load Survey Data</div>";
+  echo "<div class='form-body'>";
   echo "<div class='warning'>";
   echo "Loaing new data will replace all current user profile, survey content, and response data.<br>";
   echo "The survey content revision history will be cleared.</div>";
   echo "<div class='info'>";
-  echo "The uploaded data must be JSON formatted with the following structure:";
+  echo "The uploaded data must be JSON formatted.</br>";
+  echo "The key/value pairs must be consistent with that dumped using the links above.<br>";
   echo "</div>";
 
   echo "<div class='upload-file'>";
-  echo "<label>Upload JSON: </label>";
   echo "<input type='file' id='upload-file' name='upload_file'>";
+  echo "<a class='data upload'>Upload JSON data</a>";
+  echo "<span class='status'>Info</span>";
   echo "</div>";
 
   echo "<textarea id='new-data' name='json_data' rows=20 placeholder='New Survey Data'>";
   echo "</textarea>";
 
+  echo "</div>"; // form-body
   echo "</form>";
 }
 
