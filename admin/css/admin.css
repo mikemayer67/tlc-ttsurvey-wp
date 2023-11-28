@@ -409,17 +409,14 @@
   margin-left:2em;
 }
 
-#tlc-ttsurvey-admin .data div.dumps {
-  margin-left:4em;
+#tlc-ttsurvey-admin .data .link-buttons {
+  margin: 10px 4em;
 }
 
-#tlc-ttsurvey-admin .data div.dumps div {
-  margin:10px 0;
-}
-
-#tlc-ttsurvey-admin .data a.data {
+#tlc-ttsurvey-admin .data .link-buttons a.data {
   font-size:14px;
   font-weight:600;
+  cursor:pointer;
 }
 
 /**

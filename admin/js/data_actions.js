@@ -2,7 +2,7 @@ var ce = {};
 
 function handle_dump(e)
 {
-  var a = jQuery(this);
+  var data_link = jQuery(this);
   var data = {
     action:'tlc_ttsurvey',
     nonce:data_vars['nonce'],
@@ -12,6 +12,7 @@ function handle_dump(e)
     data_vars['ajaxurl'],
     data,
     function(response) {
+      var data_link_r = jQuery(this);
       console.log(response);
     }
   );

@@ -10,42 +10,44 @@ if(!plugin_admin_can('data')) {
   return;
 }
 
+require_once plugin_path('include/const.php');
+
 add_data_form();
 
 function add_data_form()
 {
   echo "<div class='data'>";
-  echo "<h2>Data Dump</h2>";
-  echo "<div class='info'>Captures all user profile, survey content, and response data.</div>";
-  echo "<div class='info'>Note that this does <b>not</b> preserve plugin settings.</div>";
-  echo "<div class='dumps'>";
-  echo "<div><a class='data' data-action='view'>View JSON data in new window</a></div>";
-  echo "<div><a class='data' data-action='download'>Download JSON data</a></div>";
-  echo "</div>";
-  echo "<h2>Upload Data</h2>";
-  echo "<div class='info'>Coming with Issue #109</div>";
-  echo "</div>";
+  echo "<form class='data'>";
 
-  enqueue_data_javascript();
+  $nonce = esc_attr(wp_create_nonce(DATA_NONCE));
+  add_data_dump($nonce);
+  add_data_load($nonce);
+
+  echo "</form></div>";
 }
 
-
-function enqueue_data_javascript()
+function add_data_dump($nonce)
 {
-  wp_register_script(
-    'tlc_ttsurvey_data_actions',
-    plugin_url('admin/js/data_actions.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-  wp_localize_script(
-    'tlc_ttsurvey_data_actions',
-    'data_vars',
-    array(
-      'ajaxurl' => admin_url('admin-ajax.php'),
-      'nonce' => array('data_actions',wp_create_nonce('data_actions')),
-    ),
-  );
-  wp_enqueue_script('tlc_ttsurvey_data_actions');
+  $href = plugin_url('admin/data_view.php') . "?nonce=$nonce";
+
+  $timestamp = date('YmdHis');
+  $dumpfile = "TimeAndTalentSurvey_data_$timestamp.json";
+
+  echo "<div class='label'>Dump Survey Data</div>";
+  echo "<div class='info'>";
+  echo "  Captures all user profile, survey content, and response data.";
+  echo "</div><div class='info'>";
+  echo "  Note that this does <b>not</b> preserve plugin settings.";
+  echo "</div>";
+  echo "<div class='link-buttons'>";
+  echo "<div><a class='data' href='$href' target='_blank'>View JSON data in new window</a></div>";
+  echo "<div><a class='data' href='$href' download='$dumpfile'>Download JSON data</a></div>";
+  echo "</div>";
+}
+
+function add_data_load($nonce)
+{
+  $href = plugin_url('admin/data_view.php') . "?nonce=$nonce";
+  echo "<div class='label'>Load Survey Data</div>";
+  echo "<div class='info'>Coming with Issue #109</div>";
 }
