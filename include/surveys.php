@@ -350,6 +350,34 @@ function update_survey_content_from_post()
   return $rval;
 }
 
+/**
+ * Data Dump/Load
+ **/
+
+function dump_all_survey_data()
+{
+  $posts = get_posts(
+    array(
+      'post_type' => SURVEY_POST_TYPE,
+      'numberposts' => -1,
+    )
+  );
+
+  $data = array();
+  foreach($posts as $post)
+  {
+    $id = $post->ID;
+    $name = $post->post_title;
+    $data[$name] = array(
+      'post_id' => $id,
+      'content' => json_decode($post->post_content,true),
+      'responses' => get_post_meta($id,'responses')[0] ?? 0,
+      'status' => get_post_meta($id,'status')[0] ?? '',
+    );
+  }
+  return $data;
+}
+
 
 /**
  * parse survey yaml into json

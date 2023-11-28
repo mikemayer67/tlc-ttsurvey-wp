@@ -26,11 +26,11 @@ function add_data_form()
 
 function add_data_dump()
 {
-  $href = plugin_url('admin/data_view.php') . "?nonce=$nonce";
+  $nonce = esc_attr(wp_create_nonce(DATA_NONCE));
+  $href = plugin_url('admin/data_dump.php') . "?nonce=$nonce";
 
   $timestamp = date('YmdHis');
   $dumpfile = "TimeAndTalentSurvey_data_$timestamp.json";
-  $nonce = esc_attr(wp_create_nonce(DATA_NONCE));
 
   echo "<form class='data dump'>";
   echo "<div class='label'>Dump Survey Data</div>";
@@ -40,7 +40,7 @@ function add_data_dump()
   echo "  Note that this does <b>not</b> preserve plugin settings.";
   echo "</div>";
   echo "<div class='link-buttons'>";
-  echo "<div><a class='data' href='$href' target='_blank'>View JSON data in new window</a></div>";
+  echo "<div><a class='data' href='$href&pp=1' target='_blank'>View JSON data in new window</a></div>";
   echo "<div><a class='data' href='$href' download='$dumpfile'>Download JSON data</a></div>";
   echo "</div>";
   echo "</form>";
@@ -52,8 +52,7 @@ function add_data_load()
   wp_nonce_field(DATA_NONCE);
   echo "<div class='label'>Load Survey Data</div>";
   echo "<div class='warning'>";
-  echo "Loaing new data will <b>replace</b> all current user profile, survey content, and response data.";
-  echo "</div><div class='warning'>";
+  echo "Loaing new data will replace all current user profile, survey content, and response data.<br>";
   echo "The survey content revision history will be cleared.</div>";
   echo "<div class='info'>";
   echo "The uploaded data must be JSON formatted with the following structure:";

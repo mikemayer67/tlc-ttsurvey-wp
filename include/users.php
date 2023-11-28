@@ -373,7 +373,9 @@ class User {
 
   public function anon_proxy()
   {
+    log_dev("anon_proxy::");
     if($this->_userid === ANON_USERID) {
+      log_dev("Skipping ".$this->_userid);
       // Anonymous proxies cannot have their own anonymous proxies
       return null;
     }
@@ -391,7 +393,9 @@ class User {
       // there's actually an anonymous proxy set up yet.
       // Verify that the anonid is really for an anonymous user.
       $anonid = User::_decode_anon($anonids[0]);
+      log_dev("anon_proxy:: anonid=$anonid");
       $anon = User::from_post_id($anonid);
+      log_dev("anon_proxy:: postid=".$anon->post_id());
       if($anon && $anon->userid() === ANON_USERID) {
         return $anon;
       }
@@ -412,6 +416,35 @@ class User {
     update_post_meta($this->_post_id,'anonid',User::_encode_anon($anonid));
 
     return User::from_post_id($anonid);
+  }
+
+  /**
+   * Data Dump/Load
+   **/
+
+  static function dump_all_user_data()
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+      )
+    );
+
+    $data = array();
+    foreach($posts as $post)
+    {
+      $id = $post->ID;
+      $userid = $post->post_title;
+      if($userid != ANON_USERID) {
+        $data[$userid] = array(
+          'post_id' => $id,
+          'content' => json_decode($post->post_content,true),
+          'anonid' => get_post_meta($id,'anonid')[0] ?? '',
+        );
+      }
+    }
+    return $data;
   }
 }
 

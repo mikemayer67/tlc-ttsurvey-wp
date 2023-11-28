@@ -406,7 +406,10 @@
  **/
 
 #tlc-ttsurvey-admin form.data div.info {
-  margin-left:2em;
+}
+
+#tlc-ttsurvey-admin form.data div.warning {
+  font-weight:400;
 }
 
 #tlc-ttsurvey-admin form.data .link-buttons {
