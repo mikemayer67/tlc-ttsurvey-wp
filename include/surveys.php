@@ -378,7 +378,6 @@ function dump_all_survey_data()
   return $data;
 }
 
-
 /**
  * parse survey yaml into json
  **/

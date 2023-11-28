@@ -21,6 +21,7 @@ $data = json_encode(
   array(
     'surveys'=>dump_all_survey_data(),
     'userids'=>User::dump_all_user_data(),
+    'responses'=>array(),
   ),
   JSON_PRETTY_PRINT
 );

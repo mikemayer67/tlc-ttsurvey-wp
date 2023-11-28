@@ -434,17 +434,17 @@
 }
 
 
-#tlc-ttsurvey-admin form.data.upload .upload-file {
+#tlc-ttsurvey-admin form.data.upload .header-box {
   display:flex;
   align-items:end;
   margin: 0 0 0 1em;
 }
 
-#tlc-ttsurvey-admin form.data.upload .upload-file input {
+#tlc-ttsurvey-admin form.data.upload #upload-file {
   display:none;
 }
 
-#tlc-ttsurvey-admin form.data.upload .upload-file a.upload {
+#tlc-ttsurvey-admin form.data.upload a.data.upload {
   font-size:14px;
   font-weight:600;
   cursor:pointer;

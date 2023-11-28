@@ -61,7 +61,7 @@ function add_data_load()
   echo "The key/value pairs must be consistent with that dumped using the links above.<br>";
   echo "</div>";
 
-  echo "<div class='upload-file'>";
+  echo "<div class='header-box'>";
   echo "<input type='file' id='upload-file' name='upload_file'>";
   echo "<a class='data upload'>Upload JSON data</a>";
   echo "<span class='status'>Info</span>";
