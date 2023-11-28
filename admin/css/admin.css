@@ -405,18 +405,32 @@
  * Data Tab
  **/
 
-#tlc-ttsurvey-admin .data div.info {
+#tlc-ttsurvey-admin form.data div.info {
   margin-left:2em;
 }
 
-#tlc-ttsurvey-admin .data .link-buttons {
+#tlc-ttsurvey-admin form.data .link-buttons {
   margin: 10px 4em;
 }
 
-#tlc-ttsurvey-admin .data .link-buttons a.data {
+#tlc-ttsurvey-admin form.data .link-buttons a.data {
   font-size:14px;
   font-weight:600;
   cursor:pointer;
+}
+
+#tlc-ttsurvey-admin form.data.upload .upload-file {
+  margin-left:2em;
+}
+
+#tlc-ttsurvey-admin form.data.upload .upload-file label {
+  font-weight:600;
+}
+
+#tlc-ttsurvey-admin form.data.upload textarea {
+  margin-left:2em;
+  margin-right:2em;
+  width:calc(100% - 4em);
 }
 
 /**
