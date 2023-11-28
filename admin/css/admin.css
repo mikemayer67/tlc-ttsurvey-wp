@@ -401,6 +401,23 @@
   margin:5px 0;
 }
 
+/**
+ * Data Tab
+ **/
+
+#tlc-ttsurvey-admin .data div.info {
+  margin-left:2em;
+}
+
+#tlc-ttsurvey-admin .data .link-buttons {
+  margin: 10px 4em;
+}
+
+#tlc-ttsurvey-admin .data .link-buttons a.data {
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
 
 /**
  * Other stuff

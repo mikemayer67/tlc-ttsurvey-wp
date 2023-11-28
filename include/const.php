@@ -4,6 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 const OPTIONS_NONCE      = 'tlc-ttsurvey-settings';
+const DATA_NONCE         = 'tlc-ttsurve-data';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 const LOGIN_FORM_NONCE   = 'tlc-ttsurvey-login';
 const SURVEY_FORM_NONCE  = 'tlc-ttsurvey-survey-form';

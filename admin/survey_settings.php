@@ -85,7 +85,7 @@ function add_admin_settings()
   echo "<div class='label'>Survey Admins<span class='admin-error'></span></div>";
   echo "<table class='caps'>";
   echo "<tr><th></th>";
-  foreach(explode(' ','Primary Manage Content Response Tech') as $role) {
+  foreach(explode(' ','Primary Manage Content Response Tech Data') as $role) {
     echo "<th>$role</th>";
   }
   echo "</tr>";
@@ -100,6 +100,7 @@ function add_admin_settings()
     $content  = ( $caps['content'][$id]   ?? false ) ? "checked" : "";
     $response = ( $caps['responses'][$id] ?? false ) ? "checked" : "";
     $tech     = ( $caps['tech'][$id]      ?? false ) ? "checked" : "";
+    $data     = ( $caps['data'][$id]      ?? false ) ? "checked" : "";
     $hidden_manage = '';
 
     echo "<tr>";
@@ -119,6 +120,8 @@ function add_admin_settings()
     echo "<input type='checkbox' value=1 name='caps[responses][$id]' $response>";
     echo "</div></td><td><div>";
     echo "<input type='checkbox' value=1 name='caps[tech][$id]' $tech>";
+    echo "</div></td><td><div>";
+    echo "<input type='checkbox' value=1 name='caps[data][$id]' $data>";
     echo "</div></td>";
     echo "</tr>";
 
