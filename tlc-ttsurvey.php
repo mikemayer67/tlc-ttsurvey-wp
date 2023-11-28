@@ -70,6 +70,7 @@ function plugin_admin_access()
   if(current_user_can('manage_options')) {
     $access['view'] = 1;
     $access['manage'] = 1;
+    $access['data'] = 1;
   }
   return $access;
 }
