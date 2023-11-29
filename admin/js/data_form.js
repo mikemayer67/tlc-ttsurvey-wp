@@ -5,7 +5,7 @@ var validation_timer = null;
 function start_validation_timer()
 {
   stop_validation_timer();
-  validation_timer = setTimeout(validate_json,500);
+  validation_timer = setTimeout(validate_json_data,500);
 }
 
 function stop_validation_timer()
@@ -16,30 +16,38 @@ function stop_validation_timer()
   }
 }
 
-function validate_json()
+function validate_json_data()
 {
-  console.log("validate json");
-  jQuery.post(
-    form_vars['ajaxurl'],
-    {
-      action:'tlc_ttsurvey',
-      nonce:form_vars['nonce'],
-      query:'admin/validate_json_data',
-      json_data:ce.json_data.val(),
-    },
-    function(response) {
-      if( 'error' in response ) {
-        set_error_status(response.error);
-      }
-      else if( 'warning' in response ) {
-        set_warning_status(response.warning);
-      }
-      else {
-        if(!ce.data_status.hasClass('info')) { clear_status(); }
-      }
-    },
-    'json',
-  );
+  // performs minimal validation:
+  //  - is the data valid JSON
+  //  - do we have all the required primary keys
+  //  - do we have any extra primary keys
+  // all other validation happens on the server when we submit the form
+
+  const json_data = ce.json_data.val();
+  try {
+    var data = JSON.parse(json_data);
+  } catch(e) {
+    set_error_status(e.toString());
+    return;
+  }
+
+  const data_keys = Object.keys(data);
+  const expected_keys = ['userids','surveys','responses'];
+
+  const extra_keys = data_keys.filter(x => !expected_keys.includes(x));
+  if(extra_keys.length > 0) {
+    set_warning_status(`Contains invalid key '${extra_keys[0]}'`);
+    return false;
+  }
+
+  const missing_keys = expected_keys.filter(x => !data_keys.includes(x));
+  if(missing_keys.length > 0) {
+    set_warning_status(`Missing required key '${missing_keys[0]}'`);
+    return false;
+  }
+
+  return true;
 }
 
 function clear_status()
@@ -63,7 +71,7 @@ async function upload_file(file)
   const json = await (new Response(file)).text();
   ce.upload_file.val('');
   try {
-    const data = JSON.parse(json,true);
+    const data = JSON.parse(json);
   }
   catch(e) {
     set_error_status("Not a valid JSON file");
