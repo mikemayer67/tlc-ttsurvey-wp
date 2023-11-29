@@ -1,6 +1,6 @@
 var ce = {};
-
 var validation_timer = null;
+var json_data_is_validated = false;
 
 function start_validation_timer()
 {
@@ -47,6 +47,9 @@ function validate_json_data()
     return false;
   }
 
+  json_data_is_validated = true;
+  if(!ce.data_status.hasClass('info')) { clear_status(); }
+
   return true;
 }
 
@@ -86,6 +89,7 @@ async function upload_file(file)
 function handle_upload_file(e)
 {
   e.preventDefault();
+  clear_validation();
   const files = ce.upload_file.prop('files');
   if(files) {
     stop_validation_timer();
@@ -96,9 +100,34 @@ function handle_upload_file(e)
 
 function handle_json_input(e)
 {
-  start_validation_timer();
+  clear_validation();
   clear_status();
+  start_validation_timer();
 }
+
+function handle_confirmation(e)
+{
+  if(ce.confirm_upload.is(':checked')) {
+    if(json_data_is_validated) {
+      ce.submit.attr('disabled',false);
+    }
+  } else {
+    ce.submit.attr('disabled',true);
+  }
+}
+
+function handle_submit(e)
+{
+  e.preventDefault();
+}
+
+function clear_validation()
+{
+  json_data_is_validated=false;
+  ce.confirm_upload.prop('checked',false);
+  ce.submit.attr('disabled',true);
+}
+
 
 jQuery(document).ready(
   function($) {
@@ -107,6 +136,8 @@ jQuery(document).ready(
     ce.upload_file_trigger = ce.upload_form.find('a.data.upload');
     ce.data_status = ce.upload_form.find('span.status');
     ce.json_data   = ce.upload_form.find('textarea');
+    ce.confirm_upload = ce.upload_form.find('#confirm-upload');
+    ce.submit = ce.upload_form.find('input.data.upload');
 
     ce.upload_file_trigger.on('click',function(e) {
       e.preventDefault();
@@ -115,5 +146,7 @@ jQuery(document).ready(
 
     ce.upload_file.on('change',handle_upload_file);
     ce.json_data.on('input',handle_json_input);
+    ce.confirm_upload.on('change',handle_confirmation);
+    ce.submit.on('click',handle_submit);
   }
 );

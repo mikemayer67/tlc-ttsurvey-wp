@@ -485,6 +485,22 @@
   width:calc(100% - 1em);
 }
 
+#tlc-ttsurvey-admin form.data.upload .button-box {
+  margin-left: 1em;
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+}
+
+#tlc-ttsurvey-admin form.data.upload .button-box label {
+  font-weight:500;
+}
+
+#tlc-ttsurvey-admin form.data.upload .button-box input.data.upload {
+  margin-left:auto;
+}
+
+
 /**
  * Other stuff
  **/
