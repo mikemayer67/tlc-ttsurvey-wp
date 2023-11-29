@@ -69,10 +69,10 @@ function set_warning_status(msg) { set_status(msg,'warning'); }
 function set_error_status(msg) { set_status(msg,'error'); }
 
 
-async function upload_file(file)
+async function load_json_data(file)
 {
   const json = await (new Response(file)).text();
-  ce.upload_file.val('');
+  ce.json_data_file.val('');
   try {
     const data = JSON.parse(json);
   }
@@ -86,15 +86,15 @@ async function upload_file(file)
   start_validation_timer();
 }
 
-function handle_upload_file(e)
+function handle_load_json_data(e)
 {
   e.preventDefault();
   clear_validation();
-  const files = ce.upload_file.prop('files');
+  const files = ce.json_data_file.prop('files');
   if(files) {
     stop_validation_timer();
     ce.json_data.val("");
-    upload_file(files[0]);
+    load_json_data(files[0]);
   }
 }
 
@@ -116,11 +116,6 @@ function handle_confirmation(e)
   }
 }
 
-function handle_submit(e)
-{
-  e.preventDefault();
-}
-
 function clear_validation()
 {
   json_data_is_validated=false;
@@ -128,23 +123,51 @@ function clear_validation()
   ce.submit.attr('disabled',true);
 }
 
+function handle_submit(e)
+{
+  e.preventDefault();
+
+  jQuery.post(
+    form_vars['ajaxurl'],
+    {
+      action:'tlc_ttsurvey',
+      nonce:form_vars['nonce'],
+      query:'admin/upload_survey_data',
+      survey_data:ce.json_data.val(),
+    },
+    function(response) {
+      if(response.ok) {
+        window.location.href = form_vars.overview;
+      }
+      else if(response.error) {
+        set_error_status(response.error);
+      }
+      else if(response.warning) {
+        set_warning_status(response.warning);
+      }
+      clear_validation();
+    },
+    'json',
+  );
+}
+
 
 jQuery(document).ready(
   function($) {
     ce.upload_form = $('#tlc-ttsurvey-admin form.data.upload');
-    ce.upload_file = ce.upload_form.find('#upload-file');
-    ce.upload_file_trigger = ce.upload_form.find('a.data.upload');
+    ce.json_data_file = ce.upload_form.find('#json-data-file');
+    ce.load_json_trigger = ce.upload_form.find('a.data.load');
     ce.data_status = ce.upload_form.find('span.status');
-    ce.json_data   = ce.upload_form.find('textarea');
+    ce.json_data = ce.upload_form.find('textarea');
     ce.confirm_upload = ce.upload_form.find('#confirm-upload');
     ce.submit = ce.upload_form.find('input.data.upload');
 
-    ce.upload_file_trigger.on('click',function(e) {
+    ce.load_json_trigger.on('click',function(e) {
       e.preventDefault();
-      ce.upload_file.click();
+      ce.json_data_file.click();
     });
 
-    ce.upload_file.on('change',handle_upload_file);
+    ce.json_data_file.on('change',handle_load_json_data);
     ce.json_data.on('input',handle_json_input);
     ce.confirm_upload.on('change',handle_confirmation);
     ce.submit.on('click',handle_submit);

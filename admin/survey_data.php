@@ -62,8 +62,8 @@ function add_data_load()
   echo "</div>";
 
   echo "<div class='header-box'>";
-  echo "<input type='file' id='upload-file'>";
-  echo "<a class='data upload'>Upload JSON data</a>";
+  echo "<input type='file' id='json-data-file'>";
+  echo "<a class='data load'>Load data from file</a>";
   echo "<span class='status'>Info</span>";
   echo "</div>";
 
@@ -87,7 +87,7 @@ function enqueue_data_javascript()
     http_build_query( array(
       'page'=>SETTINGS_PAGE_SLUG,
       'tab'=>'overview',
-      'status'=>'data uploaded',
+      'status'=>'Data Uploaded',
     ))
   ));
 

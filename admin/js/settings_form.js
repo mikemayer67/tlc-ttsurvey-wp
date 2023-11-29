@@ -21,8 +21,7 @@ function handle_form_submit(event)
     data,
     function(response) {
       if(response.ok) {
-        const url = form_vars.overview;
-        window.location.href = url;
+        window.location.href = form_vars.overview;
       } else {
         alert("failed to save settings: " + response.error);
       }
