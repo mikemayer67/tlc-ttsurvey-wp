@@ -73,7 +73,7 @@ function add_data_load()
   echo "<div class='button-box'>";
   echo "<input type='checkbox' id='confirm-upload'>";
   echo "<label for'confirm-upload'>I realize this will overwrite all existing survey data</label>";
-  echo "<input type='button' class='data upload' value='Upload Survey Data' disabled>";
+  echo "<input type='button' class='data upload button button-primary' value='Upload Survey Data' disabled>";
   echo "</div>";
 
   echo "</div>"; // form-body
