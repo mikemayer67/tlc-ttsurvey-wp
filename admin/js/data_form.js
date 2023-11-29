@@ -1,18 +1,42 @@
 var ce = {};
-var validation_timer = null;
+
+var validation_queued = false;
+var validation_delay = null;
+var validation_timeout = null;
+
 var json_data_is_validated = false;
+var json_data_file = null;
+
+function needs_validation()
+{
+  validation_queued = true;
+  json_data_is_validated = false;
+  set_warning_status("validating");
+  ce.confirm_upload.prop('checked',false);
+  ce.submit.attr('disabled',true);
+}
+
+function received_validation_result($result)
+{
+  if(result.ok) {
+    if(json_data_file) { set_info_status(json_data_file); }
+    else { clear_status(); }
+  } else {
+    set_error_status(response.error);
+  }
+}
 
 function start_validation_timer()
 {
   stop_validation_timer();
-  validation_timer = setTimeout(validate_json_data,500);
+  validation_delay = setTimeout(validate_json_data,500);
 }
 
 function stop_validation_timer()
 {
-  if(validation_timer) {
-    clearTimeout(validation_timer);
-    validation_timer = null;
+  if(validation_delay) {
+    clearTimeout(validation_delay);
+    validation_delay = null;
   }
 }
 
@@ -89,20 +113,19 @@ async function load_json_data(file)
 function handle_load_json_data(e)
 {
   e.preventDefault();
-  clear_validation();
   const files = ce.json_data_file.prop('files');
   if(files) {
-    stop_validation_timer();
     ce.json_data.val("");
     load_json_data(files[0]);
+    json_data_file = files[0].name;
+    needs_validation();
   }
 }
 
 function handle_json_input(e)
 {
-  clear_validation();
-  clear_status();
-  start_validation_timer();
+  json_data_file = null;
+  needs_validation();
 }
 
 function handle_confirmation(e)
@@ -114,13 +137,6 @@ function handle_confirmation(e)
   } else {
     ce.submit.attr('disabled',true);
   }
-}
-
-function clear_validation()
-{
-  json_data_is_validated=false;
-  ce.confirm_upload.prop('checked',false);
-  ce.submit.attr('disabled',true);
 }
 
 function handle_submit(e)
@@ -138,6 +154,8 @@ function handle_submit(e)
     function(response) {
       if(response.ok) {
         window.location.href = form_vars.overview;
+      } else {
+        received_validation_result(response);
       }
       else if(response.error) {
         set_error_status(response.error);
