@@ -7,6 +7,5 @@ require_once plugin_path('include/logger.php');
 
 clear_logger();
 
-echo json_encode(array('ok'=>true));
-
+wp_send_json_success()
 wp_die();

@@ -35,6 +35,5 @@ if(!key_exists('password',$response))
 
 }
 
-$rval = json_encode($response);
-echo($rval);
+wp_send_json($response);
 wp_die();

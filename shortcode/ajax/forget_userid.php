@@ -12,10 +12,5 @@ $userid = $_POST['userid'];
 $jar = CookieJar::instance(true);
 
 $cookie = forget_user_token($userid);
-$result = array(
-  'success'=>true,
-  'cookies'=>array($cookie),
-);
-
-echo json_encode($result);
+wp_send_json_success('cookies'=>array($cookie)));
 wp_die();

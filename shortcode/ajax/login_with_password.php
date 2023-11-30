@@ -13,7 +13,5 @@ $remember = filter_var($_POST['remember']??false, FILTER_VALIDATE_BOOLEAN);
 //   This modifies how login_with_password handles cookies 
 $jar = CookieJar::instance(true);
 
-$result = login_with_password($userid,$password,$remember);
-
-echo json_encode($result);
+wp_send_json(login_with_password($userid,$password,$remember))
 wp_die();
