@@ -62,7 +62,7 @@ function login_with_password(event)
 function login_response_handler(response)
 {
   if(response.success) {
-    response.cookies.forEach(function(cookie) {
+    response.data.cookies.forEach(function(cookie) {
       const key = cookie[0];
       const value = cookie[1];
       const expires = 1000*cookie[2];
@@ -75,7 +75,7 @@ function login_response_handler(response)
     window.location.href = login_vars.survey_url;
   } else {
     ce.status_message.removeClass(['info','error']).addClass('warning');
-    ce.status_message.html(response.error);
+    ce.status_message.html(response.data);
     ce.status_message.show(200,'linear');
   }
 }
@@ -238,18 +238,18 @@ function send_recovery_email(event)
       email:email,
     },
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         pwreset = {
-          expires: response.expires,
-          tokens: response.tokens,
+          expires: response.data.expires,
+          tokens: response.data.tokens,
         }
         localStorage.pwreset = JSON.stringify(pwreset);
         ce.input_status.val("info::Login info sent to "+email);
         ce.recovery_form.off('submit');
         ce.recovery_submit.click();
       }
-      if(response.error) {
-        var [level,msg] = response.error.split('::');
+      if(response.data.error) {
+        var [level,msg] = response.data.error.split('::');
         ce.status_message.removeClass(['info','warning','error'])
         ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
@@ -350,11 +350,11 @@ function send_pwreset(event)
       localStorage.removeItem('pwreset');
     
       var status = '';
-      if(response.ok) {
+      if(response.success) {
         const fullname = pwreset_user_info.fullname;
         status = encodeURIComponent('info::password updated for '+fullname);
       } else {
-        status = encodeURIComponent('warning::'+response.error);
+        status = encodeURIComponent('warning::'+response.data);
       }
     
       window.location.href = login_vars.survey_url+'&status='+status;
