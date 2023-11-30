@@ -10,13 +10,13 @@ require_once plugin_path('include/surveys.php');
 //   for now, simply valid yaml... eventually recognized survey structure
 $survey = $_POST['survey'] ?? null;
 if(!$survey) {
-  wp_send_json_failure("Required");
+  wp_send_json_error("Required");
   wp_die();
 }
 
 $error = null;
 if(!parse_survey_yaml($survey,$error)) {
-  wp_send_json_failure($error);
+  wp_send_json_error($error);
   wp_die();
 }
 

@@ -10,7 +10,7 @@ function ajax_wrapper()
   [$key,$nonce] = $_POST['nonce'];
   if(!wp_verify_nonce($nonce,$key)) {
     log_error("Bad nonce ".__FILE__.':'.__LINE__);
-    wp_send_json_failure('bad nonce');
+    wp_send_json_error('bad nonce');
     wp_die();
   }
 
@@ -21,7 +21,7 @@ function ajax_wrapper()
   if(!file_exists($query_file))
   {
     log_error("Bad ajax query ($query) @ ".__FILE__.":".__LINE__);
-    wp_send_json_failure("unimplemented query ($query)");
+    wp_send_json_error("unimplemented query ($query)");
     wp_die();
   }
 

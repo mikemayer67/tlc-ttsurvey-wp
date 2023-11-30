@@ -11,7 +11,7 @@ $pid = $_POST['pid'] ?? null;
 if(!$pid)
 {
   log_error("submit_content_form POST is missing pid (post_id)");
-  wp_send_json_failure('missing pid (post_id)'));
+  wp_send_json_error('missing pid (post_id)');
   wp_die();
 }
 

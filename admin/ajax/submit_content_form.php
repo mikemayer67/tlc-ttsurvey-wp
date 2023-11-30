@@ -9,7 +9,7 @@ $pid = $_POST['pid'] ?? null;
 if(!$pid)
 {
   log_error("submit_content_form POST is missing pid (post_id)");
-  wp_send_json_failure('missing pid (post_id)');
+  wp_send_json_error('missing pid (post_id)');
   wp_die();
 }
 
@@ -17,7 +17,7 @@ $content = $_POST['content'] ?? null;
 if(!$content)
 {
   log_error("submit_content_form POST is missing content");
-  wp_send_json_failure('missing content');
+  wp_send_json_error('missing content');
   wp_die();
 }
 
@@ -42,7 +42,7 @@ if( $rc == $pid )
     'last_modified'=>get_post_modified_time('U',true,$post),
   );
 } else {
-  wp_send_json_failure($rc->get_error_message());
+  wp_send_json_error($rc->get_error_message());
   wp_die();
 }
 

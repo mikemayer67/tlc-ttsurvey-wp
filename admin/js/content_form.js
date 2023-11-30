@@ -27,9 +27,9 @@ function populate_form()
         ce.last_modified.val(response.data.last_modified);
 
         saved_content = {
-          survey: data.response.survey,
-          sendmail: data.response.sendmail,
-          preview: data.response.preview,
+          survey: response.data.survey,
+          sendmail: response.data.sendmail,
+          preview: response.data.preview,
         };
 
         from_autosave = false;

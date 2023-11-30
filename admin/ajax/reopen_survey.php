@@ -9,7 +9,7 @@ $pid = $_POST['pid'] ?? null;
 if(reopen_survey($pid)) {
   wp_send_json_success();
 } else {
-  wp_send_json_failure();
+  wp_send_json_error();
 }
 wp_die();
 

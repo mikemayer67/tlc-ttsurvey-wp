@@ -14,7 +14,7 @@ $password = adjust_user_input('password',$_POST['password']);
 
 $user = User::from_userid($userid);
 if(!$user) {
-  wp_send_json_failure("invalid userid $userid");
+  wp_send_json_error("invalid userid $userid");
   wp_die();
 }
 
@@ -23,6 +23,6 @@ if($user->update_password($token,$password,$error)) {
   wp_send_json_success();
 } else {
   if(!$error) { $error = "Internal error: password not updated"; }
-  wp_send_json_failure($error);
+  wp_send_json_error($error);
 }
 wp_die();
