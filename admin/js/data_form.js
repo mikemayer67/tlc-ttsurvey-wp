@@ -69,6 +69,7 @@ var ce = {};
 
 function queue_validation()
 {
+  console.log('queue_validation');
   start_validation_timer();
   validation_needed = true
   json_data_is_good = false;
@@ -79,15 +80,19 @@ function queue_validation()
 
 function start_validation_timer()
 {
+  console.log('start_validation_timer');
   stop_validation_timer();
   if(validation_in_progress==false) { 
+    console.log("setTimeout");
     validation_timer = setTimeout(validate_json_data,500);
   }
 }
 
 function stop_validation_timer()
 {
+  console.log('stop_validation_timer');
   if(validation_timer) {
+    console.log("clearTimeout");
     clearTimeout(validation_timer);
     validation_timer = null;
   }
@@ -95,9 +100,10 @@ function stop_validation_timer()
 
 function validate_json_data()
 {
+  console.log('validate_json_data');
   validation_in_progress=true;
   validation_needed=false;
-  ce.json_data.addClass('validating');
+  ce.validation_status.addClass('validating');
 
   json_data = ce.json_data.val();
 
@@ -122,6 +128,7 @@ function validate_json_data()
 
 function prevalidate_json_data(json_data)
 {
+  console.log('prevalidate_json_data');
   // perform minimal validation:
   //  - is the data valid JSON
   //  - do we have all the required primary keys
@@ -160,6 +167,7 @@ function prevalidate_json_data(json_data)
 
 function handle_validation_result(result)
 {
+  console.log('handle_validation_result');
   json_data_is_good = result.ok;
 
   if(result.error) { set_error_status(result.error); }
@@ -167,8 +175,7 @@ function handle_validation_result(result)
   else if(json_data_file) { set_info_status(json_data_file); }
   else {clear_status(); }
 
-  ce.json_data.removeClass('retry');
-  ce.validation_status.html('validating');
+  ce.validation_status.html('validating').removeClass('retry');
 
   if(validation_needed) 
   {
@@ -177,14 +184,15 @@ function handle_validation_result(result)
   else
   {
     validation_in_progress = false;
-    ce.json_data.removeClass(['dirty','validating','retry'])
+    ce.json_data.removeClass('dirty');
+    ce.validation_status.removeClass('validating');
   }
 }
 
 function handle_validation_failure()
 {
-  ce.json_data.addClass('retry');
-  ce.validation_status.html('reattempting validation');
+  console.log('handle_validation_failure');
+  ce.validation_status.html('reattempting validation').addClass('retry');
   validate_json_data();
 }
 
@@ -194,11 +202,13 @@ function handle_validation_failure()
 
 function clear_status()
 {
+  console.log('clear_status');
   ce.data_status.removeClass(['info','warning','error']);
 }
 
 function set_status(msg,level)
 {
+  console.log(`set_status(${msg},${level})`);
   clear_status()
   ce.data_status.html(msg).addClass(level);
 }
@@ -213,12 +223,14 @@ function set_error_status(msg) { set_status(msg,'error'); }
 
 function handle_json_input(e)
 {
+  console.log('handle_json_input');
   json_data_file = null;
   queue_validation();
 }
 
 async function handle_load_json_data(e)
 {
+  console.log('handle_load_json_data');
   e.preventDefault();
   const files = ce.json_data_file.prop('files');
 
@@ -251,6 +263,7 @@ async function handle_load_json_data(e)
 
 function handle_confirmation(e)
 {
+  console.log('handle_confirmation');
   if(ce.confirm_upload.is(':checked')) {
     if(json_data_is_good) {
       ce.submit.attr('disabled',false);
@@ -262,6 +275,7 @@ function handle_confirmation(e)
 
 function handle_submit(e)
 {
+  console.log('handle_submit');
   e.preventDefault();
 
   send_json_data(
@@ -277,6 +291,7 @@ function handle_submit(e)
 
 function send_json_data(data, scope, success_callback)
 {
+  console.log('send_json_data');
   jQuery.ajax( {
     method: "POST",
     url: form_vars['ajaxurl'],

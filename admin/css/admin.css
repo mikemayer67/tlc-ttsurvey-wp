@@ -485,6 +485,23 @@
   width:calc(100% - 1em);
 }
 
+#tlc-ttsurvey-admin form.data.upload #json-data.dirty {
+  border-color:var(--warning-color);
+}
+
+#tlc-ttsurvey-admin form.data.upload #validation-status {
+  display:none;
+  color:var(--warning-color);
+}
+
+#tlc-ttsurvey-admin form.data.upload #validation-status.validating {
+  display:inline-block;
+}
+
+#tlc-ttsurvey-admin form.data.upload #validation-status.validating.retry {
+  color:var(--error-color);
+}
+
 #tlc-ttsurvey-admin form.data.upload .button-box {
   margin-left: 1em;
   margin-top:8px;
