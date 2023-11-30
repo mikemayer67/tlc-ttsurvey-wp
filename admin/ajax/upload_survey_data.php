@@ -15,7 +15,7 @@ function validate_survey_data($data)
 function validate_surveys($data)
 {
   // on failure:
-  // wp_send_json_failure($error)
+  // wp_send_json(array('success'=>false, 'warning'=>$error));
   // wp_die()
 }
 
@@ -39,7 +39,7 @@ $data = $_POST['survey_data'];
 $data = stripslashes_deep($data);
 $data = json_decode($data,true);
 if(is_null($data)) {
-  wp_send_json_failure(json_last_error_msg());
+  wp_send_json(array('success'=>false, 'error'=>json_last_error_msg()));
   wp_die();
 }
 

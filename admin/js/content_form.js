@@ -23,13 +23,13 @@ function populate_form()
       pid:pid,
     },
     function(response) {
-      if(response.ok) {
-        ce.last_modified.val(response.last_modified);
+      if(response.success) {
+        ce.last_modified.val(response.data.last_modified);
 
         saved_content = {
-          survey: response.survey,
-          sendmail: response.sendmail,
-          preview: response.preview,
+          survey: data.response.survey,
+          sendmail: data.response.sendmail,
+          preview: data.response.preview,
         };
 
         from_autosave = false;
@@ -40,7 +40,7 @@ function populate_form()
           //   earlier means that autosave is no longer applicable
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
-          if(autosave[pid].last_modified == response.last_modified) {
+          if(autosave[pid].last_modified == response.data.last_modified) {
             from_autosave = true;
             current_content = autosave[pid];
             ce.form_status.html('autosave').addClass('info').show();
@@ -160,7 +160,7 @@ function validate_survey_input()
       survey:ce.survey.eq(0).val(),
     },
     function(response) {
-      survey_error = response.ok ? null : response.error;
+      survey_error = response.success ? null : response.data;
       ajax_lock = false;
     },
     'json',
@@ -183,8 +183,8 @@ function refresh_sendmail_preview(subject)
       content:content,
     },
     function(response) {
-      if(response.ok) {
-        ce.preview.filter('.'+subject).html(response.preview);
+      if(response.success) {
+        ce.preview.filter('.'+subject).html(response.data);
         ajax_lock = false;
 
       }

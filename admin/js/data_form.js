@@ -109,7 +109,7 @@ function validate_json_data()
 
   result = prevalidate_json_data(json_data);
   if( result ) {
-    handle_validation_result(result);
+    handle_validation_response(result);
   }
 
   send_json_data(
@@ -119,7 +119,7 @@ function validate_json_data()
       if(response.ok) {
         window.location.href = form_vars.overview;
       } else {
-        handle_validation_result(response);
+        handle_validation_response(response);
       }
     }
   );
@@ -165,13 +165,13 @@ function prevalidate_json_data(json_data)
   return null;
 }
 
-function handle_validation_result(result)
+function handle_validation_response(response)
 {
-  console.log('handle_validation_result');
-  json_data_is_good = result.ok;
+  console.log('handle_validation_response');
+  json_data_is_good = response.success;
 
-  if(result.error) { set_error_status(result.error); }
-  else if(result.warning) { set_warning_status(result.warning); }
+  if(response.error) { set_error_status(response.error); }
+  else if(response.warning) { set_warning_status(response.warning); }
   else if(json_data_file) { set_info_status(json_data_file); }
   else {clear_status(); }
 
