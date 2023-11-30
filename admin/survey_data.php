@@ -63,17 +63,18 @@ function add_data_load()
 
   echo "<div class='header-box'>";
   echo "<input type='file' id='json-data-file'>";
-  echo "<a class='data load'>Load data from file</a>";
-  echo "<span class='status'>Info</span>";
+  echo "<a id='data-load'>Load data from file</a>";
+  echo "<span id='data-status'>Info</span>";
   echo "</div>";
 
-  echo "<textarea id='new-data' name='json_data' rows=20 placeholder='New Survey Data'>";
+  echo "<textarea id='json-data' name='json_data' rows=20 placeholder='New Survey Data'>";
+  echo "<div id='validation-status'></div>";
   echo "</textarea>";
 
   echo "<div class='button-box'>";
   echo "<input type='checkbox' id='confirm-upload'>";
   echo "<label for'confirm-upload'>I realize this will overwrite all existing survey data</label>";
-  echo "<input type='button' class='data upload button button-primary' value='Upload Survey Data' disabled>";
+  echo "<input type='button' id='data-upload' class='button button-primary' value='Upload Survey Data' disabled>";
   echo "</div>";
 
   echo "</div>"; // form-body

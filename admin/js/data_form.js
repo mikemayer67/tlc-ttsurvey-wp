@@ -1,81 +1,196 @@
 var ce = {};
 
-var validation_queued = false;
-var validation_delay = null;
-var validation_timeout = null;
+/**
+ * JSON Data Validation
+ *
+ * A fair amount of the code in this module deals with validation of the 
+ *   JSON data to be uploaded to the Wordpress server.  
+ *   1) We want the data to actually work with the survey
+ *   2) We do NOT want to break the wordpress site
+ *
+ * The only validation that occurs on the client (js) is a quick
+ *   validation that the data is valid JSON. The actual validation 
+ *   will be handled on the servier via AJAX requests to the wordpress site.
+ *
+ * Validation is needed whenever data is loaded from file or entered
+ *   by the user into the textview input block.  To avoid locking 
+ *   performing validation after each and every keystroke, a timer
+ *   is set/reset with each input event that modifies the input.
+ *   Validation occurs only when the timer fires.
+ *
+ * Because validation is handled via AJAX calls, it is inherently
+ *   asynchronous.  This means that the returned status may be out
+ *   of date with the actual content of the input box.  We must either
+ *   live with this possibility or block edits while the validation
+ *   is happening.  As the former seems to be the lesser of the two
+ *   evils, that is the approach taken below.  
+ *
+ *   When a change is made to the input data:
+ *     - a flag is set to indicate that validation is needed
+ *     - decorate the textarea (via css) to show need for validation
+ *     - disable the submit button
+ *     - clear the acknowlege checkbox
+ *     - any existing validation timer is cleared
+ *     - a validtion timer is started unless we are waiting on
+ *         the result from an (ajax) validation request
+ *
+ *   When the validation timer fires:
+ *     - a (different) flag is set to indicate that validation is in progress
+ *     - decorate the textarea (via css) to show validation in progress
+ *     - post the (ajax) validation request to the wordpress server
+ *        (set a timeout on the request to avoid infinite hang
+ *     - clear the validation needed flag
+ *
+ *   When the validation result is received (status code == 200)
+ *     - update the data status field
+ *       - if the json data has a problem, show the error
+ *       - otherwise, if the json data is unmodified, show the filename
+ *       - otherwise, clear the status
+ *
+ *     - if the validation is needed flag is set
+ *       - post a new (ajax) validation request
+ *       - clear the validation needed flag
+ *     - otherwise (no more validation needed)
+ *       - remove the validation decoration from the textarea
+ *       - clear the validation in progress flag
+ *       - if the json data is good, enable the submit button`
+ *
+ *   When the validation result fails (status code != 200)
+ *     - decorate the textarea (via css) to show validation reattempt
+ *     - post a new validation request to the wordpress server
+ *
+ **/
 
-var json_data_is_validated = false;
-var json_data_file = null;
+ var validation_timer = null
+ var validation_needed = false
+ var validation_in_progress = false
+ var json_data_is_good = false
+ var json_data_file = null
 
-function needs_validation()
+function queue_validation()
 {
-  validation_queued = true;
-  json_data_is_validated = false;
-  set_warning_status("validating");
-  ce.confirm_upload.prop('checked',false);
+  start_validation_timer();
+  validation_needed = true
+  json_data_is_good = false;
+  ce.json_data.addClass('dirty');
   ce.submit.attr('disabled',true);
-}
-
-function received_validation_result($result)
-{
-  if(result.ok) {
-    if(json_data_file) { set_info_status(json_data_file); }
-    else { clear_status(); }
-  } else {
-    set_error_status(response.error);
-  }
+  ce.confirm_upload.prop('checked',false);
 }
 
 function start_validation_timer()
 {
   stop_validation_timer();
-  validation_delay = setTimeout(validate_json_data,500);
+  if(validation_in_progress==false) { 
+    validation_timer = setTimeout(validate_json_data,500);
+  }
 }
 
 function stop_validation_timer()
 {
-  if(validation_delay) {
-    clearTimeout(validation_delay);
-    validation_delay = null;
+  if(validation_timer) {
+    clearTimeout(validation_timer);
+    validation_timer = null;
   }
 }
 
 function validate_json_data()
 {
-  // performs minimal validation:
+  validation_in_progress=true;
+  validation_needed=false;
+  ce.json_data.addClass('validating');
+
+  json_data = ce.json_data.val();
+
+  result = prevalidate_json_data(json_data);
+  if( result ) {
+    handle_validation_result(result);
+  }
+
+  send_json_data(
+    json_data,
+    'validation',
+    function(response,status) {
+      if(response.ok) {
+        window.location.href = form_vars.overview;
+      } else {
+        handle_validation_result(response);
+      }
+    }
+  );
+
+}
+
+function prevalidate_json_data(json_data)
+{
+  // perform minimal validation:
   //  - is the data valid JSON
   //  - do we have all the required primary keys
   //  - do we have any extra primary keys
-  // all other validation happens on the server when we submit the form
 
-  const json_data = ce.json_data.val();
   try {
-    var data = JSON.parse(json_data);
+    const data = JSON.parse(json_data);
   } catch(e) {
-    set_error_status(e.toString());
-    return;
+    return {
+      ok: false,
+      error: e.toString(),
+    };
   }
 
-  const data_keys = Object.keys(data);
-  const expected_keys = ['userids','surveys','responses'];
+  const keys = Object.keys(data);
+  const expected = ['userids','surveys','responses'];
 
-  const extra_keys = data_keys.filter(x => !expected_keys.includes(x));
-  if(extra_keys.length > 0) {
-    set_warning_status(`Contains invalid key '${extra_keys[0]}'`);
+  const extra = keys.filter(x => !expected.includes(x));
+  if(extra.length > 0) {
+    return {
+      ok: false,
+      warning: `Contains invalid key '${extra_keys[0]}',
+    };
+  }
+
+  const missing = expected.filter(x => !keys.includes(x));
+  if(missing.length > 0) {
+    return {
+      ok: false,
+      warning: `Missing required key '${missing_keys[0]}',
     return false;
   }
 
-  const missing_keys = expected_keys.filter(x => !data_keys.includes(x));
-  if(missing_keys.length > 0) {
-    set_warning_status(`Missing required key '${missing_keys[0]}'`);
-    return false;
-  }
-
-  json_data_is_validated = true;
-  if(!ce.data_status.hasClass('info')) { clear_status(); }
-
-  return true;
+  return null;
 }
+
+function handle_validation_result(result)
+{
+  json_data_is_good = result.ok;
+
+  if(result.error) { set_error_status(result.error); }
+  else if(result.warning) { set_warning_status(result.warning); }
+  else if(json_data_file) { set_info_status(json_data_file); }
+  else {clear_status(); }
+
+  ce.json_data.removeClass('retry');
+  ce.validation_status.html('validating');
+
+  if(validation_needed) 
+  {
+    validate_json_data();
+  }
+  else
+  {
+    validation_in_progress = false;
+    ce.json_data.removeClass(['dirty','validating','retry'])
+  }
+}
+
+function handle_validation_failure()
+{
+  ce.json_data.addClass('retry');
+  ce.validation_status.html('reattempting validation');
+  validate_json_data();
+}
+
+/**
+ * Data status
+ **/
 
 function clear_status()
 {
@@ -92,46 +207,52 @@ function set_info_status(msg) { set_status(msg,'info'); }
 function set_warning_status(msg) { set_status(msg,'warning'); }
 function set_error_status(msg) { set_status(msg,'error'); }
 
-
-async function load_json_data(file)
-{
-  const json = await (new Response(file)).text();
-  ce.json_data_file.val('');
-  try {
-    const data = JSON.parse(json);
-  }
-  catch(e) {
-    set_error_status("Not a valid JSON file");
-    return;
-  }
-
-  ce.json_data.val(json);
-  set_info_status("Loaded " + file.name);
-  start_validation_timer();
-}
-
-function handle_load_json_data(e)
-{
-  e.preventDefault();
-  const files = ce.json_data_file.prop('files');
-  if(files) {
-    ce.json_data.val("");
-    load_json_data(files[0]);
-    json_data_file = files[0].name;
-    needs_validation();
-  }
-}
+/**
+ * handle updates to json data textarea
+ **/
 
 function handle_json_input(e)
 {
   json_data_file = null;
-  needs_validation();
+  queue_validation();
 }
+
+async function handle_load_json_data(e)
+{
+  e.preventDefault();
+  const files = ce.json_data_file.prop('files');
+
+  if(files.length == 0) { return }
+  file = files[0]
+
+  if(file.size > 5*1024*1024) {
+    alert(`Cannot load ${file.name} (too big)`);
+    return;
+  }
+
+  const json = await file.text();
+  try {
+    const data = JSON.parse(json);
+  }
+  catch(e) {
+    alert(`Cannot load ${file.name} (not valid JSON)`);
+    return;
+  }
+
+  ce.json_data.val(json);
+  set_info_status(file.name);
+  json_data_file = file.name;
+  queue_validation();
+}
+
+/**
+ * Data upload
+ **/
 
 function handle_confirmation(e)
 {
   if(ce.confirm_upload.is(':checked')) {
-    if(json_data_is_validated) {
+    if(json_data_is_good) {
       ce.submit.attr('disabled',false);
     }
   } else {
@@ -143,42 +264,50 @@ function handle_submit(e)
 {
   e.preventDefault();
 
-  jQuery.post(
-    form_vars['ajaxurl'],
-    {
-      action:'tlc_ttsurvey',
-      nonce:form_vars['nonce'],
-      query:'admin/upload_survey_data',
-      survey_data:ce.json_data.val(),
-    },
-    function(response) {
-      if(response.ok) {
-        window.location.href = form_vars.overview;
-      } else {
-        received_validation_result(response);
-      }
-      else if(response.error) {
-        set_error_status(response.error);
-      }
-      else if(response.warning) {
-        set_warning_status(response.warning);
-      }
-      clear_validation();
-    },
-    'json',
+  send_json_data(
+    ce.json_data.val(),
+    'upload',
+    hanlde_validation_result,
   );
 }
 
+/**
+ * AJAX call to upload/validate json_data
+ **/
+
+function send_json_data(data, scope, success_callback)
+{
+  jQuery.ajax( {
+    method: "POST",
+    url: form_vars['ajaxurl'],
+    data: {
+      action: 'tlc_ttsurvey',
+      nonce: form_vars['nonce'],
+      query: 'admin/upload_survey_data',
+      scope: scope,
+      survey_data: data,
+    },
+    timeout: 15000, // milliseconds
+    dataType: 'json',
+    success: success_callback,
+    error: handle_validation_failure,
+  });
+}
+
+/**
+ * prepare data form scripting
+ **/
 
 jQuery(document).ready(
   function($) {
     ce.upload_form = $('#tlc-ttsurvey-admin form.data.upload');
     ce.json_data_file = ce.upload_form.find('#json-data-file');
-    ce.load_json_trigger = ce.upload_form.find('a.data.load');
-    ce.data_status = ce.upload_form.find('span.status');
-    ce.json_data = ce.upload_form.find('textarea');
+    ce.load_json_trigger = ce.upload_form.find('#data-load');
+    ce.data_status = ce.upload_form.find('#data-status');
+    ce.json_data = ce.upload_form.find('#json-data');
+    ce.validation_status = ce.upload_form.find('#validation-status');
     ce.confirm_upload = ce.upload_form.find('#confirm-upload');
-    ce.submit = ce.upload_form.find('input.data.upload');
+    ce.submit = ce.upload_form.find('#data-upload');
 
     ce.load_json_trigger.on('click',function(e) {
       e.preventDefault();

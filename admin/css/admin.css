@@ -444,13 +444,13 @@
   display:none;
 }
 
-#tlc-ttsurvey-admin form.data.upload a.data.load {
+#tlc-ttsurvey-admin form.data.upload #data-load {
   font-size:14px;
   font-weight:600;
   cursor:pointer;
 }
 
-#tlc-ttsurvey-admin form.data.upload span.status {
+#tlc-ttsurvey-admin form.data.upload #data-status {
   display:none;
   float:right;
   margin-left:auto;
@@ -463,24 +463,24 @@
   font-weight:normal;
 }
 
-#tlc-ttsurvey-admin form.data.upload span.status.info {
+#tlc-ttsurvey-admin form.data.upload #data-status.info {
   display:inline-block;
   color:black;
 }
 
-#tlc-ttsurvey-admin form.data.upload span.status.warning {
+#tlc-ttsurvey-admin form.data.upload #data-status.warning {
   display:inline-block;
   font-weight:500;
   color:var(--warning-color);
 }
 
-#tlc-ttsurvey-admin form.data.upload span.status.error {
+#tlc-ttsurvey-admin form.data.upload #data-status.error {
   display:inline-block;
   font-weight:500;
   color:var(--error-color);
 }
 
-#tlc-ttsurvey-admin form.data.upload textarea {
+#tlc-ttsurvey-admin form.data.upload #json-data {
   margin:0 0 0 1em;
   width:calc(100% - 1em);
 }
@@ -496,7 +496,7 @@
   font-weight:500;
 }
 
-#tlc-ttsurvey-admin form.data.upload .button-box input.data.upload {
+#tlc-ttsurvey-admin form.data.upload .button-box #data-upload {
   margin-left:auto;
 }
 
