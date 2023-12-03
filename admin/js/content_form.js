@@ -247,9 +247,9 @@ function handle_form_submit(event)
     form_vars['ajaxurl'],
     data,
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         ce.form_status.html('saved').addClass('info').show();
-        ce.last_modified.val(response.last_modified);
+        ce.last_modified.val(response.data.last_modified);
         saved_content.survey = ce.survey.val();
         for(const key in saved_content.sendmail) {
           saved_content.sendmail[key] = ce.sendmail.filter('.'+key).val();
@@ -262,7 +262,7 @@ function handle_form_submit(event)
         reset_queue();
         update_state();
       } else {
-        alert("failed to save content: " + response.error);
+        alert("failed to save content: " + response.data);
       }
     },
     'json',

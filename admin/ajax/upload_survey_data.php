@@ -23,15 +23,13 @@ function validate_userids($data)
 {
 }
 
-function validate_resposes$data)
+function validate_responses($data)
 {
 }
 
 function upload_survey_data($data)
 {
 }
-
-log_dev("upload_survey_data POST: ".print_r($_POST,true));
 
 $scope = $_POST['scope'] ?? '';
 $data = $_POST['survey_data'];

@@ -57,7 +57,7 @@ function handle_new_survey(event)
       name:new_name,
     },
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         window.location.reload(true);
       }
     },
