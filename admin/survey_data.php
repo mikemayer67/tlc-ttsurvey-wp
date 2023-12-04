@@ -67,9 +67,11 @@ function add_data_load()
   echo "<span id='data-status'>Info</span>";
   echo "</div>";
 
+  echo "<div class='data-container'>";
   echo "<textarea id='json-data' name='json_data' rows=20 placeholder='New Survey Data'>";
   echo "</textarea>";
-  echo "<div id='validation-status'></div>";
+  echo "<div id='validation-status'>validating</div>";
+  echo "</div>";
 
   echo "<div class='button-box'>";
   echo "<input type='checkbox' id='confirm-upload'>";
