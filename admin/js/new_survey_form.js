@@ -45,7 +45,7 @@ function handle_new_survey(event)
 {
   event.preventDefault();
 
-  new_name = ce.new_name.val();
+  const new_name = ce.new_name.val();
 
   jQuery.post(
     form_vars['ajaxurl'],

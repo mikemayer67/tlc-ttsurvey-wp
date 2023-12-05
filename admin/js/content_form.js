@@ -229,7 +229,7 @@ function handle_form_submit(event)
   ce.form_status.hide();
   event.preventDefault();
 
-  data = {
+  let data = {
     action:'tlc_ttsurvey',
     nonce:form_vars['nonce'],
     query:'admin/submit_content_form',
