@@ -1,3 +1,4 @@
+import * as validate from './validation.js';
 
 var ce = {}
 
@@ -26,16 +27,25 @@ function handle_change()
 
   const new_name = ce.new_name.val()
 
-  err = "";
-  if(new_name.length<4) {
-    err = "too short";
+  var err = "";
+  const result = validate.survey_name(new_name);
+  if(!result.ok) {
+    err = result.error;
   }
   else if(jQuery.inArray(new_name,existing_names)>=0) {
     err = "existing survey";
   }
-  else if(!/^[a-zA-Z0-9., -]+$/.test(new_name)) {
-    err = "invalid name";
-  }
+
+//  err = "";
+//  if(new_name.length<4) {
+//    err = "too short";
+//  }
+//  else if(jQuery.inArray(new_name,existing_names)>=0) {
+//    err = "existing survey";
+//  }
+//  else if(!/^[a-zA-Z0-9., -]+$/.test(new_name)) {
+//    err = "invalid name";
+//  }
 
   ce.error.html(err);
   ce.submit.prop('disabled',err.length>0);

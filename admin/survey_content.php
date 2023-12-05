@@ -113,10 +113,11 @@ function add_survey_navbar($active_pid,$current)
     $tabs[] = array(' + ',FIRST_TAB);
   }
 
-  // remaning tabs come from the survey catalog (skipping current survey)
+  // remaining tabs come from the survey catalog (skipping current survey)
   foreach( survey_catalog() as $pid=>$survey )
   {
-    if($pid != $current['post_id'])
+    $current_pid = $current['post_id'] ?? -1;
+    if($pid != $current_pid)
     {
       $tabs[] = array($survey['name'],$pid);
     }
@@ -402,6 +403,16 @@ function enqueue_reopen_javascript()
   );
   wp_enqueue_script('tlc_ttsurvey_reopen_form');
 }
+
+function enqueue_new_survey_js_as_module($tag,$handle,$src)
+{
+  if($handle === 'tlc_ttsurvey_new_survey_form') {
+    log_dev("importing new survey script to module");
+    $tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
+  }
+  return $tag;
+}
+add_filter('script_loader_tag',ns('enqueue_new_survey_js_as_module'),10,3);
 
 function enqueue_new_survey_javascript()
 {
