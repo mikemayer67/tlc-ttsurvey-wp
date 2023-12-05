@@ -496,18 +496,21 @@
 #tlc-ttsurvey-admin form.data.upload #validation-status {
   display:none;
   position:absolute;
-  margin-right:0;
-  margin-top:0;
-  margin-left:auto;
+  top:3px;
+  right:3px;
+  z-index:10;
+  padding:1px 8px;
 }
 
 #tlc-ttsurvey-admin form.data.upload #validation-status.validating {
   display:inline-block;
-  color:var(--warning-color);
+  background-color:var(--warning-color);
+  color:white;
 }
 
 #tlc-ttsurvey-admin form.data.upload #validation-status.validating.retry {
-  color:var(--error-color);
+  background-color:var(--error-color);
+  color:white;
 }
 
 #tlc-ttsurvey-admin form.data.upload .button-box {
