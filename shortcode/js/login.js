@@ -62,7 +62,7 @@ function login_with_password(event)
 function login_response_handler(response)
 {
   if(response.success) {
-    response.data.cookies.forEach(function(cookie) {
+    response.cookies.forEach(function(cookie) {
       const key = cookie[0];
       const value = cookie[1];
       const expires = 1000*cookie[2];
@@ -75,7 +75,7 @@ function login_response_handler(response)
     window.location.href = login_vars.survey_url;
   } else {
     ce.status_message.removeClass(['info','error']).addClass('warning');
-    ce.status_message.html(response.data);
+    ce.status_message.html(response.error);
     ce.status_message.show(200,'linear');
   }
 }
