@@ -14,7 +14,7 @@ function validate_survey_data($data)
 
 function validate_surveys($data)
 {
-  sleep(3);
+  sleep(2);
   // on failure:
   // wp_send_json(array('success'=>false, 'warning'=>$error));
   // wp_die()

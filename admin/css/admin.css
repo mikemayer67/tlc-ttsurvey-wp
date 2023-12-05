@@ -7,6 +7,8 @@
   --warning-color:#cc5200;
   --bright-error-color:#800;
   --pale-error-color:#f88;
+  --warning-fill:#fff8e0;
+  --error-fill:#fff0f0;
 }
 
 #tlc-ttsurvey-admin form {
@@ -487,6 +489,19 @@
 
 #tlc-ttsurvey-admin form.data.upload #json-data.dirty {
   border-color:var(--warning-color);
+  border-width:3px;
+}
+
+#tlc-ttsurvey-admin form.data.upload #json-data.warning {
+  border-color:var(--warning-color);
+  background-color:var(--warning-fill);
+  border-width:3px;
+}
+
+#tlc-ttsurvey-admin form.data.upload #json-data.error {
+  border-color:var(--error-color);
+  background-color:var(--error-fill);
+  border-width:3px;
 }
 
 #tlc-ttsurvey-admin form.data.upload div.data-container {

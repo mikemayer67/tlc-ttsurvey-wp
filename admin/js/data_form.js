@@ -191,6 +191,7 @@ function handle_validation_response(response,status,jqHXR)
 
 function handle_validation_failure(jqHXR,status,error)
 {
+  clear_status();
   ce.validation_status.html('reattempting validation').addClass('retry');
   validate_json_data();
 }
@@ -202,12 +203,14 @@ function handle_validation_failure(jqHXR,status,error)
 function clear_status()
 {
   ce.data_status.removeClass(['info','warning','error']);
+  ce.json_data.removeClass(['info','warning','error']);
 }
 
 function set_status(msg,level)
 {
   clear_status()
   ce.data_status.html(msg).addClass(level);
+  ce.json_data.addClass(level);
 }
 
 function set_info_status(msg) { set_status(msg,'info'); }
@@ -247,6 +250,7 @@ async function handle_load_json_data(e)
   }
 
   ce.json_data.val(json);
+  ce.json_data_file.val('');
   set_info_status(file.name);
   json_data.file = file.name;
   queue_validation();
