@@ -1,3 +1,5 @@
+import * as validate from './validation.js';
+
 var ce = {};
 
 /**
@@ -105,7 +107,7 @@ function validate_json_data()
 
   const data = ce.json_data.val().trim();
 
-  result = prevalidate_json_data(data);
+  var result = prevalidate_json_data(data);
   if( !result.success ) {
     handle_validation_response(result);
     return;
@@ -161,9 +163,28 @@ function prevalidate_json_data(data)
     };
   }
 
+  var result = prevalidate_survey_data(data.surveys); 
+  if(!result.success) {
+    return result;
+  }
+
   return {
     success: true,
   }
+}
+
+function prevalidate_survey_data(surveys)
+{
+  for ( let name in surveys ) {
+    var result = validate.survey_name(name);
+    if(!result.ok) {
+      return {
+        success: false,
+        warning: `'${name}' is not a valid survey name (${result.error})`,
+      };
+    }
+  }
+  return {success:true};
 }
 
 function handle_validation_response(response,status,jqHXR)
@@ -233,7 +254,7 @@ async function handle_load_json_data(e)
   const files = ce.json_data_file.prop('files');
 
   if(files.length == 0) { return }
-  file = files[0]
+  const file = files[0]
 
   if(file.size > 5*1024*1024) {
     alert(`Cannot load ${file.name} (too big)`);
