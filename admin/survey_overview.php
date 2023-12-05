@@ -61,7 +61,7 @@ function add_past_survey_overview($current)
 
   $catalog = survey_catalog();
   if($catalog) {
-    $current_name = $current['name'];
+    $current_name = $current['name']??null;
     $others = array();
     foreach($catalog as $post_id=>$survey) {
       $name = $survey['name'];

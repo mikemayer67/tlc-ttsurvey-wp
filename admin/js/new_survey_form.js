@@ -1,24 +1,7 @@
 import * as validate from './validation.js';
+import * as lock from './lock.js';
 
 var ce = {}
-
-function hold_lock()
-{
-  jQuery.post(
-    form_vars.ajaxurl,
-    {
-      action:'tlc_ttsurvey',
-      nonce: form_vars.nonce,
-      query: 'admin/obtain_content_lock',
-    },
-    function(response) {
-      if(!response.has_lock) {
-        window.location.reload(true);
-      }
-    },
-    'json',
-  );
-}
 
 function handle_change()
 {
@@ -72,8 +55,8 @@ jQuery(document).ready(
     ce.error = ce.form.find('span.error');
     ce.submit = ce.form.find('input.submit');
 
-    hold_lock();
-    setInterval(hold_lock,15000);
+    lock.hold();
+    setInterval(lock.hold,15000);
 
     ce.new_name.on('keyup',handle_change);
     ce.form.on('submit',handle_new_survey);

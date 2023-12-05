@@ -11,8 +11,64 @@ if(!plugin_admin_can('data')) {
 }
 
 require_once plugin_path('include/const.php');
+require_once plugin_path('admin/content_lock.php');
 
-add_data_form();
+add_noscript_body();
+add_script_body();
+
+function add_noscript_body()
+{
+  echo "<noscript class='warning'>";
+  echo "<p>Managing survey data requires that Javascript be enabled</p>";
+  echo "</noscript>";
+}
+
+function add_script_body()
+{
+  echo "<div class='content requires-javascript'>";
+
+  // check to see if we have lock
+  $lock = obtain_content_lock();
+  if($lock['has_lock']) {
+    // we have the lock
+    add_data_form();
+  } else {
+    // someone else has lock
+    add_content_lock($lock);
+  }
+  echo "</div>";
+}
+
+function add_content_lock($lock)
+{
+  $locked_by = $lock['locked_by'];
+  echo "<div class='info lock'>";
+  echo "<div>The survey is currently being edited by $locked_by.</div>";
+  echo "<div>This tab will automatically refresh when the edit lock is released.</div>";
+  echo "</div>";
+
+  enqueue_watch_lock_javascript();
+}
+
+function enqueue_watch_lock_javascript()
+{
+  wp_register_script(
+    'tlc_ttsurvey_watch_lock',
+    plugin_url('admin/js/watch_content_lock.js'),
+    array('jquery'),
+    '1.0.3',
+    true
+  );
+  wp_localize_script(
+    'tlc_ttsurvey_watch_lock',
+    'watch_vars',
+    array(
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce' => array('watch_lock',wp_create_nonce('watch_lock')),
+    ),
+  );
+  wp_enqueue_script('tlc_ttsurvey_watch_lock');
+}
 
 function add_data_form()
 {
