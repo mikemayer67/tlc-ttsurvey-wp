@@ -404,16 +404,6 @@ function enqueue_reopen_javascript()
   wp_enqueue_script('tlc_ttsurvey_reopen_form');
 }
 
-function enqueue_new_survey_js_as_module($tag,$handle,$src)
-{
-  if($handle === 'tlc_ttsurvey_new_survey_form') {
-    log_dev("importing new survey script to module");
-    $tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
-  }
-  return $tag;
-}
-add_filter('script_loader_tag',ns('enqueue_new_survey_js_as_module'),10,3);
-
 function enqueue_new_survey_javascript()
 {
   wp_register_script(
