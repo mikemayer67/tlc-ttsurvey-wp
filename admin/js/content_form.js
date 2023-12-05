@@ -32,8 +32,8 @@ function populate_form()
           preview: response.data.preview,
         };
 
-        from_autosave = false;
-        current_content = saved_content;
+        var from_autosave = false;
+        const current_content = saved_content;
 
         if(autosave[pid]) {
           // equality means that the autosave is for the current revision
@@ -139,7 +139,7 @@ function watch_queue()
   ajax_lock = true;
   queue_timer = null;
 
-  input = queue.shift();
+  const input = queue.shift();
   if( input == "survey" ) {
     validate_survey_input();
   } else {
@@ -200,9 +200,9 @@ function content_has_changed()
 
   if(saved_content.survey != ce.survey.val()) { return true; }
 
-  rval = false;
+  var rval = false;
   ce.sendmail.each(function() {
-    saved_sendmail = saved_content.sendmail[this.name];
+    const saved_sendmail = saved_content.sendmail[this.name];
     if( this.value != saved_sendmail ) { rval = true; }
   });
   return rval;

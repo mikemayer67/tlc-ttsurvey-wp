@@ -113,10 +113,11 @@ function add_survey_navbar($active_pid,$current)
     $tabs[] = array(' + ',FIRST_TAB);
   }
 
-  // remaning tabs come from the survey catalog (skipping current survey)
+  // remaining tabs come from the survey catalog (skipping current survey)
   foreach( survey_catalog() as $pid=>$survey )
   {
-    if($pid != $current['post_id'])
+    $current_pid = $current['post_id'] ?? -1;
+    if($pid != $current_pid)
     {
       $tabs[] = array($survey['name'],$pid);
     }
