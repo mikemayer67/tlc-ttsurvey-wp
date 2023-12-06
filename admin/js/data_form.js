@@ -1,6 +1,8 @@
 import * as validate from './validation.js';
 
 var ce = {};
+var validation_warnings = [];
+var validation_errors = [];
 
 /**
  * JSON Data Validation
@@ -105,9 +107,29 @@ function validate_json_data()
   validation.needed=false;
   ce.validation_status.addClass('validating');
 
-  const data = ce.json_data.val().trim();
+  validation_errors = [];
+  validation_warnings = [];
+
+  const json_data = ce.json_data.val().trim();
+
+  if(json_data.length == 0) {
+    return {
+      ok:false,
+      warning:"Nothing to upload",
+    };
+  }
+
+  try {
+    parsed_data = JSON.parse(json_data);
+  } catch(e) {
+    return {
+      ok: false,
+      error: e.toString(),
+    };
+  }
 
   var result = prevalidate_json_data(data);
+
   if( !result.success ) {
     handle_validation_response(result);
     return;
@@ -127,22 +149,6 @@ function prevalidate_json_data(data)
   //  - is the data valid JSON
   //  - do we have all the required primary keys
   //  - do we have any extra primary keys
-
-  if(data.length == 0) {
-    return {
-      ok:false,
-      warning:"Nothing to upload",
-    };
-  }
-
-  try {
-    data = JSON.parse(data);
-  } catch(e) {
-    return {
-      ok: false,
-      error: e.toString(),
-    };
-  }
 
   const keys = Object.keys(data);
   const expected = ['userids','surveys','responses'];

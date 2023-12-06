@@ -483,7 +483,7 @@
 }
 
 #tlc-ttsurvey-admin form.data.upload #json-data {
-  margin:0 0 0 1em;
+  margin:0 0 0 0;
   width:calc(100% - 1em);
 }
 
@@ -504,7 +504,8 @@
   border-width:3px;
 }
 
-#tlc-ttsurvey-admin form.data.upload div.data-container {
+#tlc-ttsurvey-admin form.data.upload div.data-box {
+  margin-left:1em;
   position:relative;
 }
 
@@ -527,6 +528,43 @@
   background-color:var(--error-color);
   color:white;
 }
+
+#tlc-ttsurvey-admin form.data.upload div.validation {
+  display:none;
+  margin-left:2em;
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation div.label {
+  margin: 10px 0 0 0;
+  font-size:14px;
+  font-weight:600;
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation.warnings div.label {
+  color:var(--warning-color);
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation.errors div.label {
+  color:var(--error-color);
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation ul {
+  margin:0 0 0 1.5em;
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation ul li {
+  margin:0;
+  list-style-type:'- ';
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation.warnings ul li {
+  color:var(--warning-color);
+}
+
+#tlc-ttsurvey-admin form.data.upload div.validation.errors ul li {
+  color:var(--error-color);
+}
+
 
 #tlc-ttsurvey-admin form.data.upload .button-box {
   margin-left: 1em;
