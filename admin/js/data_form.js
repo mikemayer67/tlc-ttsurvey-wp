@@ -1,8 +1,6 @@
 import * as validate from './validation.js';
 
 var ce = {};
-var validation_warnings = [];
-var validation_errors = [];
 
 /**
  * JSON Data Validation
@@ -69,24 +67,22 @@ var validation_errors = [];
    timer: null,
    needed: false,
    in_progress: false,
- };
- var json_data = {
-   is_good:false,
-   file:null,
+   has_warnings: false,
+   has_errors: false,
  };
 
 function queue_validation()
 {
-  start_validation_timer();
+  console.log("queue_validation");
   validation.needed = true
-  json_data.is_good = false;
   ce.json_data.addClass('dirty');
-  ce.submit.attr('disabled',true);
-  ce.confirm_upload.prop('checked',false);
+  disable_submit();
+  start_validation_timer();
 }
 
 function start_validation_timer()
 {
+  console.log("start_validation_timer");
   stop_validation_timer();
   if(validation.in_progress==false) { 
     validation.timer = setTimeout(validate_json_data,500);
@@ -95,6 +91,7 @@ function start_validation_timer()
 
 function stop_validation_timer()
 {
+  console.log("stop_validation_timer");
   if(validation.timer) {
     clearTimeout(validation.timer);
     validation.timer = null;
@@ -103,106 +100,90 @@ function stop_validation_timer()
 
 function validate_json_data()
 {
+  console.log("validate_json_data");
+  console.log("validate_json_data in_progress=true");
   validation.in_progress=true;
   validation.needed=false;
   ce.validation_status.addClass('validating');
 
-  validation_errors = [];
-  validation_warnings = [];
+  validation.has_warnings = false;
+  validation.has_errors = false;
+  ce.validation_warnings.hide();
+  ce.validation_errors.hide();
+  ce.validation_warnings_ul.empty();
+  ce.validation_errors_ul.empty();
 
   const json_data = ce.json_data.val().trim();
 
   if(json_data.length == 0) {
-    return {
-      ok:false,
-      warning:"Nothing to upload",
-    };
-  }
-
-  try {
-    parsed_data = JSON.parse(json_data);
-  } catch(e) {
-    return {
-      ok: false,
-      error: e.toString(),
-    };
-  }
-
-  var result = prevalidate_json_data(data);
-
-  if( !result.success ) {
-    handle_validation_response(result);
+    add_validation_error("Nothing to upload");
+    finalize_validation();
     return;
   }
 
-  send_json_data(
-    data,
-    'validation',
-    handle_validation_response,
-  );
+  try {
+    const parsed_data = JSON.parse(json_data);
+  } catch(e) {
+    add_validation_error(e.toString());
+    finalize_validation();
+    return;
+  }
 
+  jQuery.ajax( {
+    method: "POST",
+    url: form_vars['ajaxurl'],
+    data: {
+      action: 'tlc_ttsurvey',
+      nonce: form_vars['nonce'],
+      query: 'admin/validate_survey_data',
+      survey_data: json_data,
+    },
+    timeout: 15000, // milliseconds
+    dataType: 'json',
+    success: handle_validation_response,
+    error: handle_validation_failure,
+  });
 }
 
-function prevalidate_json_data(data)
+function finalize_validation()
 {
-  // perform minimal validation:
-  //  - is the data valid JSON
-  //  - do we have all the required primary keys
-  //  - do we have any extra primary keys
+  console.log("finalize_validation");
+  console.log("finalize_validation in_progress=false");
+  validation.in_progress = false;
 
-  const keys = Object.keys(data);
-  const expected = ['userids','surveys','responses'];
+  ce.validation_status.html('validating').removeClass(['validating','retry']);
 
-  const extra = keys.filter(x => !expected.includes(x));
-  if(extra.length > 0) {
-    return {
-      success: false,
-      warning: `Contains invalid key '${extra[0]}'`,
-    };
+  ce.json_data.removeClass(['dirty','warning','error']);
+  if(validation.has_errors) {
+    ce.json_data.addClass('error');
+    return;
+  } 
+
+  if(validation.has_warnings) {
+    ce.json_data.addClass('warning');
   }
 
-  const missing = expected.filter(x => !keys.includes(x));
-  if(missing.length > 0) {
-    return {
-      success: false,
-      warning: `Missing required key '${missing[0]}'`,
-    };
-  }
-
-  var result = prevalidate_survey_data(data.surveys); 
-  if(!result.success) {
-    return result;
-  }
-
-  return {
-    success: true,
-  }
-}
-
-function prevalidate_survey_data(surveys)
-{
-  for ( let name in surveys ) {
-    var result = validate.survey_name(name);
-    if(!result.ok) {
-      return {
-        success: false,
-        warning: `'${name}' is not a valid survey name (${result.error})`,
-      };
-    }
-  }
-  return {success:true};
+  enable_confirm();
 }
 
 function handle_validation_response(response,status,jqHXR)
 {
-  json_data.is_good = response.success;
+  console.log("handle_validation_response");
+  ce.json_data.removeClass(['warning','error']);
 
-  if(response.error) { set_error_status(response.error); }
-  else if(response.warning) { set_warning_status(response.warning); }
-  else if(json_data.file) { set_info_status(json_data.file); }
-  else {clear_status(); }
+  if(response.warnings) {
+    ce.json_data.addClass('warning');
+    for( const warning of response.warnings) {
+      add_validation_warning(warning);
+    }
+  }
 
-  ce.validation_status.html('validating').removeClass('retry');
+  if(response.errors) {
+    ce.json_data.addClass('error');
+    for( const error of response.errors) {
+      add_validation_error(error);
+    }
+  }
 
   if(validation.needed) 
   {
@@ -210,39 +191,33 @@ function handle_validation_response(response,status,jqHXR)
   }
   else
   {
-    validation.in_progress = false;
-    ce.json_data.removeClass('dirty');
-    ce.validation_status.removeClass('validating');
+    finalize_validation();
   }
 }
 
 function handle_validation_failure(jqHXR,status,error)
 {
-  clear_status();
+  console.log("handle_validation_failure");
   ce.validation_status.html('reattempting validation').addClass('retry');
   validate_json_data();
 }
 
-/**
- * Data status
- **/
-
-function clear_status()
+function add_validation_error(error)
 {
-  ce.data_status.removeClass(['info','warning','error']);
-  ce.json_data.removeClass(['info','warning','error']);
+  console.log("add_validation_error");
+  validation.has_errors = true;
+  ce.validation_errors.show()
+  ce.validation_errors_ul.append(jQuery('<li>').append(error));
 }
 
-function set_status(msg,level)
+function add_validation_warning(warning)
 {
-  clear_status()
-  ce.data_status.html(msg).addClass(level);
-  ce.json_data.addClass(level);
+  console.log("add_validation_warning");
+  validation.has_warnings = true;
+  ce.validation_warnings.show()
+  ce.validation_warnings_ul.append(jQuery('<li>').append(warning));
 }
 
-function set_info_status(msg) { set_status(msg,'info'); }
-function set_warning_status(msg) { set_status(msg,'warning'); }
-function set_error_status(msg) { set_status(msg,'error'); }
 
 /**
  * handle updates to json data textarea
@@ -250,12 +225,14 @@ function set_error_status(msg) { set_status(msg,'error'); }
 
 function handle_json_input(e)
 {
-  json_data.file = null;
+  console.log("handle_json_input");
+  ce.data_file.html("");
   queue_validation();
 }
 
 async function handle_load_json_data(e)
 {
+  console.log("handle_load_json_data");
   e.preventDefault();
   const files = ce.json_data_file.prop('files');
 
@@ -278,8 +255,7 @@ async function handle_load_json_data(e)
 
   ce.json_data.val(json);
   ce.json_data_file.val('');
-  set_info_status(file.name);
-  json_data.file = file.name;
+  ce.data_file.html(file.name);
   queue_validation();
 }
 
@@ -289,8 +265,9 @@ async function handle_load_json_data(e)
 
 function handle_confirmation(e)
 {
+  console.log("handle_confirmation");
   if(ce.confirm_upload.is(':checked')) {
-    if(json_data.is_good) {
+    if(!validation.has_errors) {
       ce.submit.attr('disabled',false);
     }
   } else {
@@ -300,27 +277,11 @@ function handle_confirmation(e)
 
 function handle_submit(e)
 {
+  console.log("handle_submit");
   e.preventDefault();
 
-  send_json_data(
-    ce.json_data.val(),
-    'upload',
-    function(response,status) {
-      if(response.success) {
-        window.location.href = form_vars.overview;
-      } else {
-        handle_validation_response(response);
-      }
-    }
-  );
-}
+  const json_data = ce.json_data.val().trim();
 
-/**
- * AJAX call to upload/validate json_data
- **/
-
-function send_json_data(data, scope, success_callback)
-{
   jQuery.ajax( {
     method: "POST",
     url: form_vars['ajaxurl'],
@@ -328,14 +289,46 @@ function send_json_data(data, scope, success_callback)
       action: 'tlc_ttsurvey',
       nonce: form_vars['nonce'],
       query: 'admin/upload_survey_data',
-      scope: scope,
-      survey_data: data,
+      survey_data: json_data,
     },
     timeout: 15000, // milliseconds
     dataType: 'json',
-    success: success_callback,
+    success: handle_upload_response,
     error: handle_validation_failure,
   });
+}
+
+function handle_upload_response(response,status,jqHXR)
+{
+  console.log("handle_upload_response");
+  if(response.success) {
+    window.location.href = form_vars.overview;
+  } else {
+    handle_valiation_response(response);
+  }
+}
+
+/**
+ * submit/conform status
+ **/
+
+function disable_submit()
+{
+  console.log("disable_submit");
+  ce.submit.attr('disabled',true);
+  ce.confirm_upload.prop('checked',false).attr('disabled',true);
+}
+
+function enable_confirm()
+{
+  console.log("enable_confirm");
+  ce.confirm_upload.prop('checked',false).attr('disabled',false);
+}
+
+function enable_submit()
+{
+  console.log("enable_submit");
+  ce.submit.attr('disabled',false);
 }
 
 /**
@@ -347,9 +340,13 @@ jQuery(document).ready(
     ce.upload_form = $('#tlc-ttsurvey-admin form.data.upload');
     ce.json_data_file = ce.upload_form.find('#json-data-file');
     ce.load_json_trigger = ce.upload_form.find('#data-load');
-    ce.data_status = ce.upload_form.find('#data-status');
+    ce.data_file = ce.upload_form.find('#data-file');
     ce.json_data = ce.upload_form.find('#json-data');
     ce.validation_status = ce.upload_form.find('#validation-status');
+    ce.validation_warnings = ce.upload_form.find('.validation.warnings');
+    ce.validation_warnings_ul = ce.validation_warnings.find('ul');
+    ce.validation_errors = ce.upload_form.find('.validation.errors');
+    ce.validation_errors_ul = ce.validation_errors.find('ul');
     ce.confirm_upload = ce.upload_form.find('#confirm-upload');
     ce.submit = ce.upload_form.find('#data-upload');
 

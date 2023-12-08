@@ -89,7 +89,7 @@ function add_data_load()
   echo "<div class='header-box'>";
   echo "<input type='file' id='json-data-file'>";
   echo "<a id='data-load'>Load data from file</a>";
-  echo "<span id='data-status'>Info</span>";
+  echo "<span id='data-file'></span>";
   echo "</div>";
 
   echo "<div class='data-box'>";
