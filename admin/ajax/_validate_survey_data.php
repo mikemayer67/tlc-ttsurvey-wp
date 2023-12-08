@@ -45,6 +45,12 @@ function validate_survey_data($json_data)
     return add_error($findings,"survey data must be an associative array");
   }
 
+  foreach(['surveys','userids','responses'] as $key) {
+    if(!array_key_exists($key,$data)) {
+      $findings = add_warning($findings,"Contains no $key");
+    }
+  }
+
   foreach($data as $key=>$value)
   {
     log_dev("Validating $key data");
