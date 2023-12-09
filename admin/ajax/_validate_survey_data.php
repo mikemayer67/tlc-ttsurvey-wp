@@ -81,6 +81,13 @@ function validate_surveys($surveys,$findings)
       $findings = add_error($findings,$error);
       continue;
     }
+    if(!is_associative_array($data)) {
+      $findings = add_error($findings,"$name survery data must be an associative array");
+      continue;
+    }
+    if(!array_key_exists("post_id",$data)) {
+      $findings = add_error($findings,"$name survey is missing post_id");
+    }
   }
   return $findings;
 }
