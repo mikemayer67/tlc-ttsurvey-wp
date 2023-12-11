@@ -55,7 +55,7 @@ function add_data_dump()
   $href = plugin_url('admin/data_dump.php') . "?nonce=$nonce";
 
   $timestamp = date('YmdHis');
-  $dumpfile = "TimeAndTalentSurvey_data_$timestamp.json";
+  $dumpfile = "TimeAndTalentSurvey_data_$timestamp.tlctt";
 
   echo "<form class='data dump'>";
   echo "<div class='label'>Dump Survey Data</div>";
@@ -65,8 +65,8 @@ function add_data_dump()
   echo "  Note that this does <b>not</b> preserve plugin settings.";
   echo "</div>";
   echo "<div class='link-buttons'>";
-  echo "<div><a class='data' href='$href&pp=1' target='_blank'>View JSON data in new window</a></div>";
-  echo "<div><a class='data' href='$href' download='$dumpfile'>Download JSON data</a></div>";
+  echo "<div><a class='data' href='$href&pp=1' target='_blank'>View data dump in new window</a></div>";
+  echo "<div><a class='data' href='$href' download='$dumpfile'>Download data dump</a></div>";
   echo "</div>";
   echo "</div>"; // form-body
   echo "</form>";
