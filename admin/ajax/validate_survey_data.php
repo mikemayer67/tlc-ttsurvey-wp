@@ -10,10 +10,9 @@ $data = stripslashes($_POST['survey_data']);
 $checksum = $_POST['checksum'];
 $expected = hash('crc32b',$data);
 
-log_dev("expected: $expected");
-
 if($checksum !== $expected) {
-  return wp_send_json(array("bad_checksum"=>true));
+  log_warning("Invalid checksum for uploading data. Expected $expected. Found $checksum.");
+  return wp_send_json(array("vid"=>$vid, "bad_checksum"=>true));
 }
 
 $findings = validate_survey_data($data);

@@ -36,25 +36,25 @@ var ce = {};
  *
  * The DOM state is updated to reflect the current validaiton state.
  *   The validation factors that determine the state are:
- *   - isEmpty: no uploaded
+ *   - is_empty: no uploaded
  *   - in_progress: waiting on AJAX validation to complete
  *   - found_errors: validation found errors with the data
  *   - found_warnings: validation found potential issues with the data
  **/
 
 var validation = {
-  isEmpty: true,
+  is_empty: true,
   in_progress: false,
-  retrying: false;
-  complete: false;
+  retrying: false,
+  complete: false,
   found_errors: false,
   found_warnings: false,
   checksum: null,
 };
 
-function clear_data_file 
+function clear_data_file()
 {
-  validation.isEmpty = true;
+  validation.is_empty = true;
   validation.checksum = null;
   ce.json_data.val("");
   ce.data_file_name.html("");
@@ -63,10 +63,10 @@ function clear_data_file
   clear_acknowledgements();
 }
 
-function clear_findings 
+function clear_findings()
 {
   validation.found_errors = false;
-  validation.foundwArnings = false;
+  validation.found_warnings = false;
   ce.validation_warnings.find('ul').empty();
   ce.validation_errors.find('ul').empty();
 }
@@ -79,13 +79,12 @@ function clear_acknowledgements()
 
 function validate_json_data()
 {
-  console.log("validate_json_data");
   clear_findings();
   clear_acknowledgements();
   validation.in_progress = true;
   validation.complete = false;
   update_dom();
-
+  
   jQuery.ajax( {
     method: "POST",
     url: form_vars['ajaxurl'],
@@ -106,7 +105,6 @@ function validate_json_data()
 
 function handle_validation_response(response,status,jqHXR)
 {
-  console.log("handle_validation_response");
 
   validation.in_progress = false;
   validation.retrying = false;
@@ -116,6 +114,7 @@ function handle_validation_response(response,status,jqHXR)
     const filename = ce.data_file_name.html();
     alert(`Cannot load ${filename}: invalid checksum`);
     clear_data_file(); // will also clear findings
+    update_dom();
     return;
   }
 
@@ -141,7 +140,6 @@ function handle_validation_response(response,status,jqHXR)
 
 function handle_validation_failure(jqHXR,status,error)
 {
-  console.log("handle_validation_failure");
   validation.retrying = true;
   validate_json_data();
 }
@@ -153,7 +151,6 @@ function handle_validation_failure(jqHXR,status,error)
 
 async function handle_load_json_data(e)
 {
-  console.log("handle_load_json_data");
   e.preventDefault();
 
   const files = ce.data_file_input.prop('files');
@@ -165,34 +162,36 @@ async function handle_load_json_data(e)
   //   must have properly formatted JSON data
 
   if(files.length == 0) { return }
-  const file = files[0]
+  const file = files[0];
+
+  ce.data_file_input.val('');
 
   if(file.size > 5*1024*1024) {
-    alert(`Cannot load ${file.name} (too big)`);
+    handle_bad_file(`Cannot load ${file.name} (too big)`);
     return;
   }
 
   const tlctt = await file.text();
   const eol = tlctt.indexOf("\n");
   if(eol<0) {
-    alert(`Cannot load ${file.name}: missing signature line`);
+    handle_bad_file(`Cannot load ${file.name}: missing signature line`);
     return;
   }
   const firstLine = tlctt.substring(0,eol);
   const eos = firstLine.indexOf(":");
   if(eos < 0) {
-    alert(`Cannot load ${file.name}: invalid signature line`);
+    handle_bad_file(`Cannot load ${file.name}: invalid signature line`);
     return;
   }
   const signature = firstLine.substring(0,eos);
   if( signature !== "tlctt") {
-    alert(`Cannot load ${file.name}: invalid signature`);
+    handle_bad_file(`Cannot load ${file.name}: invalid signature`);
     return;
   }
 
   const json = tlctt.substring(eol+1);
   if(json.length == 0) {
-    alert(`Cannot load ${file.name}: no survey data`);
+    handle_bad_file(`Cannot load ${file.name}: no survey data`);
     return;
   }
 
@@ -200,20 +199,25 @@ async function handle_load_json_data(e)
     const data = JSON.parse(json);
   }
   catch(e) {
-    alert(`Cannot load ${file.name}: invalid JSON data`);
+    handle_bad_file(`Cannot load ${file.name}: invalid JSON data`);
     return;
   }
 
   // add the data to the form and begin AJAX validation
 
-  validation.isEmpty = false;
+  validation.is_empty = false;
   validation.checksum = firstLine.substring(eos+1);
 
   ce.json_data.val(json.trim());
-  ce.data_file_input.val('');
   ce.data_file_name.html(file.name);
 
   validate_json_data();
+}
+
+function handle_bad_file(error)
+{
+  alert(error);
+
 }
 
 /**
@@ -222,7 +226,6 @@ async function handle_load_json_data(e)
 
 function handle_submit(e)
 {
-  console.log("handle_submit");
   e.preventDefault();
 
   validation.in_progress = true;
@@ -234,7 +237,7 @@ function handle_submit(e)
       action: 'tlc_ttsurvey',
       nonce: form_vars['nonce'],
       query: 'admin/upload_survey_data',
-      survey_data: ce.json_data.val();
+      survey_data: ce.json_data.val(),
     },
     timeout: 15000, // milliseconds
     dataType: 'json',
@@ -245,7 +248,6 @@ function handle_submit(e)
 
 function handle_submit_response(response,status,jqHXR)
 {
-  console.log("handle_submit_response");
   validation.in_progress = false;
   if(response.success) {
     window.location.href = form_vars.overview;
@@ -256,7 +258,6 @@ function handle_submit_response(response,status,jqHXR)
 
 function handle_submit_failure(jqHXR,status,error)
 {
-  console.log("handle_submit_failure");
   validation.in_progress = false;
   alert("No response from server");
   clear_data_file();
@@ -267,36 +268,12 @@ function handle_submit_failure(jqHXR,status,error)
  * DOM management
  **/
 
-// function disable_submit()
-// {
-//   console.log("disable_submit");
-//   ce.submit.attr('disabled',true);
-//   ce.confirm_upload.prop('checked',false).attr('disabled',true);
-// }
-// 
-// function enable_confirm()
-// {
-//   console.log("enable_confirm");
-//   ce.confirm_upload.prop('checked',false).attr('disabled',false);
-// }
-
 function update_dom()
 {
-//  ce.validation_warnings.hide();
-//  ce.validation_errors.hide();
-//  ce.validation_warnings.find('ul').empty();
-//  ce.validation_errors.find('ul').empty();
-//
-//  console.log("finalize_validation");
-//
-//
-//
-//  enable_confirm();
-  
   // validaiton status
   ce.validation_status.removeClass(['validating','retry']);
   if(validation.in_progress) {
-    ce.validation_status..html('validating').addClass('validating');
+    ce.validation_status.html('validating').addClass('validating');
     if(validation.retrying) {
       ce.validation_status.html('reattempting validation').addClass('retry');
     }
@@ -304,30 +281,30 @@ function update_dom()
 
   // json_body
   ce.json_data.removeClass(['warning','error','dirty']);
-  if(validation.in_progress)    { ce.validation.addClass('dirty');   }
-  if(validation.found_warnings) { ce.validation.addClass('warning'); }
-  if(validation.found_errors)   { ce.validation.addClass('error');   }
+  if(validation.in_progress)    { ce.json_data.addClass('dirty');   }
+  if(validation.found_warnings) { ce.json_data.addClass('warning'); }
+  if(validation.found_errors)   { ce.json_data.addClass('error');   }
 
   // warnings and errors
-  if(validtion.found_warnings) {
+  if(validation.found_warnings) {
     ce.validation_warnings.show();
   } else {
     ce.validation_warnings.hide();
   }
-  if(validtion.found_errors) {
+  if(validation.found_errors) {
     ce.validation_errors.show();
   } else {
-    ce.validation_warnings.hide();
+    ce.validation_errors.hide();
   }
 
   // acknowlege checkboxes
-  if(!validation.complete) {
+  if(validation.is_empty || !validation.complete) {
     ce.acknowledge_upload.hide();
     ce.acknowledge_warnings.hide();
   }
   else {
     ce.acknowledge_upload.show();
-    if(validation.has_warnings) {
+    if(validation.found_warnings) {
       ce.acknowledge_warnings.show();
     } else {
       ce.acknowledge_warnings.hide();
@@ -336,53 +313,17 @@ function update_dom()
 
   // submit button
   var ok_to_submit = false;
-  if(validation_complete && !validation.has_errors) {
+  if(validation.complete && !validation.found_errors) {
     const upload_acknowledged = ce.acknowledge_upload_cb.prop('checked');
     if(upload_acknowledged) {
-      if(validation.has_warnings) {
-        ok_to_submit = ce.acknowledge_upload_cb.prop('checked');
+      if(validation.found_warnings) {
+        ok_to_submit = ce.acknowledge_warnings_cb.prop('checked');
       } else {
         ok_to_submit = true;
       }
     }
   }
-
-
-  switch(validationState) {
-    case ValidationState.NO_DATA:
-      ce.submit.attr('disabled',true);
-      ce.validation_warnings.hide();
-      ce.validation_errors.hide();
-      ce.acknowledge_upload.hide();
-      ce.acknowledge_warnings.hide();
-      break;
-    case ValidationState.VALIDATING:
-      ce.submit.attr('disabled',true);
-      ce.validation_warnings.hide();
-      ce.validation_errors.hide();
-      ce.acknowledge_upload_box.hide();
-      ce.acknowledge_warnings.hide();
-      break;
-    case ValidationState.HAS_ERRORS:
-      ce.submit.attr('disabled',true);
-      ce.validation_warnings.hide();
-      ce.validation_errors.hide();
-      ce.acknowledge_upload_box.hide();
-      ce.acknowledge_warnings.hide();
-      break;
-    case ValidationState.HAS_WARNINGS:
-      const acknowledged = upload_acknowledged && warnings_acknowledged;
-      ce.submit.attr('disabled',!acknowledged);
-      ce.acknowledge_upload_box.show();
-      ce.acknowledge_warnings.show();
-      break;
-    case ValidationState.VALIDATED:
-      const acknowledged = upload_acknowledged;
-      ce.submit.attr('disabled',!acknowledged);
-      ce.acknowledge_upload_box.show();
-      ce.acknowledge_warnings.hide();
-      break;
-  }
+  ce.submit.attr('disabled',!ok_to_submit);
 }
 
 /**
@@ -408,12 +349,14 @@ jQuery(document).ready(
 
     data_load_link.on('click',function(e) {
       e.preventDefault();
-      if(!validation.in_progress) { ce.data_file.click(); }
+      if(!validation.in_progress) { ce.data_file_input.click(); }
     });
 
     ce.data_file_input.on('change',handle_load_json_data);
     ce.acknowledge_upload.on('change',update_dom);
     ce.acknowledge_warnings.on('change',update_dom);
     ce.submit.on('click',handle_submit);
+
+    update_dom();
   }
 );
