@@ -87,13 +87,13 @@ function add_data_load()
   echo "</div>";
 
   echo "<div class='header-box'>";
-  echo "<input type='file' id='json-data-file'>";
+  echo "<input type='file' id='data-file-input' accept='.tlctt'>";
   echo "<a id='data-load'>Load data from file</a>";
-  echo "<span id='data-file'></span>";
+  echo "<span id='data-file-name'></span>";
   echo "</div>";
 
   echo "<div class='data-box'>";
-  echo "<textarea id='json-data' name='json_data' rows=20 placeholder='New Survey Data'>";
+  echo "<textarea id='json-data' name='json_data' rows=20 placeholder='New Survey Data' readonly>";
   echo "</textarea>";
   echo "<div id='validation-status'>validating</div>";
   echo "</div>";
@@ -108,8 +108,14 @@ function add_data_load()
   echo "</div>";
 
   echo "<div class='button-box'>";
-  echo "<input type='checkbox' id='confirm-upload'>";
-  echo "<label for'confirm-upload'>I acknowledge that I am aware this will reset <b>all</b> data for <b>all</b> surveys</label>";
+  echo "<div class='ack-box'>";
+  echo "<div id='acknowledge-upload'>";
+  echo "<input type='checkbox' id='ack-upload-cb'>";
+  echo "<label for'ack-upload-cb'>I acknowledge that this will reset <b>all</b> data for <b>all</b> surveys</label>";
+  echo "</div><div id='acknowledge-warnings'>";
+  echo "<input type='checkbox' id='ack-warnings-cb'>";
+  echo "<label for'ack-warnings-cb'>I acknowledge there are potential issues with the survey data</label>";
+  echo "</div></div>";
   echo "<input type='button' id='data-upload' class='button button-primary' value='Upload Survey Data' disabled>";
   echo "</div>";
 

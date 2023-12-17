@@ -443,7 +443,7 @@
   margin: 0 0 0 1em;
 }
 
-#tlc-ttsurvey-admin form.data.upload #json-data-file {
+#tlc-ttsurvey-admin form.data.upload #data-file-input {
   display:none;
 }
 
@@ -453,7 +453,7 @@
   cursor:pointer;
 }
 
-#tlc-ttsurvey-admin form.data.upload #data-file {
+#tlc-ttsurvey-admin form.data.upload #data-file-name {
   display:inline-block;
   float:right;
   margin-left:auto;
@@ -554,10 +554,6 @@
   margin-top:8px;
   display:flex;
   align-items:center;
-}
-
-#confirm-upload:disabled + label {
-  color:var(--disabled-color);
 }
 
 #tlc-ttsurvey-admin form.data.upload .button-box label {
