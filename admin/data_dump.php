@@ -25,6 +25,9 @@ $data = json_encode(
   ),
   JSON_PRETTY_PRINT
 );
+$checksum = hash('crc32b',$data);
+
+$data = "tlctt:$checksum\n$data";
 
 if($_GET['pp']??false) {
   echo "<pre>$data</pre>";
