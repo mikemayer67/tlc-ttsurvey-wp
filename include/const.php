@@ -35,6 +35,7 @@ const SURVEY_IS_DRAFT = 'draft';
 const SURVEY_IS_ACTIVE = 'active';
 const SURVEY_IS_CLOSED = 'closed';
 const SURVEY_POST_TYPE = 'tlc-ttsurvey-form';
+const SURVEY_STATUS_VALUES = array('draft','active','closed');
 
 const SENDMAIL_TEMPLATES = array(
   'welcome' => array(
