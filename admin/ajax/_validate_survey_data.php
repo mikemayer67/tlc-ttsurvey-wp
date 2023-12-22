@@ -175,8 +175,6 @@ function validate_content_sendmail($findings,$name,$sendmail)
   return $findings;
 }
 
-// Validation of user data
-
 function validate_survey_status($name,$survey,$findings)
 {
   if(!array_key_exists("status",$survey)) {
@@ -189,7 +187,7 @@ function validate_survey_status($name,$survey,$findings)
   return $findings;
 }
 
-// Validation of user responses
+// Validation of user data
 
 function validate_userids($userids,$findings)
 {
@@ -214,6 +212,8 @@ function validate_userid_and_data($findings, $userid, $data)
   }
   return $findings;
 }
+
+// Validation of user responses
 
 function validate_responses($data,$findings)
 {

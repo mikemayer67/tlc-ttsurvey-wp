@@ -1,8 +1,6 @@
 <?php
 namespace TLC\TTSurvey;
 
-require_once plugin_path('include/users.php');
-
 function adjust_and_validate_user_input($key,&$value,&$error=null)
 {
   $value = adjust_user_input($key,$value);
@@ -68,11 +66,6 @@ function validate_user_input($key,$value,&$error=null)
     elseif(!preg_match("/^[a-zA-Z][a-zA-Z0-9]+$/",$value)) {
       $error = "letters/numbers only";
     }
-    if(!is_userid_available($value))
-    {
-      $error = 'already in use';
-    }
-    
   }
   elseif($key=='password')
   {

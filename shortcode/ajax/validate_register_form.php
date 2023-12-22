@@ -5,19 +5,29 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
+require_once plugin_path('include/users.php');
 
 $response = array();
+
 $keys = array("userid","password","fullname","email");
 foreach( $keys as $key )
 {
   $value = adjust_user_input($key,$_POST[$key]);
-  if($value) {
-    $error = '';
-    if(!validate_user_input($key,$value,$error)) {
-      $response[$key] = $error;
+  if(!$value) {
+    if($key != "email") {
+      $response[$key] = "#empty";
     }
-  } elseif($key != "email") {
-    $response[$key] = '#empty';
+    continue;
+  }
+
+  $error = '';
+  if(!validate_user_input($key,$value,$error)) {
+    $response[$key] = $error;
+    continue;
+  }
+
+  if($key == "userid" && !is_userid_available($value)) {
+    $response[$key] = "already in use";
   }
 }
 
