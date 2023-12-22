@@ -366,11 +366,12 @@ function dump_all_survey_data()
   $data = array();
   foreach($posts as $post)
   {
+    $content = json_decode($post->post_content,true);
     $id = $post->ID;
-    $name = $post->post_title;
-    $data[$name] = array(
-      'post_id' => $id,
-      'content' => json_decode($post->post_content,true),
+    $data[] = array(
+      'name' => $post->post_title,
+      'post_id' => $post->ID,
+      'content' => $content,
       'responses' => get_post_meta($id,'responses')[0] ?? 0,
       'status' => get_post_meta($id,'status')[0] ?? '',
     );

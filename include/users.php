@@ -437,7 +437,8 @@ class User {
       $id = $post->ID;
       $userid = $post->post_title;
       if($userid != ANON_USERID) {
-        $data[$userid] = array(
+        $data[] = array(
+          'userid' => $userid,
           'post_id' => $id,
           'content' => json_decode($post->post_content,true),
           'anonid' => get_post_meta($id,'anonid')[0] ?? '',

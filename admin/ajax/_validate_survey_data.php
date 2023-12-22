@@ -7,6 +7,34 @@ require_once plugin_path('include/logger.php');
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/validation.php');
 
+const VALIDATION_SCHEMA = [ 'type'=>'hash', 'required'=>true, 'keys'=>[
+  'surveys' => [ 'type'=>'hashlist', 'required'=>true, 'keys'=>[
+    'name' =>     [ 'type'=>'string',  'required' => true, 'validate'=>'survey_name'    ],
+    'post_id' =>  [ 'type'=>'integer', 'required'=>true                                 ],
+    'status' =>   [ 'type'=>'enum',    'required'=>true, 'values'=>SURVEY_STATUS_VALUES ],
+    'response' => [ 'type'=>'integer', 'required'=>false                                ],
+    'content' =>  [ 'type'=>'hash',    'required'=>false, 'keys'=>[
+      'survey' =>   [ 'type'=>'string',  'required'=>false, 'validate'=>'survey_form' ],
+      'sendmail' => [ 'type'=>'hash',    'required'=>false, 'keys'=>[
+        'welcome' =>  [ 'type'=>'string',  'required'=>false, 'validate'=>'markdown' ],
+        'recovery' => [ 'type'=>'string',  'required'=>false, 'validate'=>'markdown' ],
+      ]],
+    ]],
+  ]],
+  'userids' => [ 'type'=>'hashlist',  'required'=>true, 'keys'=>[
+    'userid' =>  [ 'type'=>'string',  'required'=>true, 'validate'=>'userid' ],
+    'post_id' => [ 'type'=>'integer', 'required'=>true                       ],
+    'anonid' =>  [ 'type'=>'string',  'required'=>true, 'validate'=>'anonid' ],
+    'content' => [ 'type'=>'hash',    'required'=>true, 'keys'=>[
+      'pw_hash' =>      [ 'type'=>'string', 'required'=>true,  'validate'=>'pw_hash'  ],
+      'fullname' =>     [ 'type'=>'string', 'required'=>true,  'validate'=>'fullname' ],
+      'access_token' => [ 'type'=>'string', 'required'=>false, 'validate'=>'token'    ],
+    ]],
+  ]],
+  'responses' => [ 'type'=>'hashlist', 'required'=>false, 'keys'=>[
+  ]],
+]];
+
 // Support functions
 
 function is_associative_array($x)
