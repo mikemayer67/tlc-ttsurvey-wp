@@ -4,7 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('include/surveys.php');
+require_once plugin_path('include/validation.php');
 
 // validate the survey itelf:
 //   for now, simply valid yaml... eventually recognized survey structure

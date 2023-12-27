@@ -4,7 +4,7 @@ namespace TLC\TTSurvey;
 if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/logger.php');
-require_once plugin_path('admin/ajax/survey_data_validation.php');
+require_once plugin_path('include/validation.php');
 
 $data = stripslashes($_POST['survey_data']);
 $checksum = $_POST['checksum'];
