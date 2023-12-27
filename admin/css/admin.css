@@ -558,7 +558,14 @@
 
 #tlc-ttsurvey-admin form.data.upload .button-box label {
   font-weight:500;
+}
+
+#tlc-ttsurvey-admin #acknowledge-upload label {
   color:var(--error-color);
+}
+
+#tlc-ttsurvey-admin #acknowledge-warnings label {
+  color:var(--warning-color);
 }
 
 #tlc-ttsurvey-admin form.data.upload .button-box #data-upload {

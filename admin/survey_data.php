@@ -109,13 +109,15 @@ function add_data_load()
 
   echo "<div class='button-box'>";
   echo "<div class='ack-box'>";
+  echo "<div id='acknowledge-warnings'>";
+  echo "<input type='checkbox' id='ack-warnings-cb'>";
+  echo "<label for'ack-warnings-cb'>I acknowledge there are potential issues with the survey data</label>";
+  echo "</div>";
   echo "<div id='acknowledge-upload'>";
   echo "<input type='checkbox' id='ack-upload-cb'>";
   echo "<label for'ack-upload-cb'>I acknowledge that this will reset <b>all</b> data for <b>all</b> surveys</label>";
-  echo "</div><div id='acknowledge-warnings'>";
-  echo "<input type='checkbox' id='ack-warnings-cb'>";
-  echo "<label for'ack-warnings-cb'>I acknowledge there are potential issues with the survey data</label>";
-  echo "</div></div>";
+  echo "</div>";
+  echo "</div>";
   echo "<input type='button' id='data-upload' class='button button-primary' value='Upload Survey Data' disabled>";
   echo "</div>";
 

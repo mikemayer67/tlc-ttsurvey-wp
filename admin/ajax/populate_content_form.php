@@ -27,7 +27,7 @@ foreach( SENDMAIL_TEMPLATES as $key=>$template ) {
   $custom_content = $content['sendmail'][$key] ?? '';
   $sendmail[$key] = $custom_content;
   $message_data = $template['demo_data'];
-  $message_data['title'] = get_post($pid)->post_title;
+  $message_data['title'] = $post->post_title;
   $preview[$key] = sendmail_render_message(
     $key,
     stripslashes($custom_content),

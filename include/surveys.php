@@ -218,11 +218,11 @@ function survey_response_count($post_id)
   return get_post_meta($post_id,'responses') ?? 0;
 }
 
-function survey_form($post_id)
+function survey_content($post_id)
 {
   if(!$post_id) { return null; }
   $post = get_post($post_id);
-  return $post->content;
+  return json_decode($post->content,true);
 }
 
 function reopen_survey($post_id)
