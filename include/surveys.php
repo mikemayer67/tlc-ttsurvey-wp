@@ -113,147 +113,194 @@ add_action('edit_form_top',ns('survey_edit_form_top'));
 add_action('wp_'.SURVEY_POST_TYPE.'_revisions_to_keep',ns('survey_revisions_to_keep'));
 
 /**
- * Survey lookup functions
+ * Survey and Catalog classes
  **/
 
-function get_survey_post_id($name)
+class Survey
 {
-  $ids = get_posts(
-    array(
-      'post_type' => SURVEY_POST_TYPE,
-      'numberposts' => -1,
-      'title' => $name,
-      'fields' => 'ids',
-    )
-  );
-  if(count($ids) > 1) {
-    # log error both to the plugin log and to the php error log
-    log_error("Multiple posts associated with $name survey");
-    wp_die();
-  }
-  if(!$ids) { 
-    log_info("No post found for name '$name'");
-    return null;
-  }
-  return $ids[0];
-}
+  private $_post_id = null;
+  private $_name = null;
+  private $_status = null;
+  private $_last_modified = null;
+  private $_content = null;
 
-function get_survey_post_by_name($name)
-{
-  $post_id = get_survey_post_id($name);
-  return get_survey_post_by_id($post_id);
-}
-
-function get_survey_post_by_id($post_id)
-{
-  if($post_id) {
-    return get_post($post_id);
-  } else {
-    return null;
-  }
-}
-
-function survey_catalog()
-{
-  $posts = get_posts(
-    array(
-      'post_type' => SURVEY_POST_TYPE,
-      'numberposts' => -1,
-    )
-  );
-  $rval = array();
-  foreach( $posts as $post ) {
-    $name = $post->post_title;
-    $post_id = $post->ID;
-    if( array_key_exists($name,$rval) ) {
-      log_error("Multiple posts associated with name '$name'");
+  private function __construct($post)
+  {
+    if($post->post_type != SURVEY_POST_TYPE) {
+      log_error("Attempted to construct survey from non-survey post ($post->ID)");
       wp_die();
     }
 
-    $status = get_post_meta($post_id,'status') ?? null;
-    if($status) {
-      if(count($status) > 1) {
-        log_error("Multiple statuses associated with $name survey");
-        wp_die();
-      }
-      $status = $status[0];
+    $this->_post_id = $post_id = $post->ID;
+    $this->_name = $name = $post->post_title;
+
+    $status = get_post_meta($post->ID,'status') ?? null;
+    if(!$status) {
+      log_error("Survey $name is missing status metadata");
+      wp_die();
     }
-    $rval[$post_id] = array(
-      'post_id'=>$post_id, 
-      'name'=>$name, 
-      'status'=>$status,
-      'last_modified'=>get_post_modified_time('U',true,$post),
+    if(count($status)>1) {
+      log_error("Survey $name has multiple status entries in the metadata");
+      wp_die();
+    }
+    $this->_status = $status[0];
+
+    $this->_last_modified = get_post_modified_time('U',true,$post);
+  }
+
+  public static function from_name($name)
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => SURVEY_POST_TYPE,
+        'numberposts' => -1,
+        'title' => $name,
+      )
     );
+    if(!$posts) {
+      log_info("No survey found with name '$name'");
+      return null;
+    }
+    if(count($posts)>1) {
+      log_error("Multiple surveys found with name '$name'");
+      wp_die();
+    }
+
+    return new Survey($posts[0]);
   }
 
-  return $rval;
+  public static function from_post_id($post_id)
+  {
+    if(!$post_id) { return null; }
+    return new Survey(get_post($post_id));
+  }
+
+  public static function from_post($post)
+  {
+    if(!$post) { return null; }
+    return new Survey($post);
+  }
+
+  // getters
+
+  public function post_id()       { return $this->_post_id;       }
+  public function name()          { return $this->_name;          }
+  public function status()        { return $this->_status;        }
+  public function last_modified() { return $this->_last_modified; }
+
+  // the following assumes that there is only one survey that is either draft or active
+  public function is_draft()   { return $this->_status == SURVEY_IS_DRAFT;  }
+  public function is_active()  { return $this->_status == SURVEY_IS_ACTIVE; }
+  public function is_closed()  { return $this->_status == SURVEY_IS_CLOSED; }
+  public function is_current() { return ! $this->is_closed();               }
+
+  public function response_count()
+  {
+    return get_post_meta($this->_post_id,'responses') ?? 0;
+  }
+
+  public function content()
+  {
+    if(!$this->_content) {
+      $post = get_post($this->_post_id);
+      $json = $post->content;
+      $this->_content = json_decode($json,true);
+    }
+    return $this->_content;
+  }
+
+  // state handling
+
+  public function reopen() {
+    $catalog = SurveyCatalog::instance();
+
+    $current = $catalog->current_survey();
+    if($current) {
+      $curname = $current->name();
+      if($current->status() == SURVEY_IS_ACTIVE) {
+        log_error("Attempting to reopen $this->_name survey when $curname survey is already open");
+      } else {
+        log_error("Attempting to reopen $this->_name survey when draft $curname survey exists");
+      }
+      return false;
+    }
+
+    update_post_meta($this->_post_id,'status',SURVEY_IS_ACTIVE);
+    log_info("Survey $this->_name ($this->_post_id) reopened");
+
+    $catalog->set_current($this);
+
+    return true;
+  }
 }
 
-function current_survey()
+class SurveyCatalog
 {
-  $rval = null;
-  $catalog = survey_catalog();
-  foreach($catalog as $post_id=>$survey) {
-    if( in_array($survey['status'],[SURVEY_IS_ACTIVE,SURVEY_IS_DRAFT]) )
-    {
-      if($rval) {
-        error_log("Multiple active/draft surveys found");
+  // catalog singleton
+  private static $_instance = null;
+
+  public static function instance()
+  {
+    if(!self::$_instance) { self::$_instance = new SurveyCatalog(); }
+    return self::$_instance;
+  }
+
+  // catalog instance
+  private $_index = array();
+  private $_current = null;
+
+  private function __construct()
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => SURVEY_POST_TYPE,
+        'numbrerposts' => -1,
+      )
+    );
+    foreach( $posts as $post ) {
+      $survey = Survey::from_post($post);
+      $name = $survey->name;
+      if( array_key_exists($name,$index) ) {
+        log_error("Multiple surveys found with name '$name'");
         wp_die();
       }
-      $rval = $survey;
+      $index[$post->ID] = $survey;
+
+      if($survey->is_current()) {
+        if($this->_current) {
+          log_error("Multiple open surveys found");
+          wp_die();
+        }
+        $this->_current = $survey;
+      }
     }
   }
-  return $rval;
-}
 
-function active_survey()
-{
-  $rval = current_survey();
-  if($rval && $rval['status']==SURVEY_IS_ACTIVE) { return $rval; }
-  return null;
-}
+  public function current_survey() { 
+    return $this->_current; 
+  }
 
-function survey_response_count($post_id)
-{
-  return get_post_meta($post_id,'responses') ?? 0;
-}
-
-function survey_content($post_id)
-{
-  if(!$post_id) { return null; }
-  $post = get_post($post_id);
-  return json_decode($post->content,true);
-}
-
-function reopen_survey($post_id)
-{
-  $current = current_survey();
-  if($current) {
-    $name = $current['name'];
-    $status = $current['status'];
-    if($status == SURVEY_IS_ACTIVE) {
-      log_error("Attempted to reopen survey when $name is already open");
+  public function set_current($survey) {
+    if($this->_current) {
+      if($this->_current->post_id() != $survey->post_id()) {
+        log_error("Can only have one current survey at a time");
+        wp_die();
+      }
     } else {
-      log_error("Attempted to reopen survey when draft $name exists");
+      $this->_current = $survey;
     }
-    return null;
   }
-  $post = get_post($post_id);
-  if(!$post) {
-    log_error("Attempted to reopen nonexistent survey ($post_id)");
-    return null;
-  }
-  if($post->post_type != SURVEY_POST_TYPE) {
-    log_error("Post $post_id is not a survey post");
+
+  public function active_survey() {
+    if($this->_current && $this->_current->is_active()) { return $this->_current; }
     return null;
   }
 
-  update_post_meta($post_id,'status',SURVEY_IS_ACTIVE);
-
-  log_info("Suvey $name ($post_id) reopened");
-
-  return true;
 }
+
+/**
+ * Survey lookup functions
+ **/
 
 function create_new_survey($name)
 {
