@@ -299,12 +299,12 @@ class SurveyCatalog
     );
     foreach( $posts as $post ) {
       $survey = Survey::from_post($post);
-      $name = $survey->name;
-      if( array_key_exists($name,$index) ) {
+      $name = $survey->name();
+      if( array_key_exists($name,$this->_index) ) {
         log_error("Multiple surveys found with name '$name'");
         wp_die();
       }
-      $index[$post->ID] = $survey;
+      $this->_index[$post->ID] = $survey;
 
       if($survey->is_current()) {
         if($this->_current) {
@@ -314,6 +314,11 @@ class SurveyCatalog
         $this->_current = $survey;
       }
     }
+  }
+
+  public function lookup_by_post_id($post_id)
+  {
+    return $this->_index[$post_id] ?? null;
   }
 
   public function current_survey() 
@@ -351,7 +356,7 @@ class SurveyCatalog
   public function create_new_survey($name)
   {
     if( $this->_current ) {
-      $cur_name  $this->_current->name();
+      $cur_name = $this->_current->name();
       log_error("Cannot create new survey with existing $cur_name survey open");
       wp_die();
     }
@@ -362,6 +367,28 @@ class SurveyCatalog
     }
     $post_id = $survey->post_id();
     $this->index[$post_id] = $survey;
+  }
+
+  public function closed_surveys($newest_to_oldest=true)
+  {
+    $post_ids = array_keys($this->_index);
+    if($newest_to_oldest) { rsort($post_ids); }
+    else                  {  sort($post_ids); }
+    $closed = array();
+    foreach($post_ids as $post_id) {
+      $survey = $this->_index[$post_id];
+      if($survey->is_closed()) { $closed[] = $survey; }
+    }
+    return $closed;
+  }
+
+  public function survey_names()
+  {
+    $names = array();
+    foreach($this->_index as $survey) {
+      $names[] = $survey->name();
+    }
+    return $names;
   }
 
   // update status from admin tabs

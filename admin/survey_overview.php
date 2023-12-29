@@ -19,21 +19,23 @@ echo "</div>";
 
 function add_tlc_settings_overview()
 {
-  $current = current_survey();
   echo "<table>";
-  add_current_survey_overview($current);
-  add_past_survey_overview($current);
+  add_current_survey_overview();
+  add_past_survey_overview();
   add_admins_overview();
   add_survey_url();
   add_advanced();
   echo "</table>";
 }
 
-function add_current_survey_overview($current)
+function add_current_survey_overview()
 {
+  $catalog = SurveyCatalog::instance();
+  $current = $catalog->current_survey();
+
   if($current) {
-    $name = $current['name'];
-    $status = $current['status'];
+    $name = $current->name();
+    $status = $current->status();
   } else {
     $name = "None";
     $status = "(create/reopen one on the Content tab)";
@@ -52,28 +54,21 @@ function add_current_survey_overview($current)
   echo "</tr>";
 }
 
-function add_past_survey_overview($current)
+function add_past_survey_overview()
 {
   echo "<tr>";
   echo "  <td class='label'>Past Surveys</td>";
   echo "  <td class='value'>";
   echo "    <table>";
 
-  $catalog = survey_catalog();
-  if($catalog) {
-    $current_name = $current['name']??null;
-    $others = array();
-    foreach($catalog as $post_id=>$survey) {
-      $name = $survey['name'];
-      $status = $survey['status'];
-      if(strcmp($current_name,$name)!=0) { $others[$name] = $status; }
-    }
-    krsort($others);
-
-    foreach($others as $name=>$status) {
+  $catalog = SurveyCatalog::instance();
+  $surveys = $catalog->closed_surveys();
+  if($surveys) {
+    foreach( $surveys as $survey ) {
+      $name = $survey->name();
+      $status = $survey->status();
       echo "<tr><td class='name'>$name</td><td class='value'>$status</td></tr>";
     }
-
   } else {
     echo "<tr><td class='name'>n/a</td></tr>";
   }
