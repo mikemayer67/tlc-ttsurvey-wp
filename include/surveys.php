@@ -181,6 +181,30 @@ class Survey
     return new Survey($post);
   }
 
+  public static function create_new($name)
+  {
+    $post_id = wp_insert_post(
+      array(
+        'post_content' => '',
+        'post_title' => $name,
+        'post_type' => SURVEY_POST_TYPE,
+        'post_status' => 'publish',
+      ),
+      true,
+    );
+    if(!$post_id) {
+      log_warning("Failed to insert new $name survey into posts");
+      wp_die();
+    }
+
+    update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
+    update_post_meta($post_id,'responses',0);
+
+    log_info("Created new $name survey");
+
+    return Survey::from_post_id($post_id);
+  }
+
   // getters
 
   public function post_id()       { return $this->_post_id;       }
@@ -211,28 +235,44 @@ class Survey
 
   // state handling
 
-  public function reopen() {
-    $catalog = SurveyCatalog::instance();
+  public function set_status($status) 
+  {
+    $this->_status = $status;
+    update_post_meta($this->_post_id,'status',$status);
+  }
 
-    $current = $catalog->current_survey();
-    if($current) {
-      $curname = $current->name();
-      if($current->status() == SURVEY_IS_ACTIVE) {
-        log_error("Attempting to reopen $this->_name survey when $curname survey is already open");
-      } else {
-        log_error("Attempting to reopen $this->_name survey when draft $curname survey exists");
-      }
+  // update status from admin tabs
+
+  public function update_content($survey,$sendmail)
+  {
+    $content = array();
+    $content['survey'] = $survey;
+    foreach( $sendmail as $key=>$template ) {
+      $content['sendmail'][$key] = $template;
+    }
+
+    $rval = wp_update_post(
+      array(
+        'ID' => $this->_post_id,
+        'post_content' => wp_slash(json_encode($content)),
+      )
+    );
+
+    if(!$rval) 
+    {
+      log_warning("Failed to update content for $this->_name survey"); 
       return false;
     }
 
-    update_post_meta($this->_post_id,'status',SURVEY_IS_ACTIVE);
-    log_info("Survey $this->_name ($this->_post_id) reopened");
+    wp_save_post_revision($this->post_id);
 
-    $catalog->set_current($this);
+    log_info("Content updated for $this->_name survey");             
+    $this->_content = $content;
 
     return true;
   }
 }
+
 
 class SurveyCatalog
 {
@@ -276,125 +316,107 @@ class SurveyCatalog
     }
   }
 
-  public function current_survey() { 
+  public function current_survey() 
+  { 
     return $this->_current; 
   }
 
-  public function set_current($survey) {
-    if($this->_current) {
-      if($this->_current->post_id() != $survey->post_id()) {
-        log_error("Can only have one current survey at a time");
-        wp_die();
-      }
-    } else {
-      $this->_current = $survey;
-    }
-  }
-
-  public function active_survey() {
+  public function active_survey() 
+  {
     if($this->_current && $this->_current->is_active()) { return $this->_current; }
     return null;
   }
 
-}
+  public function reopen($survey) 
+  {
+    $new_name = $survey->name();
+    if( $this->_current ) {
+      $cur_name = $this->_current->name();
+      if( $this->_current->post_id() == $survey->post_id() ) { return true; }
 
-/**
- * Survey lookup functions
- **/
-
-function create_new_survey($name)
-{
-  $current = current_survey();
-  if($current) {
-    $name = $current['name'];
-    $status = $current['status'];
-    if($status == SURVEY_IS_ACTIVE) {
-      log_error("Attempted to create survey when $name is already open");
-    } else {
-      log_error("Attempted to create survey when draft $name exists");
+      if( $this->_current->status() == SURVEY_IS_ACTIVE ) {
+        log_error("Attempting to reopen $new_name survey when $cur_name survey is already open");
+      } else {
+        log_error("Attempting to reopen $new_name survey when draft $cur_name survey exists");
+      }
+      return false;
     }
-    return null;
+
+    $survey->set_status(SURVEY_IS_ACTIVE);
+    $this->_current = $survey;
+
+    return true;
   }
 
-  $post_id = wp_insert_post(
-    array(
-      'post_content' => '',
-      'post_title' => $name,
-      'post_type' => SURVEY_POST_TYPE,
-      'post_status' => 'publish',
-    ),
-    true,
-  );
-  if(!$post_id) {
-    log_warning("Failed to insert new survey into wp_posts");
-    return null;
+  public function create_new_survey($name)
+  {
+    if( $this->_current ) {
+      $cur_name  $this->_current->name();
+      log_error("Cannot create new survey with existing $cur_name survey open");
+      wp_die();
+    }
+    $survey = Survey::create_new($name);
+    if(!$survey) {
+      log_warning("Failed to insert new $name survey into posts");
+      wp_die();
+    }
+    $post_id = $survey->post_id();
+    $this->index[$post_id] = $survey;
   }
 
-  update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
-  update_post_meta($post_id,'responses',0);
+  // update status from admin tabs
 
-  log_info("Created new survey $name");
+  public function update_status($status)
+  {
+    if(!$status) { return; false; }
 
-  return true;
+    $current = $this->_current;
+    if(!$current) { return false; }
+
+    if($current->status() == $status) { return true; }
+
+    $current->set_status($status);
+
+    if($status == SURVEY_IS_CLOSED) { $this->_current = null; }
+    return true;
+  }
 }
 
 
 /**
- * Update survey status from admin settings tab
+ * Updates from admin tab
  **/
 
 function update_survey_status_from_post()
 {
-  $current = current_survey();
-  if(!$current) { return null; }
-
-  $new_status = $_POST['survey_status'] ?? null;
-  if(!$new_status) { return null; }
-
-  update_post_meta($current['post_id'],'status',$new_status);
+  $status = $_POST['survey_status'] ?? null;
+  $catalog = SurveyCatalog::instance();
+  return $catalog->update_status($status);
 }
-
-/**
- * Update survey content from admin content tab
- **/
 
 function update_survey_content_from_post()
 {
-  $current = current_survey();
+  $pid = $_POST['pid'] ?? '';
+  $survey = $_POST['survey'] ?? '';
+  $sendmail = array();
+  foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
+    $sendmail[$key] = $_POST[$key] ?? '';
+  }
+
+  $catalog = SurveyCatalog::instance();
+  $current = $catalog->current_survey();
   if(!$current) { 
     log_warning("Attempted to update survey with no current survey");
-    return null; 
+    return false; 
   }
 
-  $pid = $_POST['pid'] ?? '';
-  $cur_pid = $current['post_id'];
-
-  if(strcmp($pid,$cur_pid)!=0) {
+  $cur_pid = $current->post_id();
+  if(strcmp($pid,$cur_pid)) {
     log_warning("Attempted to update survey $pid, current is $cur_pid");
-    return null;
+    return false;
   }
 
-  $survey = $_POST['survey'] ?? '';
-  $data = array('survey' => $survey);
-  foreach( array_keys(SENDMAIL_TEMPLATES) as $key ) {
-    $data[$key] = $_POST[$key] ?? '';
-  }
-
-  $rval = wp_update_post(array(
-    'ID' => $pid,
-    'post_content' => wp_slash(json_encode($data)),
-  ));
-
-  wp_save_post_revision($pid);
-
-  if($rval) {
-    $name = $current['name'];
-    log_info("Content updated for $name survey");
-  } else {
-    log_warning("Failed to update content for survey $pid");
-  }
-
-  return $rval;
+  return $current->update_content($survey,$sendmail);
 }
 
 /**
