@@ -48,8 +48,7 @@ function add_script_body()
 function determine_content_tab()
 {
   // returns the post_id of the selected content tab
-  $catalog = SurveyCatalog::instance();
-  $current = $catalog->current_survey();
+  $current = current_survey();
 
   // if post_id (pid) was specified as part of the GET request, honor it
   //   note that if value of pid is 'first', we need to resolve that to
@@ -70,7 +69,7 @@ function determine_content_tab()
 
   // no pid specified and no current survey
   //   Show the newest entry in the survey catalog
-  $closed = $catalog->closed_surveys();
+  $closed = closed_surveys();
   if($closed) { return $closed[0]->post_id(); }
 
   // no pid specified, no current survey, and no survey catalog
@@ -92,8 +91,7 @@ function add_survey_navbar($active_pid)
 
   //   first tab is current survey if there is a current survey
   //     otherwise, it's the new survey tab
-  $catalog = SurveyCatalog::instance();
-  $current = $catalog->current_survey();
+  $current = current_survey();
 
   if($current) {
     $tabs[] = array($current->name(),$current->post_id());
@@ -102,7 +100,7 @@ function add_survey_navbar($active_pid)
   }
 
   // remaining tabs come from the survey catalog (skipping current survey)
-  foreach( $catalog->closed_surveys() as $survey ) {
+  foreach( closed_surveys() as $survey ) {
     $tabs[] = array($survey->name(), $survey->post_id());
   }
 
@@ -122,8 +120,7 @@ function add_survey_navbar($active_pid)
 
 function add_survey_tab_content($active_pid)
 {
-  $catalog = SurveyCatalog::instance();
-  $current = $catalog->current_survey();
+  $current = current_survey();
 
   $current_pid = $current ? $current->post_id() : '';
 
@@ -138,8 +135,7 @@ function add_survey_tab_content($active_pid)
 
 function add_new_survey_content()
 {
-  $catalog = SurveyCatalog::instance();
-  $existing_names = $catalog->survey_names();
+  $existing_names = survey_catalog()->survey_names();
 
   $cur_year = date('Y');
   $suggested_name = "$cur_year";
@@ -172,8 +168,7 @@ function add_new_survey_content()
 
 function add_past_survey_content($pid)
 {
-  $catalog = SurveyCatalog::instance();
-  $survey = $catalog->lookup_by_post_id($pid);
+  $survey = survey_catalog()->lookup_by_post_id($pid);
 
   if(!$survey) { 
     log_error("Attempted to show content for invalid pid ($pid)");
@@ -182,7 +177,7 @@ function add_past_survey_content($pid)
 
   echo "<div class='past'>";
 
-  $current = $catalog->current_survey();
+  $current = current_survey();
 
   if(!$current) {
     echo "<form class='reopen-survey'>";
@@ -207,8 +202,7 @@ function add_past_survey_content($pid)
 
 function add_current_survey_content()
 {
-  $catalog = SurveyCatalog::instance();
-  $survey = $catalog->current_survey();
+  $survey = current_survey();
 
   echo "<div class='current'>";
 

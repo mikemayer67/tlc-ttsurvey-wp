@@ -33,7 +33,7 @@ function populate_form()
         };
 
         var from_autosave = false;
-        const current_content = saved_content;
+        var current_content = saved_content;
 
         if(autosave[pid]) {
           // equality means that the autosave is for the current revision

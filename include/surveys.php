@@ -285,6 +285,11 @@ class SurveyCatalog
     return self::$_instance;
   }
 
+  public static function close()
+  {
+    self::$_instance = null;
+  }
+
   // catalog instance
   private $_index = array();
   private $_current = null;
@@ -332,8 +337,11 @@ class SurveyCatalog
     return null;
   }
 
-  public function reopen($survey) 
+  public function reopen_survey($post_id) 
   {
+    $survey = $this->_index[$post_id] ?? null;
+    if(!$survey) { return; }
+
     $new_name = $survey->name();
     if( $this->_current ) {
       $cur_name = $this->_current->name();
@@ -367,6 +375,7 @@ class SurveyCatalog
     }
     $post_id = $survey->post_id();
     $this->index[$post_id] = $survey;
+    return true;
   }
 
   public function closed_surveys($newest_to_oldest=true)
@@ -409,6 +418,17 @@ class SurveyCatalog
   }
 }
 
+/**
+ * Convenience functions
+ **/
+
+function survey_catalog() { return SurveyCatalog::instance();                   }
+function current_survey() { return SurveyCatalog::instance()->current_survey(); }
+function active_survey()  { return SurveyCatalog::instance()->active_survey();  }
+function closed_surveys() { return SurveyCatalog::instance()->closed_surveys(); }
+
+function reopen_survey($post_id) { return SurveyCatalog::instance()->reopen_survey($post_id); }
+function create_new_survey($name) { return SurveyCatalog::instance()->create_new_survey($name); }
 
 /**
  * Updates from admin tab

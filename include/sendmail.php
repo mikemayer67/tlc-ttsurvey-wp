@@ -32,8 +32,7 @@ function sendmail_render_message($subject,$custom_content,$message_data)
 function _sendmail_send($email,$subject,$message_data) 
 {
   $survey = current_survey();
-  $post = get_post($survey['post_id']);
-  $content = json_decode($post->post_content,true);
+  $content = $survey->content();
 
   $message_data['title'] = $survey['name'];
 

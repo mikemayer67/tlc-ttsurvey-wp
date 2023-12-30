@@ -30,8 +30,7 @@ function add_tlc_settings_overview()
 
 function add_current_survey_overview()
 {
-  $catalog = SurveyCatalog::instance();
-  $current = $catalog->current_survey();
+  $current = current_survey();
 
   if($current) {
     $name = $current->name();
@@ -61,8 +60,7 @@ function add_past_survey_overview()
   echo "  <td class='value'>";
   echo "    <table>";
 
-  $catalog = SurveyCatalog::instance();
-  $surveys = $catalog->closed_surveys();
+  $surveys = closed_surveys();
   if($surveys) {
     foreach( $surveys as $survey ) {
       $name = $survey->name();
