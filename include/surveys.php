@@ -185,8 +185,8 @@ class Survey
   {
     $post_id = wp_insert_post(
       array(
-        'post_content' => '',
         'post_title' => $name,
+        'post_content' => '',
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
       ),
@@ -201,6 +201,32 @@ class Survey
     update_post_meta($post_id,'responses',0);
 
     log_info("Created new $name survey");
+
+    return Survey::from_post_id($post_id);
+  }
+
+  public static function create_from_upload($data)
+  {
+    $name = $data['name'];
+    $content = wp_slash(json_encode($data['content']));
+    $responses = intval($data['responses'] ?? 0);
+    $status = $data['status'] ?? SURVEY_IS_CLOSED;
+
+    $post_id = wp_insert_post(
+      array(
+        'post_title' => $name,
+        'post_content' => $content,
+        'post_type' => SURVEY_POST_TYPE,
+        'post_status' => 'publish',
+      ),
+      true,
+    );
+    if(!$post_id) { return null; }
+
+    update_post_meta($post_id,'status',$status);
+    update_post_meta($post_id,'responses',$responses);
+
+    log_info("Loaded $name survey");
 
     return Survey::from_post_id($post_id);
   }
@@ -400,6 +426,11 @@ class SurveyCatalog
     return $names;
   }
 
+  public function post_ids()
+  {
+    return array_keys($this->_index);
+  }
+
   // update status from admin tabs
 
   public function update_status($status)
@@ -493,6 +524,24 @@ function dump_all_survey_data()
     );
   }
   return $data;
+}
+
+function load_all_survey_data($data,&$error=null)
+{
+  $post_id_map = array();
+
+  foreach($data as $survey_data) {
+    $name = $survey_data['name'];
+    $old_post_id = $survey_data['post_id'];
+    $survey = Survey::create_from_upload($survey_data);
+    if(!$survey) {
+      $error = "Failed to load $name survey";
+      return null;
+    }
+    $post_id_map[$old_post_id] = $survey->post_id();
+  }
+
+  return $post_id_map;
 }
 
 /**

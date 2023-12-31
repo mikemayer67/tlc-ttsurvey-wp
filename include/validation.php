@@ -121,6 +121,9 @@ class SurveyDataValidation
       return;
     } 
 
+    // Issue 111: @@@ TODO: Add response schema
+    // - validate that surveys.responses is consistent with content of responses data
+
     $survey_data_schema = [
       'surveys'=>[ 'type'=>'hashlist', 'required'=>true, 'schema'=>[
           'name'=>    [ 'type'=>'string',  'required'=>true, 'rule'=>'survey_name'],

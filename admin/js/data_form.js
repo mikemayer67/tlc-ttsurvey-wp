@@ -228,7 +228,11 @@ function handle_submit(e)
 {
   e.preventDefault();
 
+  clear_findings();
+  clear_acknowledgements();
   validation.in_progress = true;
+  validation.complete = false;
+  update_dom();
 
   jQuery.ajax( {
     method: "POST",
@@ -252,6 +256,7 @@ function handle_submit_response(response,status,jqHXR)
   if(response.success) {
     window.location.href = form_vars.overview;
   } else {
+    alert("Upload failed: " + response.error);
     handle_validation_response(response);
   }
 }
@@ -298,7 +303,7 @@ function update_dom()
   }
 
   // acknowlege checkboxes
-  if(validation.is_empty || !validation.complete) {
+  if(validation.is_empty || validation.found_errors || !validation.complete) {
     ce.acknowledge_upload.hide();
     ce.acknowledge_warnings.hide();
   }
