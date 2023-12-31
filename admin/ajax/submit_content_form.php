@@ -9,8 +9,7 @@ $pid = $_POST['pid'] ?? null;
 if(!$pid)
 {
   log_error("submit_content_form POST is missing pid (post_id)");
-  $rval = json_encode(array('ok'=>false, 'error'=>'missing pid (post_id)'));
-  echo $rval;
+  wp_send_json_error('missing pid (post_id)');
   wp_die();
 }
 
@@ -18,8 +17,7 @@ $content = $_POST['content'] ?? null;
 if(!$content)
 {
   log_error("submit_content_form POST is missing content");
-  $rval = json_encode(array('ok'=>false, 'error'=>'missing content'));
-  echo $rval;
+  wp_send_json_error('missing content');
   wp_die();
 }
 
@@ -29,7 +27,6 @@ if(!$content)
 //   - Remove the current escaping from each value in the context array
 //   - Convert the context array to JSON
 //   - Fully escape the JSON for insertion into the wordpress database
-//$content = array_map('stripslashes',$content);
 $content = stripslashes_deep($content);
 $content = json_encode($content);
 $content = addslashes($content);
@@ -41,16 +38,14 @@ if( $rc == $pid )
 {
   $post = get_post($pid);
   $response = array(
-    'ok'=>true,
     'last_modified'=>get_post_modified_time('U',true,$post),
   );
 } else {
-  $response = array('ok'=>false, $rc->get_error_message(), );
+  wp_send_json_error($rc->get_error_message());
+  wp_die();
 }
 
-$rval = json_encode($response);
-
-echo($rval);
+wp_send_json_success($response);
 wp_die();
 
 

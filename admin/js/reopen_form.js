@@ -14,7 +14,7 @@ function handle_reopen_survey(event)
       pid:pid,
     },
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         window.location.reload(true);
       }
     },

@@ -6,8 +6,10 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('include/surveys.php');
 
 $pid = $_POST['pid'] ?? null;
-$rc = reopen_survey($pid);
-
-echo json_encode(array('ok'=>$rc));
+if(reopen_survey($pid)) {
+  wp_send_json_success();
+} else {
+  wp_send_json_error();
+}
 wp_die();
 

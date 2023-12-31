@@ -12,7 +12,7 @@ wp_enqueue_style('tlc-ttsurvey-survey', plugin_url('shortcode/css/survey.css'));
 function add_survey_menubar($userid)
 {
   $survey = current_survey();
-  $survey_name = $survey['name'];
+  $survey_name = $survey->name();
 
   $user = User::from_userid($userid);
 

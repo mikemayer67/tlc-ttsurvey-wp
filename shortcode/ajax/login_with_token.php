@@ -9,7 +9,5 @@ require_once plugin_path('include/login.php');
 //   This modifies how login_with_password handles cookies 
 $jar = CookieJar::instance(true);
 
-$result = login_with_token($_POST['token']);
-
-echo json_encode($result);
+wp_send_json(login_with_token($_POST['token']));
 wp_die();

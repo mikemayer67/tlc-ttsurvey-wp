@@ -1,0 +1,26 @@
+<pre>Array
+(
+    [forms] => Array
+        (
+            [194] => Array
+                (
+                    [title] => 2023
+                    [name] => 2023
+                    [created] => 2023-09-18 12:55:20
+                    [modified] => 2023-11-27 04:44:35
+                    [content] => {"survey":"Last time around??\n\n- double quotes: \"hello there\"\n- single quotes: 'bye bye'\n- apostrophe: isn't too bad, is it?  \n\nthis should be a new revision","sendmail":{"welcome":"## Welcome to the 2023 Time and Talent Survey.\n\nYour participation will help council figure out how to best utilize our resources and...\n","recovery":""}}
+                )
+
+            [168] => Array
+                (
+                    [title] => 2022
+                    [name] => 2022
+                    [created] => 2023-09-08 02:56:04
+                    [modified] => 2023-10-18 00:42:25
+                    [content] => {"survey":"Just to verify","welcome":"And here as well"}
+                )
+
+        )
+
+)
+</pre>

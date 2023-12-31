@@ -24,5 +24,5 @@ $result = register_new_user(
   $remember,
 );
 
-echo json_encode($result);
+wp_send_json($result);
 wp_die();

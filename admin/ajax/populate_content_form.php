@@ -11,8 +11,7 @@ $pid = $_POST['pid'] ?? null;
 if(!$pid)
 {
   log_error("submit_content_form POST is missing pid (post_id)");
-  $rval = json_encode(array('ok'=>false, 'error'=>'missing pid (post_id)'));
-  echo $rval;
+  wp_send_json_error('missing pid (post_id)');
   wp_die();
 }
 
@@ -28,7 +27,7 @@ foreach( SENDMAIL_TEMPLATES as $key=>$template ) {
   $custom_content = $content['sendmail'][$key] ?? '';
   $sendmail[$key] = $custom_content;
   $message_data = $template['demo_data'];
-  $message_data['title'] = get_post($pid)->post_title;
+  $message_data['title'] = $post->post_title;
   $preview[$key] = sendmail_render_message(
     $key,
     stripslashes($custom_content),
@@ -37,7 +36,6 @@ foreach( SENDMAIL_TEMPLATES as $key=>$template ) {
 }
 
 $response = array(
-  'ok'=>true,
   'pid'=>$pid,
   'last_modified'=>get_post_modified_time('U',true,$post),
   'survey' => $content['survey'] ?? '',
@@ -45,9 +43,7 @@ $response = array(
   'preview'=>$preview,
 );
 
-$rval = json_encode($response);
-
-echo $rval;
+wp_send_json_success($response);
 wp_die();
 
 

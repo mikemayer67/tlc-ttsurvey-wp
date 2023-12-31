@@ -130,6 +130,19 @@ add_action('wp_ajax_nopriv_tlc_ttsurvey', ns('ajax_wrapper'));
 add_action('wp_ajax_tlc_ttsurvey', ns('ajax_wrapper'));
 
 /**
+ * Module support
+ **/
+
+function enqueue_javascript_as_module($tag,$handle,$src)
+{
+  if(str_starts_with($src,plugin_url(''))) {
+    $tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
+  }
+  return $tag;
+}
+add_filter('script_loader_tag',ns('enqueue_javascript_as_module'),10,3);
+
+/**
  * Import admin/shortcode specific functions
  **/
 

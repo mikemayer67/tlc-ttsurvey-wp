@@ -39,10 +39,15 @@ function add_settings_form()
 
 function add_settings_status()
 {
-  $current_status = current_survey()['status'] ?? null;
+  $current = current_survey();
 
   echo "<div class='label'>Survey Status</div>";
-  if($current_status == SURVEY_IS_DRAFT) {
+  if(!$current) {
+    echo "<div class='info'>";
+    echo "  There is no active or draft survey. Create/reopen one in the Content tab.";
+    echo "</div>";
+  }
+  elseif($current->is_draft()) {
     echo "<div class='info'>";
     echo "  Changing the status from Draft to Active will open the survey.";
     echo "</div>";
@@ -57,7 +62,7 @@ function add_settings_status()
     echo "    <option value='".SURVEY_IS_ACTIVE."'>Active</option>";
     echo "  </select>";
     echo "</div>";
-  } elseif($current_status == SURVEY_IS_ACTIVE) {
+  } elseif($current->is_active()) {
     echo "<div class='info'>";
     echo "  Changing the status from Active to Closed will close the survey.";
     echo "</div>";
@@ -72,10 +77,6 @@ function add_settings_status()
     echo "    <option value='".SURVEY_IS_ACTIVE."' selected>Active</option>";
     echo "    <option value='".SURVEY_IS_CLOSED."'>Closed</option>";
     echo "  </select>";
-    echo "</div>";
-  } else {
-    echo "<div class='info'>";
-    echo "  There is no active or draft survey. Create/reopen one in the Content tab.";
     echo "</div>";
   }
 }

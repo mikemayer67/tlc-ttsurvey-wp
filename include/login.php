@@ -317,6 +317,12 @@ function register_new_user($userid, $password, $pwconfirm, $fullname, $email, $r
       'error'=>"Invalid userid: $error",
     );
   }
+  if(!is_userid_available($userid)) {
+    return array(
+      'success'=>false, 
+      'error'=>"Invalid userid: already in use",
+    );
+  }
   if(!validate_user_input('password',$password,$error)) {
     return array(
       'success'=>false, 

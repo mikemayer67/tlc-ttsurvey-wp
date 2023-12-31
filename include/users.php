@@ -105,7 +105,7 @@ function register_userid_post_type()
   register_post_type( USERID_POST_TYPE,
     array(
       'labels' => array(
-        'name' => 'TLC TTSurvey Participants',
+        'name' => 'Participants',
         'menu_name' => "Time & Talent Participants",
         'singular_name' => 'Participant',
         'add_new' => 'New Participant',
@@ -250,6 +250,28 @@ class User {
     return User::from_post_id($post_id);
   }
 
+  public static function create_from_upload($user_data)
+  {
+    $userid = $user_data['userid'];
+    $content = $user_data['content'];
+
+    $post_id = wp_insert_post(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'post_title' => $userid,
+        'post_content' => json_encode($content),
+        'post_status' => 'publish',
+      ),
+      true
+    );
+
+    update_post_meta($post_id,'anonid',User::_encode_anon($post_id));
+
+    log_info("Loaded user $userid");
+
+    return User::from_post_id($post_id);
+  }
+
   /**
    * Getters
    **/
@@ -368,12 +390,14 @@ class User {
    * Anonymous Proxy
    **/
 
-  private static function _encode_anon($anonid) { return ($anonid * 81) ^ 0xce67; }
-  private static function _decode_anon($anonid) { return ($anonid ^ 0xce67) / 81; }
+  private static function _encode_anon($anonid) { return (intval($anonid) * 81) ^ 0xce67; }
+  private static function _decode_anon($anonid) { return (intval($anonid) ^ 0xce67) / 81; }
 
   public function anon_proxy()
   {
+    log_dev("anon_proxy::");
     if($this->_userid === ANON_USERID) {
+      log_dev("Skipping ".$this->_userid);
       // Anonymous proxies cannot have their own anonymous proxies
       return null;
     }
@@ -391,7 +415,11 @@ class User {
       // there's actually an anonymous proxy set up yet.
       // Verify that the anonid is really for an anonymous user.
       $anonid = User::_decode_anon($anonids[0]);
+      log_dev("anon_proxy:: anonid=$anonid");
       $anon = User::from_post_id($anonid);
+      if($anon) {
+        log_dev("anon_proxy:: postid=".$anon->post_id());
+      }
       if($anon && $anon->userid() === ANON_USERID) {
         return $anon;
       }
@@ -413,6 +441,72 @@ class User {
 
     return User::from_post_id($anonid);
   }
+
+  /**
+   * Data Dump/Load
+   **/
+
+  static function dump_all_user_data()
+  {
+    $posts = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+      )
+    );
+
+    $data = array();
+    foreach($posts as $post)
+    {
+      $id = $post->ID;
+      $userid = $post->post_title;
+      if($userid != ANON_USERID) {
+        $data[] = array(
+          'userid' => $userid,
+          'post_id' => $id,
+          'content' => json_decode($post->post_content,true),
+          'anonid' => get_post_meta($id,'anonid')[0] ?? '',
+        );
+      }
+    }
+    return $data;
+  }
+
+  static function anonid_map($data)
+  {
+    $anonid_map = array();
+
+    foreach($data as $user) {
+      if(array_key_exists('anonid',$user)) {
+        $anonid = $user['anonid'] ?? null;
+        if($anonid) {
+          $anonid = User::_decode_anon($anonid);
+          $postid = intval($user['post_id']);
+          if($anonid != $postid) {
+            $anonid_map[$anonid] = $user['post_id'];
+          }
+        }
+      }
+    }
+    return $anonid_map;
+  }
+
+  static function load_all_user_data($data,&$error=null)
+  {
+    $post_id_map = array();
+    foreach($data as $user_data) {
+      $userid = $user_data['userid'];
+      $old_post_id = $user_data['post_id'];
+      $user = self::create_from_upload($user_data);
+      if(!$user) {
+        $error = "Failed to load user $userid";
+        return null;
+      }
+      $psost_id_map[$old_post_id] = $user->post_id();
+    }
+    return $post_id_map;
+  }
+
 }
 
 /**
@@ -460,4 +554,5 @@ function validate_user_access_token($userid,$token)
   if(!$user) { return false; }
   return $token == $user->access_token();
 }
+
 

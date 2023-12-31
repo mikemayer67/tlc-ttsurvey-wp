@@ -1,23 +1,7 @@
+import * as validate from './validation.js';
+import * as lock from './lock.js';
 
 var ce = {}
-
-function hold_lock()
-{
-  jQuery.post(
-    form_vars.ajaxurl,
-    {
-      action:'tlc_ttsurvey',
-      nonce: form_vars.nonce,
-      query: 'admin/obtain_content_lock',
-    },
-    function(response) {
-      if(!response.has_lock) {
-        window.location.reload(true);
-      }
-    },
-    'json',
-  );
-}
 
 function handle_change()
 {
@@ -26,15 +10,13 @@ function handle_change()
 
   const new_name = ce.new_name.val()
 
-  err = "";
-  if(new_name.length<4) {
-    err = "too short";
+  var err = "";
+  const result = validate.survey_name(new_name);
+  if(!result.ok) {
+    err = result.error;
   }
   else if(jQuery.inArray(new_name,existing_names)>=0) {
     err = "existing survey";
-  }
-  else if(!/^[a-zA-Z0-9., -]+$/.test(new_name)) {
-    err = "invalid name";
   }
 
   ce.error.html(err);
@@ -46,7 +28,7 @@ function handle_new_survey(event)
 {
   event.preventDefault();
 
-  new_name = ce.new_name.val();
+  const new_name = ce.new_name.val();
 
   jQuery.post(
     form_vars['ajaxurl'],
@@ -57,7 +39,7 @@ function handle_new_survey(event)
       name:new_name,
     },
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         window.location.reload(true);
       }
     },
@@ -73,8 +55,8 @@ jQuery(document).ready(
     ce.error = ce.form.find('span.error');
     ce.submit = ce.form.find('input.submit');
 
-    hold_lock();
-    setInterval(hold_lock,15000);
+    lock.hold();
+    setInterval(lock.hold,15000);
 
     ce.new_name.on('keyup',handle_change);
     ce.form.on('submit',handle_new_survey);

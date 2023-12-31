@@ -23,24 +23,24 @@ function populate_form()
       pid:pid,
     },
     function(response) {
-      if(response.ok) {
-        ce.last_modified.val(response.last_modified);
+      if(response.success) {
+        ce.last_modified.val(response.data.last_modified);
 
         saved_content = {
-          survey: response.survey,
-          sendmail: response.sendmail,
-          preview: response.preview,
+          survey: response.data.survey,
+          sendmail: response.data.sendmail,
+          preview: response.data.preview,
         };
 
-        from_autosave = false;
-        current_content = saved_content;
+        var from_autosave = false;
+        var current_content = saved_content;
 
         if(autosave[pid]) {
           // equality means that the autosave is for the current revision
           //   earlier means that autosave is no longer applicable
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
-          if(autosave[pid].last_modified == response.last_modified) {
+          if(autosave[pid].last_modified == response.data.last_modified) {
             from_autosave = true;
             current_content = autosave[pid];
             ce.form_status.html('autosave').addClass('info').show();
@@ -139,7 +139,7 @@ function watch_queue()
   ajax_lock = true;
   queue_timer = null;
 
-  input = queue.shift();
+  const input = queue.shift();
   if( input == "survey" ) {
     validate_survey_input();
   } else {
@@ -160,7 +160,7 @@ function validate_survey_input()
       survey:ce.survey.eq(0).val(),
     },
     function(response) {
-      survey_error = response.ok ? null : response.error;
+      survey_error = response.success ? null : response.data;
       ajax_lock = false;
     },
     'json',
@@ -183,8 +183,8 @@ function refresh_sendmail_preview(subject)
       content:content,
     },
     function(response) {
-      if(response.ok) {
-        ce.preview.filter('.'+subject).html(response.preview);
+      if(response.success) {
+        ce.preview.filter('.'+subject).html(response.data);
         ajax_lock = false;
 
       }
@@ -200,9 +200,9 @@ function content_has_changed()
 
   if(saved_content.survey != ce.survey.val()) { return true; }
 
-  rval = false;
+  var rval = false;
   ce.sendmail.each(function() {
-    saved_sendmail = saved_content.sendmail[this.name];
+    const saved_sendmail = saved_content.sendmail[this.name];
     if( this.value != saved_sendmail ) { rval = true; }
   });
   return rval;
@@ -229,7 +229,7 @@ function handle_form_submit(event)
   ce.form_status.hide();
   event.preventDefault();
 
-  data = {
+  let data = {
     action:'tlc_ttsurvey',
     nonce:form_vars['nonce'],
     query:'admin/submit_content_form',
@@ -247,9 +247,9 @@ function handle_form_submit(event)
     form_vars['ajaxurl'],
     data,
     function(response) {
-      if(response.ok) {
+      if(response.success) {
         ce.form_status.html('saved').addClass('info').show();
-        ce.last_modified.val(response.last_modified);
+        ce.last_modified.val(response.data.last_modified);
         saved_content.survey = ce.survey.val();
         for(const key in saved_content.sendmail) {
           saved_content.sendmail[key] = ce.sendmail.filter('.'+key).val();
@@ -262,7 +262,7 @@ function handle_form_submit(event)
         reset_queue();
         update_state();
       } else {
-        alert("failed to save content: " + response.error);
+        alert("failed to save content: " + response.data);
       }
     },
     'json',

@@ -20,11 +20,10 @@ function handle_form_submit(event)
     form_vars['ajaxurl'],
     data,
     function(response) {
-      if(response.ok) {
-        const url = form_vars.overview;
-        window.location.href = url;
+      if(response.success) {
+        window.location.href = form_vars.overview;
       } else {
-        alert("failed to save settings: " + response.error);
+        alert("failed to save settings: " + response.data);
       }
     },
     'json',

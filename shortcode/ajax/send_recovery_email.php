@@ -12,16 +12,13 @@ require_once plugin_path('shortcode/login.php');
 
 $email = adjust_user_input('email',$_POST['email']);
 if(!$email) { 
-  echo json_encode(array('ok'=>false));
+  wp_send_json_error();
   wp_die();
 }
 
 $users = User::from_email($email);
 if(!$users) {
-  echo json_encode(array(
-    'ok'=>false,
-    'error'=>"warning::unrecognized email $email",
-  ));
+  wp_send_json_error("warning::unrecognized email $email");
   wp_die();
 }
 
@@ -44,22 +41,14 @@ foreach($users as $user) {
 if(!sendmail_login_recovery($email,$tokens))
 {
   log_error("Failed to send login recovery email to $email");
-  echo json_encode(array(
-    'ok'=>false,
-    'error'=>"error::internal error: failed to send email",
-  ));
+  wp_send_json_error("error::internal error: failed to send email");
   wp_die();
 }
 
-echo json_encode(array(
-  'ok'=>true,
-  'tokens'=>$tokens,
-  'expires'=>$expires,
-));
-
+wp_send_json_success(
+  array(
+    'tokens'=>$tokens,
+    'expires'=>$expires,
+  )
+);
 wp_die();
-
-
-
-  
-

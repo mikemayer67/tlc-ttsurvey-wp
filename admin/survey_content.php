@@ -28,16 +28,15 @@ function add_noscript_body()
 
 function add_script_body()
 {
-  $current = current_survey();
   echo "<div class='content requires-javascript'>";
 
   // check to see if we have lock
   $lock = obtain_content_lock();
   if($lock['has_lock']) {
     // we have the lock
-    $active_pid = determine_content_tab($current);
-    add_survey_navbar($active_pid,$current);
-    add_survey_tab_content($active_pid,$current);
+    $active_pid = determine_content_tab();
+    add_survey_navbar($active_pid);
+    add_survey_tab_content($active_pid);
   } else {
     // someone else has lock
     add_content_lock($lock);
@@ -46,20 +45,11 @@ function add_script_body()
 }
 
 
-function add_content_lock($lock)
+function determine_content_tab()
 {
-  $locked_by = $lock['locked_by'];
-  echo "<div class='info lock'>";
-  echo "<div>The survey is currently being edited by $locked_by.</div>";
-  echo "<div>This tab will automatically refresh when the edit lock is released.</div>";
-  echo "</div>";
+  // returns the post_id of the selected content tab
+  $current = current_survey();
 
-  enqueue_watch_lock_javascript();
-}
-
-
-function determine_content_tab($current)
-{
   // if post_id (pid) was specified as part of the GET request, honor it
   //   note that if value of pid is 'first', we need to resolve that to
   //   the current post_id if there is a current survey
@@ -67,26 +57,20 @@ function determine_content_tab($current)
   if($pid)
   {
     if($pid == FIRST_TAB) { 
-      return $current['post_id'] ?? FIRST_TAB;
-    }
-    else {
+      return $current ? $current->post_id() : FIRST_TAB;
+    } else {
       return $pid;
     }
   }
 
   // no pid was specified as part of the GET request.
   //   Show the current survey if there is one
-  if($current) {
-    return $current['post_id'];
-  }
+  if($current) { return $current->post_id(); }
 
   // no pid specified and no current survey
   //   Show the newest entry in the survey catalog
-  $catalog = survey_catalog();
-  if($catalog) {
-    krsort($catalog);
-    return array_key_first($catalog);
-  }
+  $closed = closed_surveys();
+  if($closed) { return $closed[0]->post_id(); }
 
   // no pid specified, no current survey, and no survey catalog
   //   Only option is to create a new survey (i.e. first and only tab)
@@ -94,7 +78,7 @@ function determine_content_tab($current)
 }
 
 
-function add_survey_navbar($active_pid,$current)
+function add_survey_navbar($active_pid)
 {
   echo "<div class='nav-tab-wrapper survey'>";
 
@@ -107,26 +91,24 @@ function add_survey_navbar($active_pid,$current)
 
   //   first tab is current survey if there is a current survey
   //     otherwise, it's the new survey tab
+  $current = current_survey();
+
   if($current) {
-    $tabs[] = array($current['name'],$current['post_id']);
+    $tabs[] = array($current->name(),$current->post_id());
   } else {
     $tabs[] = array(' + ',FIRST_TAB);
   }
 
-  // remaning tabs come from the survey catalog (skipping current survey)
-  foreach( survey_catalog() as $pid=>$survey )
-  {
-    if($pid != $current['post_id'])
-    {
-      $tabs[] = array($survey['name'],$pid);
-    }
+  // remaining tabs come from the survey catalog (skipping current survey)
+  foreach( closed_surveys() as $survey ) {
+    $tabs[] = array($survey->name(), $survey->post_id());
   }
 
   // populate the tabs
   foreach($tabs as $tab)
   {
     [$label,$pid] = $tab;
-    $active = $pid == $active_pid ? 'nav-tab-active' : '';
+    $active = ($pid == $active_pid) ? 'nav-tab-active' : '';
     $query_args['pid'] = $pid;
     $uri = implode('?', array($uri_path,http_build_query($query_args)));
     echo "<a class='pid nav-tab $active' href='$uri'>$label</a>";
@@ -136,24 +118,24 @@ function add_survey_navbar($active_pid,$current)
 }
 
 
-function add_survey_tab_content($active_pid,$current)
+function add_survey_tab_content($active_pid)
 {
-  $current_pid = $current['post_id'] ?? '';
+  $current = current_survey();
+
+  $current_pid = $current ? $current->post_id() : '';
+
   if($active_pid == FIRST_TAB) {
     add_new_survey_content();
   } elseif( $active_pid == $current_pid ) {
-    add_current_survey_content($current);
+    add_current_survey_content();
   } else {
-    add_past_survey_content($active_pid,$current);
+    add_past_survey_content($active_pid);
   }
 }
 
 function add_new_survey_content()
 {
-  $existing_names = array();
-  foreach(survey_catalog() as $pid=>$survey) {
-    $existing_names[] = $survey['name'];
-  }
+  $existing_names = survey_catalog()->survey_names();
 
   $cur_year = date('Y');
   $suggested_name = "$cur_year";
@@ -184,15 +166,18 @@ function add_new_survey_content()
   enqueue_new_survey_javascript();
 }
 
-function add_past_survey_content($pid,$current)
+function add_past_survey_content($pid)
 {
-  echo "<div class='past'>";
+  $survey = survey_catalog()->lookup_by_post_id($pid);
 
-  $survey = survey_catalog()[$pid] ?? null;
   if(!$survey) { 
     log_error("Attempted to show content for invalid pid ($pid)");
-    return null;
+    return;
   }
+
+  echo "<div class='past'>";
+
+  $current = current_survey();
 
   if(!$current) {
     echo "<form class='reopen-survey'>";
@@ -203,7 +188,7 @@ function add_past_survey_content($pid,$current)
     enqueue_reopen_javascript();
   }
 
-  $name = $survey['name'];
+  $name = $survey->name();
   echo "<div class='info'>";
   echo "<div> The $name Time and Talent Survey is currently closed. ";
   echo "</div><div>";
@@ -215,13 +200,14 @@ function add_past_survey_content($pid,$current)
   echo "</div>";
 }
 
-function add_current_survey_content($survey)
+function add_current_survey_content()
 {
+  $survey = current_survey();
+
   echo "<div class='current'>";
 
-  $name = $survey['name'];
-  $status = $survey['status'];
-  if($status == SURVEY_IS_ACTIVE) {
+  $name = $survey->name();;
+  if($survey->is_active()) {
     echo "<div class='info'>";
     echo "<div> The $name Time and Talent Survey is currently open. ";
     echo "</div><div>";
@@ -230,7 +216,7 @@ function add_current_survey_content($survey)
     echo "</div></div>";
     $editable = false;
   }
-  elseif($status == SURVEY_IS_DRAFT) {
+  elseif($survey->is_draft()) {
     echo "<div class='info'>";
     echo "<div>The $name Time and Talent Survey is currently in draft mode.";
     echo "</div><div>";
@@ -258,9 +244,9 @@ function add_current_survey_content($survey)
 
 function add_survey_content($survey,$editable=false)
 {
-  $name = $survey['name'];
-  $pid = $survey['post_id'];
-  $last_modified = $survey['last_modified'];
+  $name = $survey->name();
+  $pid = $survey->post_id();
+  $last_modified = $survey->last_modified();
 
   // wrap the content in a form
   //   no action/method as submision will be handled by javascript
@@ -423,22 +409,3 @@ function enqueue_new_survey_javascript()
   wp_enqueue_script('tlc_ttsurvey_new_survey_form');
 }
 
-function enqueue_watch_lock_javascript()
-{
-  wp_register_script(
-    'tlc_ttsurvey_watch_lock',
-    plugin_url('admin/js/watch_content_lock.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-  wp_localize_script(
-    'tlc_ttsurvey_watch_lock',
-    'watch_vars',
-    array(
-      'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => array('watch_lock',wp_create_nonce('watch_lock')),
-    ),
-  );
-  wp_enqueue_script('tlc_ttsurvey_watch_lock');
-}

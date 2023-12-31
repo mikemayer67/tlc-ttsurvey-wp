@@ -8,7 +8,7 @@ $current = current_survey();
 
 if($current)
 {
-  $name = $current['name'];
+  $name = $current->name();
   echo "<div id='status-message' class='card info'>";
   echo "<p>The $name Time and Talent Survey is under construction</p>";
   echo "</div>";
