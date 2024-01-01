@@ -87,10 +87,10 @@ function validate_json_data()
   
   jQuery.ajax( {
     method: "POST",
-    url: form_vars['ajaxurl'],
+    url: form_vars.ajaxurl,
     data: {
       action: 'tlc_ttsurvey',
-      nonce: form_vars['nonce'],
+      nonce: form_vars.nonce,
       query: 'admin/validate_survey_data',
       survey_data: ce.json_data.val(),
       checksum: validation.checksum,
@@ -236,10 +236,10 @@ function handle_submit(e)
 
   jQuery.ajax( {
     method: "POST",
-    url: form_vars['ajaxurl'],
+    url: form_vars.ajaxurl,
     data: {
       action: 'tlc_ttsurvey',
-      nonce: form_vars['nonce'],
+      nonce: form_vars.nonce,
       query: 'admin/upload_survey_data',
       survey_data: ce.json_data.val(),
     },
@@ -254,7 +254,7 @@ function handle_submit_response(response,status,jqHXR)
 {
   validation.in_progress = false;
   if(response.success) {
-    window.location.href = form_vars.overview;
+    window.location.href = form_vars.uploaded;
   } else {
     alert("Upload failed: " + response.error);
     handle_validation_response(response);
@@ -332,6 +332,57 @@ function update_dom()
 }
 
 /**
+ * Purge functions
+ **/
+
+function handle_purge_validation()
+{
+  const validation_text = ce.purge_validation.val();
+  if( validation_text == "Purge Data" ) {
+    ce.purge_button.attr('disabled',false);
+    ce.purge_validation.addClass('validated');
+  } else {
+    ce.purge_button.attr('disabled',true);
+    ce.purge_validation.removeClass('validated');
+  }
+}
+
+function handle_purge(e)
+{
+  e.preventDefault();
+
+  const confirmed = confirm("Last Chance...\nPurging the data is irreversible.\n\nDo you want to continue?");
+
+  jQuery.ajax( {
+    method: "POST",
+    url: form_vars.ajaxurl,
+    data: {
+      action: 'tlc_ttsurvey',
+      nonce: form_vars.nonce,
+      query: 'admin/purge_survey_data',
+    },
+    dataType: 'json',
+    success: handle_purge_response,
+    error: handle_purge_failure,
+  });
+}
+
+function handle_purge_response(response,status,jqHXR)
+{
+  if(response.success) {
+    window.location.href = form_vars.purged;
+  } else {
+    alert("Purge failed: " + response.error);
+  }
+}
+
+function handle_purge_failure(jqHXR,status,error)
+{
+  alert("No response from server");
+}
+
+
+/**
  * prepare data form scripting
  **/
 
@@ -352,6 +403,10 @@ jQuery(document).ready(
     ce.acknowledge_warnings_cb = upload_form.find('#acknowledge-warnings input');
     ce.submit = upload_form.find('#data-upload');
 
+    const purge_form = $('#tlc-ttsurvey-admin form.data.purge');
+    ce.purge_validation = purge_form.find('.purge-validation input');
+    ce.purge_button = purge_form.find('#data-purge');
+
     data_load_link.on('click',function(e) {
       e.preventDefault();
       if(!validation.in_progress) { ce.data_file_input.click(); }
@@ -361,6 +416,10 @@ jQuery(document).ready(
     ce.acknowledge_upload.on('change',update_dom);
     ce.acknowledge_warnings.on('change',update_dom);
     ce.submit.on('click',handle_submit);
+
+    ce.purge_validation.on('paste',function(e) { return false; });
+    ce.purge_validation.on('input',handle_purge_validation);
+    ce.purge_button.on('click',handle_purge);
 
     update_dom();
   }

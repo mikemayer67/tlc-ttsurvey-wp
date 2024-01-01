@@ -44,6 +44,7 @@ function add_data_form()
   echo "<div class='data'>";
   add_data_dump();
   add_data_load();
+  add_data_purge();
   echo "</div>";
 
   enqueue_data_javascript();
@@ -125,14 +126,49 @@ function add_data_load()
   echo "</form>";
 }
 
+function add_data_purge()
+{
+  $nonce = esc_attr(wp_create_nonce(DATA_NONCE));
+  $href = plugin_url('admin/data_purge.php') . "?nonce=$nonce";
+
+  echo "<form class='data purge'>";
+  echo "<div class='label'>Purge Survey Data</div>";
+  echo "<div class='form-body'>";
+  echo "<div class='warning'>";
+  echo "This will remove <b>ALL</b> the survey and user data from the database.</br>";
+  echo "This action is <b>NOT</b> reversible</br>";
+  echo "</div>";
+  echo "<div class='info'>";
+  echo "You may want to dump a copy of the data (above) to avoid losing all your data.";
+  echo "</div>";
+  echo "<div class='purge-validation'>";
+  echo "<input placeholder='Enter \"Purge Data\" to continue.'>";
+  echo "</div>";
+  echo "<div class='button-box'>";
+  echo "<input type='button' id='data-purge' class='button button-primary' value='Purge All Data' disabled>";
+  echo "</div>";
+  echo "</div>"; // form-body
+  echo "</form>";
+}
+
+
 function enqueue_data_javascript()
 {
-  $overview_url = implode('?', array(
+  $uploaded_url = implode('?', array(
     parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
     http_build_query( array(
       'page'=>SETTINGS_PAGE_SLUG,
       'tab'=>'overview',
       'status'=>'Data Uploaded',
+    ))
+  ));
+
+  $purged_url = implode('?', array(
+    parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH),
+    http_build_query( array(
+      'page'=>SETTINGS_PAGE_SLUG,
+      'tab'=>'overview',
+      'status'=>'Data Purged',
     ))
   ));
 
@@ -149,10 +185,10 @@ function enqueue_data_javascript()
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('data_form',wp_create_nonce('data_form')),
-      'overview' => $overview_url,
+      'uploaded' => $uploaded_url,
+      'purged' => $purged_url,
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_data_form');
 }
-
 
