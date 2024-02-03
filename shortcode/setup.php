@@ -109,7 +109,7 @@ function add_javascript_recommended()
   echo "<p class='noscript'>This survey works best with Javascript enabled. ";
   $pdf_uri = survey_pdf_uri();
   if($pdf_uri) {
-    echo "If Javascript is not an option, you may wish to download a ";
+    echo "If enabling Javascript is not an option, you may wish to download a ";
     echo "<a target='_blank' href='$pdf_uri'>PDF version of the survey</a>.";
   }
   echo "</p>";
