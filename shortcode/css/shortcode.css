@@ -13,26 +13,48 @@
 }
 
 #tlc-ttsurvey div.noscript {
+  background-color:"white";
+  width: min(100%,400px);
+  margin:0;
+  padding:0;
+  border: 1px solid black;
+  box-shadow:0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
   color:var(--noscript-color);
-  background-color:var(--noscript-bg-color);
-  padding:30px 20px;
-  margin:1em 5em 5em 5em;
-  border:solid;
-  border-color:var(--noscript-color);
 }
 
-#tlc-ttsurvey div.noscript p:first-child {
-  font-weight:bold;
-  margin-left:0;
-  margin-bottom:5px;
+@media (min-width:480px) {
+  #tlc-ttsurvey div.noscript {
+    width:min(100%,600px);
+    margin:0 auto;
+  }
 }
 
-#tlc-ttsurvey div.noscript p {
+#tlc-ttsurvey div.noscript p.header {
+  color: white;
+  font-weight:bolder;
+  background-color:var(--noscript-color);
+  padding:4px 8px;
+}
+
+#tlc-ttsurvey div.noscript div {
+  padding:8px 1em;
+}
+
+#tlc-ttsurvey div.noscript div p {
+  color:black;
+  font-size:smaller;
+  padding-top: 3px;
   margin-left:1em;
 }
 
+#tlc-ttsurvey div.noscript div p:first-child {
+  color:var(--noscript-color);
+  font-size:smaller;
+  margin-left:0;
+}
 
 #tlc-ttsurvey div.javascript-required {
+  padding-top:5px;
   display: none;
 }
 
