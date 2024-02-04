@@ -117,38 +117,6 @@ function handle_shortcode($attr,$content=null,$tag=null)
   return $html;
 }
 
-function add_javascript_recommended()
-{
-  $pdf_uri = survey_pdf_uri();
-
-  echo "<noscript>";
-  echo "<p class='noscript'>This survey works best with Javascript enabled. ";
-  $pdf_uri = survey_pdf_uri();
-  if($pdf_uri) {
-    echo "If Javascript is not an option, you may wish to download a ";
-    echo "<a target='_blank' href='$pdf_uri'>PDF version of the survey</a>.";
-  }
-  echo "</p>";
-  echo "</noscript>";
-}
-
-function start_javascript_required($page)
-{
-  $return_url = survey_url();
-  echo "<noscript><div>";
-  echo "<div class='noscript header'>";
-  echo "$page requires that Javascript be enabled";
-  echo "</div>";
-  echo "<p><a href='$return_url'>Return to login page</a></p>";
-  echo "</div></noscript>";
-  echo "<div class='javascript-required'>";
-}
-
-function end_javascript_required()
-{
-  echo "</div>";
-}
-
 function add_status_message()
 {
   $status = status_message();

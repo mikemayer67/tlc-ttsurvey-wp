@@ -29,8 +29,6 @@ function add_survey_menubar($userid)
   add_profile_editor($user);
   echo "</div>"; // menubar-box
   echo "<div class='spacer'></div>";
-
-  add_javascript_recommended();
 }
 
 function add_user_menu($user)
@@ -57,10 +55,6 @@ function add_profile_editor($user)
   echo "<input id='profile-editor-toggle' type='checkbox' class='toggle'>";
 
   echo "<div class='profile-editor'>";
-  echo "<noscript>";
-  echo "<p class='noscript'>Because Javascript is disabled, your unsaved responses ";
-  echo "to the survey will be lost when you update your profile.</p>";
-  echo "</noscript>";
   echo "<p>Profile Editor for $fullname</p>";
   echo "<div><label for='profile-editor-toggle' class='cancel'>Cancel</label></div>";
   echo "</div>";

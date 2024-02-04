@@ -441,9 +441,6 @@ function setup_elements()
   for( const key in ce ) { ce.off(); }
   ce = {};
 
-  // show javascript required elements
-  jQuery('#tlc-ttsurvey .javascript-required').show();
-
   // populate the elements
   ce.status_message = jQuery('#tlc-ttsurvey #status-message');
   ce.container = jQuery('#tlc-ttsurvey #login');
