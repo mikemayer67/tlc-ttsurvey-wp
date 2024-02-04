@@ -7,16 +7,28 @@
 }
 
 #tlc-ttsurvey {
-  --noscript-color:#800;
   --ttsurvey-color:#006;
+  --noscript-color:#800;
+  --noscript-bg-color:#fcc;
 }
 
-#tlc-ttsurvey p.noscript {
+#tlc-ttsurvey div.noscript {
   color:var(--noscript-color);
-  background-color:white;
-  font-size:smaller;
-  margin-bottom:15px;
-  padding:0 10px;
+  background-color:var(--noscript-bg-color);
+  padding:30px 20px;
+  margin:1em 5em 5em 5em;
+  border:solid;
+  border-color:var(--noscript-color);
+}
+
+#tlc-ttsurvey div.noscript p:first-child {
+  font-weight:bold;
+  margin-left:0;
+  margin-bottom:5px;
+}
+
+#tlc-ttsurvey div.noscript p {
+  margin-left:1em;
 }
 
 

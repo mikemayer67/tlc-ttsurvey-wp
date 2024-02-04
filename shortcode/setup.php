@@ -93,8 +93,22 @@ function handle_shortcode($attr,$content=null,$tag=null)
   ob_start();
 
   echo "<div id='tlc-ttsurvey'>";
+  echo "<noscript>";
+  echo "<div class='noscript'>";
+  echo "<p>The Time & Talent Survey requires that Javascript be enabled on your browser.</p>";
+  echo "<p>For help enabling Javascript on your browser, see ";
+  echo "<a href='https://www.computerhope.com/issues/ch000891.htm' target='_blank'>this link.</a>";
+  echo "</p>";
+  $pdf_uri = survey_pdf_uri();
+  if($pdf_uri) {
+    echo "<p>If Javascript is not an option, you may wish to download a ";
+    echo "<a target='_blank' href='$pdf_uri'>PDF version of the survey</a>.</p>";
+  }
+  echo "</div>";
+  echo "</noscript>";
+  echo "<div class='javascript-required'>";
   add_shortcode_content();
-  echo "</div>"; // tlc-ttsurvey
+  echo "</div></div>"; // tlc-ttsurvey
 
   $html = ob_get_contents();
   ob_end_clean();
