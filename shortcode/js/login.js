@@ -248,8 +248,8 @@ function send_recovery_email(event)
         ce.recovery_form.off('submit');
         ce.recovery_submit.click();
       }
-      if(response.data.error) {
-        var [level,msg] = response.data.error.split('::');
+      if(response.data) {
+        var [level,msg] = response.data.split('::');
         ce.status_message.removeClass(['info','warning','error'])
         ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
