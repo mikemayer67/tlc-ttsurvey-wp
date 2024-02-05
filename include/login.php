@@ -87,7 +87,6 @@ class CookieJar
 
   public function set_active_userid($userid)
   {
-    log_dev("set_active_userid($userid)");
     $this->_active_userid = $userid;
     return $this->_set_cookie(ACTIVE_USER_COOKIE,$userid,0);
   }
@@ -153,7 +152,6 @@ function start_survey_as($userid)
 
 function resume_survey_as($userid,$token)
 {
-  log_dev("resume_survey_as($userid,$token)");
   if( validate_user_access_token($userid,$token) ) { 
     return CookieJar::instance()->set_active_userid($userid);
   }
@@ -187,12 +185,10 @@ function login_init()
 
   if(array_key_exists('forget',$_REQUEST)) {
     $userid = $_REQUEST['forget'];
-    log_dev("login_init:: forget $userid");
     forget_user_token($userid);
   }
 
   if(array_key_exists('logout',$_REQUEST)) {
-    log_dev("log out");
     handle_logout();
   }
 

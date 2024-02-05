@@ -6,7 +6,6 @@ if( ! defined('WPINC') ) { die; }
 require_once plugin_path('shortcode/setup.php');
 require_once plugin_path('shortcode/login/_elements.php');
 
-start_javascript_required('Password reset');
 add_status_message();
 
 start_login_form("Password Reset",'pwreset');
@@ -39,5 +38,3 @@ INFO
 add_login_submit("Change Password",'pwreset',true);
 
 close_login_form();
-
-end_javascript_required();

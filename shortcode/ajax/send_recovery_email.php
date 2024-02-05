@@ -10,6 +10,8 @@ require_once plugin_path('include/sendmail.php');
 require_once plugin_path('include/validation.php');
 require_once plugin_path('shortcode/login.php');
 
+log_info("Send_recovery_email.php:: ".print_r($_POST,true));
+
 $email = adjust_user_input('email',$_POST['email']);
 if(!$email) { 
   wp_send_json_error();
