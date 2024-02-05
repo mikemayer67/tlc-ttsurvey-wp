@@ -34,7 +34,7 @@ function _sendmail_send($email,$subject,$message_data)
   $survey = current_survey();
   $content = $survey->content();
 
-  $message_data['title'] = $survey['name'];
+  $message_data['title'] = $survey->name();
 
   $message = sendmail_render_message(
     $subject,
@@ -44,7 +44,7 @@ function _sendmail_send($email,$subject,$message_data)
 
   return wp_mail(
     $email,
-    $survey['name'] . ' Time & Talent survey',
+    $survey->name() . ' Time & Talent survey',
     $message,
     'Content-Type: text/html; charset=UTF-8',
   );

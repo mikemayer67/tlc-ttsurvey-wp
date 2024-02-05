@@ -253,7 +253,7 @@ class Survey
   {
     if(!$this->_content) {
       $post = get_post($this->_post_id);
-      $json = $post->content;
+      $json = $post->post_content;
       $this->_content = json_decode($json,true);
     }
     return $this->_content;

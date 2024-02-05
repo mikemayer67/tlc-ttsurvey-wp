@@ -1,5 +1,8 @@
 jQuery(document).ready(
   function($) { 
+    // show javascript required elements
+    jQuery('#tlc-ttsurvey .javascript-required').show();
+
     if(shortcode_vars.scroll) {
       const container = jQuery('#tlc-ttsurvey').get(0);
       const position = container.getBoundingClientRect();

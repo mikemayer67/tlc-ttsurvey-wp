@@ -239,7 +239,7 @@ function send_recovery_email(event)
     },
     function(response) {
       if(response.success) {
-        pwreset = {
+        const pwreset = {
           expires: response.data.expires,
           tokens: response.data.tokens,
         }
@@ -248,8 +248,8 @@ function send_recovery_email(event)
         ce.recovery_form.off('submit');
         ce.recovery_submit.click();
       }
-      if(response.data.error) {
-        var [level,msg] = response.data.error.split('::');
+      if(response.data) {
+        var [level,msg] = response.data.split('::');
         ce.status_message.removeClass(['info','warning','error'])
         ce.status_message.html(msg).addClass(level).show(200,'linear');
       }
@@ -440,9 +440,6 @@ function setup_elements()
   // clear old elements (needed for AJAX repopulation of login form)
   for( const key in ce ) { ce.off(); }
   ce = {};
-
-  // show javascript required elements
-  jQuery('#tlc-ttsurvey .javascript-required').show();
 
   // populate the elements
   ce.status_message = jQuery('#tlc-ttsurvey #status-message');
