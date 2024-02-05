@@ -78,6 +78,7 @@ class CookieJar
   private function _set_cookie($key,$value,$expires)
   {  
     if($this->_ajax) {
+      log_dev("ajax _set_cookie($key,$value,$expires)");
       return array($key,$value,$expires);
     } else {
       setcookie($key,$value,$expires,'/');
@@ -107,6 +108,7 @@ class CookieJar
     if($token) {
       $this->_access_tokens[$userid] = $token;
     } else {
+      log_dev("unset _access_token for $userid");
       unset($this->_access_tokens[$userid]);
     }
     return $this->_set_cookie( 
@@ -118,6 +120,7 @@ class CookieJar
 
   public function clear_access_token($userid)
   {
+    log_dev("clear_access_token($userid)");
     return $this->set_access_token($userid,null);
   }
 

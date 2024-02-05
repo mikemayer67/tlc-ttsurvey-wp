@@ -239,7 +239,7 @@ function send_recovery_email(event)
     },
     function(response) {
       if(response.success) {
-        pwreset = {
+        const pwreset = {
           expires: response.data.expires,
           tokens: response.data.tokens,
         }
