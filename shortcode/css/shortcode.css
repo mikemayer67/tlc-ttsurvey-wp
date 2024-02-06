@@ -13,7 +13,7 @@
 }
 
 #tlc-ttsurvey div.noscript {
-  background-color:"white";
+  background-color:white;
   width: min(100%,400px);
   margin:0;
   padding:0;
