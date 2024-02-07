@@ -9,7 +9,10 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
-require_once plugin_path('shortcode/survey/menubar.php');
+require_once plugin_path('include/users.php');
+require_once plugin_path('include/surveys.php');
+
+wp_enqueue_style('tlc-ttsurvey-survey', plugin_url('shortcode/css/survey.css'));
 
 function add_survey_content($userid=null)
 {
@@ -27,7 +30,9 @@ function add_survey_content($userid=null)
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
   echo "<div id='survey'>";
+
   add_survey_menubar($userid);
+  add_user_profile_editor($userid);
 
   for($x=0; $x<=20; $x++) {
     echo "<p>Line $x</p>";
@@ -35,11 +40,48 @@ function add_survey_content($userid=null)
   echo "</div>";
   echo "</form>";
 
-  for($x=0; $x<=10; $x++) {
+  for($x=0; $x<=20; $x++) {
     echo "<p>Post Line $x</p>";
   }
 
   return true;
+}
+
+function add_survey_menubar($userid)
+{
+  $survey = current_survey();
+  $survey_name = $survey->name() . " Time & Talent Survey";
+
+  $user = User::from_userid($userid);
+  $fullname = $user->fullname();
+
+  $status = "Status";
+
+  $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  $icon_url = plugin_url('/img/icons8-down.png');
+
+  echo <<<MENUBAR_HTML
+    <nav class='menubar'>
+      <div class='menubar-item survey-name'>$survey_name</div>
+      <div class='menubar-item status'>$status</div>
+      <div class='menubar-item user'>
+      <button class='menu-btn user'>$fullname<img src='$icon_url'></button>
+        <div class='menu user'>
+            <a href='' data-action='edit-profile'>Edit Profile</a>
+            <a href='$form_uri?logout=1'>Log Out</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class='profile-editor'>
+      <p>Profile editor for <?=$fullname?>
+      <div><a class='edit-profile-cancel'>Cancel</a></div>
+    </div>
+    MENUBAR_HTML;
+}
+
+function add_user_profile_editor($userid)
+{
 }
 
 function enqueue_survey_script()
