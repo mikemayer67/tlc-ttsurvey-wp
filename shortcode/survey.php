@@ -72,16 +72,19 @@ function add_survey_menubar($userid)
         </div>
       </div>
     </nav>
-    
-    <div class='profile-editor'>
-      <p>Profile editor for <?=$fullname?>
-      <div><a class='edit-profile-cancel'>Cancel</a></div>
-    </div>
     MENUBAR_HTML;
 }
 
 function add_user_profile_editor($userid)
 {
+  echo <<<PROFILE_EDITOR_HTML
+    <div class='modal user-profile'>
+      <div class='dialog-box user-profile'>
+        <p>Hello there</p>
+        <a href=''>Cancel</a>
+      </div>
+    </div>
+    PROFILE_EDITOR_HTML;
 }
 
 function enqueue_survey_script()
