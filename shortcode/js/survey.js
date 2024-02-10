@@ -47,10 +47,60 @@ function setup_menubar()
   });
 }
 
+function setup_user_profile()
+{
+  ce.profile_button.on('click', function(e) {
+    e.preventDefault();
+    ce.profile_modal.show();
+  })
+
+  ce.profile_cancel.on('click', function(e) {
+    e.preventDefault();
+    ce.profile_modal.hide();
+  });
+
+  jQuery(window).on('scroll',function(e) {
+    if( ce.profile_modal.is(':visible') ) {
+      const survey_top = ce.container.offset().top;
+      const survey_width = ce.container.outerWidth();
+      const survey_bottom = survey_top + ce.container.outerHeight();
+      const menubar_top = ce.menubar.offset().top;
+      const menubar_bottom = menubar_top + ce.menubar.outerHeight();
+      const editor_top = menubar_bottom + 5;
+      const editor_bottom = editor_top + ce.profile_editor.outerHeight();
+      const editor_width = 0.8 * survey_width;
+
+      if( editor_bottom > survey_bottom - 5 ) {
+        ce.profile_editor.hide();
+      } else {
+        ce.profile_editor.show();
+        if( menubar_fixed ) {
+          ce.profile_editor.css( {
+            'position':'fixed',
+            'top':page_top + 35,
+            'width':editor_width,
+          });
+        } else {
+          ce.profile_editor.css( {
+            'position':'absolute',
+            'top': 35,
+            'width':editor_width,
+          });
+        }
+      }
+    }
+  });
+}
+
 function setup_elements()
 {
   ce.container = jQuery('#survey');
   ce.menubar = ce.container.find('nav.menubar');
+  ce.user_menu = ce.menubar.find('.menu.user');
+  ce.profile_button = ce.menubar.find('a.user-profile');
+  ce.profile_modal  = ce.container.find('.modal.user-profile');
+  ce.profile_editor = ce.profile_modal.find('.dialog.user-profile');
+  ce.profile_cancel = ce.profile_editor.find('.cancel');
 
   ce.wpadminbar = jQuery('#wpadminbar');
   if(ce.wpadminbar) {
@@ -60,6 +110,7 @@ function setup_elements()
   }
 
   setup_menubar();
+  setup_user_profile();
 }
 
 jQuery(document).ready(

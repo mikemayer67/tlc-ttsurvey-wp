@@ -67,7 +67,7 @@ function add_survey_menubar($userid)
       <div class='menubar-item user'>
       <button class='menu-btn user'>$fullname<img src='$icon_url'></button>
         <div class='menu user'>
-            <a href='' data-action='edit-profile'>Edit Profile</a>
+            <a href='' class='user-profile'>Edit Profile</a>
             <a href='$form_uri?logout=1'>Log Out</a>
         </div>
       </div>
@@ -79,9 +79,9 @@ function add_user_profile_editor($userid)
 {
   echo <<<PROFILE_EDITOR_HTML
     <div class='modal user-profile'>
-      <div class='dialog-box user-profile'>
+      <div class='dialog user-profile'>
         <p>Hello there</p>
-        <a href=''>Cancel</a>
+        <a href='' class='cancel'>Cancel</a>
       </div>
     </div>
     PROFILE_EDITOR_HTML;
