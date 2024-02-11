@@ -1,5 +1,6 @@
 var ce = {};
-var page_top = 0;
+
+var menubar_top = -1;
 var menubar_fixed = false;
 
 
@@ -8,11 +9,13 @@ function setup_user_profile()
   ce.profile_button.on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
+    update_layout(e);
   })
 
   ce.profile_cancel.on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.hide();
+    update_layout(e);
   });
 
   jQuery(window).on('scroll',function(e) {
@@ -20,61 +23,67 @@ function setup_user_profile()
 }
 
 
-function handle_scroll(e)
-{
+function update_layout(e) {
+  var page_top = 0;
+  if(ce.wpadminbar && ce.wpadminbar.css('position') == 'fixed') {
+    page_top = ce.wpadminbar.height();
+  }
+  const scroll_top = jQuery(window).scrollTop() + page_top;
+
   const survey_height = ce.container.outerHeight();
   const survey_width = ce.container.outerWidth();
   const survey_top = ce.container.offset().top;
   const survey_left = ce.container.offset().left;
   const survey_bottom = survey_top + survey_height;
 
-  const menubar_height = ce.menubar.outerHeight(); 
-
-  const scroll_top = jQuery(window).scrollTop() + page_top;
-
-  var menubar_top = 0;
-
   // Menubar
 
-  if( scroll_top > survey_bottom - menubar_height ) {
-    menubar_top = survey_bottom - menubar_height;
-    if(menubar_fixed) {
-      menubar_fixed = false;
-      ce.menubar.css({
-        'position':'absolute',
-        'top':(survey_height-menubar_height) + 'px',
-        'left':0,
-        'width':'100%',
-      });
-    }
-  } else if(scroll_top > survey_top ) {
-    menubar_top = scroll_top;
-    if(!menubar_fixed) {
-      menubar_fixed = true;
-      ce.menubar.css({
-        'position':'fixed',
-        'top':page_top,
-        'left':survey_left + 'px',
-        'width':survey_width + 'px',
-      });
-    }
-  } else {
+  const menubar_height = ce.menubar.outerHeight(); 
+
+  const pos = ce.wpadminbar.css('position');
+  
+  if( scroll_top < survey_top ) {
+    ce.menubar.css({
+      'position':'absolute',
+      'top':0,
+      'left':0,
+      'width':'100%',
+    });
+    menubar_fixed = false;
     menubar_top = survey_top;
-    if(menubar_fixed) {
-      menubar_fixed = false;
-      ce.menubar.css({
-        'position':'absolute',
-        'top':0,
-        'left':0,
-        'width':'100%',
-      });
-    }
+  }
+  else if( scroll_top > survey_bottom - menubar_height ) {
+    ce.menubar.css({
+      'position':'absolute',
+      'top':survey_height - menubar_height,
+      'left':0,
+      'width':'100%',
+    });
+    menubar_fixed = false;
+    menubar_top = survey_bottom - menubar_height;
+  }
+  else {
+    ce.menubar.css({
+      'position':'fixed',
+      'top':page_top,
+      'left':survey_left,
+      'width':survey_width,
+    });
+    menubar_fixed = true;
+    menubar_top = scroll_top;
+  }
+
+  if(e.type == "resize" && menubar_fixed) {
+    ce.menubar.css({
+      'left':survey_left,
+      'width':survey_width,
+    });
   }
 
   // Profile Editor
-
+  
   if( ! ce.profile_modal.is(':visible') ) { return; }
- 
+
   const menubar_bottom = menubar_top + menubar_height;
 
   const editor_height = ce.profile_editor.outerHeight();
@@ -101,50 +110,14 @@ function handle_scroll(e)
       });
     }
   }
-  
-}
 
-function handle_resize(e)
-{
-  const survey_left = ce.container.offset().left;
-  const survey_width = ce.container.outerWidth();
-
-  // Menubar
-
-  if(menubar_fixed) {
-    ce.menubar.css({
-      'left':survey_left + 'px',
-      'width':survey_width + 'px',
-    });
-  } else {
-    ce.menubar.css({
-      'left':0,
-      'width':survey_width + 'px',
-    });
-  }
-
-  // Profile Editor
-
-  if( ce.profile_modal.is(':visible') )
-  {
-    ce.profile_editor.css({'width':0.8*survey_width});
-  }
-
-  page_top = 0;
-  ce.wpadminbar = jQuery('#wpadminbar');
-  if(ce.wpadminbar) {
-    if(ce.wpadminbar.css('position') == 'fixed') {
-      page_top = ce.wpadminbar.height();
-    }
-  }
-
-  handle_scroll(e);
 }
 
 
 function setup_elements()
 {
   ce.container = jQuery('#survey');
+  ce.wpadminbar = jQuery('#wpadminbar');
   ce.menubar = ce.container.find('nav.menubar');
   ce.user_menu = ce.menubar.find('.menu.user');
   ce.profile_button = ce.menubar.find('a.user-profile');
@@ -152,15 +125,8 @@ function setup_elements()
   ce.profile_editor = ce.profile_modal.find('.dialog.user-profile');
   ce.profile_cancel = ce.profile_editor.find('.cancel');
 
-  ce.wpadminbar = jQuery('#wpadminbar');
-  if(ce.wpadminbar) {
-    if(ce.wpadminbar.css('position') == 'fixed') {
-      page_top = ce.wpadminbar.height();
-    }
-  }
-
-  jQuery(window).on('scroll',handle_scroll);
-  jQuery(window).on('resize',handle_resize);
+  jQuery(window).on('scroll',update_layout);
+  jQuery(window).on('resize',update_layout);
 
   setup_user_profile();
 }
