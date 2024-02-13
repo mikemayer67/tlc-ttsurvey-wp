@@ -150,7 +150,6 @@ function add_shortcode_content()
   if($userid && !$page) {
     require_once plugin_path("shortcode/survey.php");
     if(add_survey_content($userid)) {
-      enqueue_survey_script();
       return;
     }
   }
