@@ -19,25 +19,30 @@ function add_survey_menubar($userid)
 
   $user = User::from_userid($userid);
   $fullname = $user->fullname();
+  $email = $user->email();
 
   $status = "Status";
 
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
   $icon_url = plugin_url('/img/icons8-down.png');
 
-  echo <<<MENUBAR_HTML
-    <nav class='menubar'>
-      <div class='menubar-item survey-name'>$survey_name</div>
-      <div class='menubar-item status'>$status</div>
-      <div class='menubar-item user'>
-      <button class='menu-btn user'>$fullname<img src='$icon_url'></button>
-        <div class='menu user'>
-            <a href='' class='user-profile'>Edit Profile</a>
-            <a href='$form_uri?logout=1'>Log Out</a>
-        </div>
-      </div>
-    </nav>
-    MENUBAR_HTML;
+  echo "<nav class='menubar'>";
+  echo "<div class='menubar-item survey-name'>$survey_name</div>";
+  echo "<div class='menubar-item status'>$status</div>";
+  echo "<div class='menubar-item user'>";
+  echo "<button class='menu-btn user'>$fullname<img src='$icon_url'></button>";
+  echo "<div class='menu user'>";
+  echo "<a href='' class='edit-user-name'>Update Name</a>";
+  if($email) {
+    echo "<a href='' class='edit-user-email'>Update Email</a>";
+    echo "<a href='' class='drop-user-email'>Remove Email</a>";
+  } else {
+    echo "<a href='' class='add-user-email'>Add Email</a>";
+  }
+  echo "<a href='' class='change-password'>Change Password</a>";
+  echo "<hr class='menu-sep'>";
+  echo "<a href='$form_uri?logout=1'>Log Out</a>";
+  echo "</div></div></nav>";
 }
 
 function add_user_profile_editor($userid)
