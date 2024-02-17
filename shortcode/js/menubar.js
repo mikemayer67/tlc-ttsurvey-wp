@@ -4,21 +4,41 @@ var menubar_top = -1;
 var menubar_fixed = false;
 
 
-function setup_user_profile()
+function setup_user_menu()
 {
-  ce.profile_button.on('click', function(e) {
+  ce.user_menu.find('.edit-user-name').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
+    ce.profile_modal.find('form').hide();
+    ce.profile_modal.find('form.name').show();
     update_layout(e);
-  })
+  });
+  ce.user_menu.find('.edit-user-email').on('click', function(e) {
+    e.preventDefault();
+    ce.profile_modal.show();
+    ce.profile_modal.find('form').hide();
+    ce.profile_modal.find('form.email').show();
+    update_layout(e);
+  });
+  ce.user_menu.find('.add-user-email').on('click', function(e) {
+    e.preventDefault();
+    ce.profile_modal.show();
+    ce.profile_modal.find('form').hide();
+    ce.profile_modal.find('form.email').show();
+    update_layout(e);
+  });
+  ce.user_menu.find('.change-password').on('click', function(e) {
+    e.preventDefault();
+    ce.profile_modal.show();
+    ce.profile_modal.find('form').hide();
+    ce.profile_modal.find('form.password').show();
+    update_layout(e);
+  });
 
   ce.profile_cancel.on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.hide();
     update_layout(e);
-  });
-
-  jQuery(window).on('scroll',function(e) {
   });
 }
 
@@ -125,15 +145,14 @@ function setup_elements()
   ce.wpadminbar = jQuery('#wpadminbar');
   ce.menubar = ce.container.find('nav.menubar');
   ce.user_menu = ce.menubar.find('.menu.user');
-  ce.profile_button = ce.menubar.find('a.user-profile');
   ce.profile_modal  = ce.container.find('.modal.user-profile');
-  ce.profile_editor = ce.profile_modal.find('.dialog.user-profile');
+  ce.profile_editor = ce.profile_modal.find('.dialog');
   ce.profile_cancel = ce.profile_editor.find('.cancel');
 
   jQuery(window).on('scroll',update_layout);
   jQuery(window).on('resize',update_layout);
 
-  setup_user_profile();
+  setup_user_menu();
 }
 
 jQuery(document).ready(

@@ -32,20 +32,54 @@ function add_survey_menubar($userid)
   echo "<div class='menubar-item user'>";
   echo "<button class='menu-btn user'>$fullname<img src='$icon_url'></button>";
   echo "<div class='menu user'>";
-  echo "<a href='' class='edit-user-name'>Update Name</a>";
+  echo "<a class='edit-user-name'>Update Name</a>";
   if($email) {
-    echo "<a href='' class='edit-user-email'>Update Email</a>";
-    echo "<a href='' class='drop-user-email'>Remove Email</a>";
+    echo "<a class='edit-user-email'>Update Email</a>";
+    echo "<a class='drop-user-email'>Remove Email</a>";
   } else {
-    echo "<a href='' class='add-user-email'>Add Email</a>";
+    echo "<a class='add-user-email'>Add Email</a>";
   }
-  echo "<a href='' class='change-password'>Change Password</a>";
+  echo "<a class='change-password'>Change Password</a>";
   echo "<hr class='menu-sep'>";
   echo "<a href='$form_uri?logout=1'>Log Out</a>";
   echo "</div></div></nav>";
 }
 
 function add_user_profile_editor($userid)
+{
+  echo "<div class='modal user-profile'>";
+  echo "<div class='dialog user-profile'>";
+  add_user_name_editor($userid);
+  add_user_email_editor($userid);
+  add_user_password_editor($userid);
+  echo "</div></div>";
+}
+
+function add_user_name_editor($userid)
+{
+  echo "<form class='user-profile name'>";
+  wp_nonce_field(USER_PROFILE_NONCE);
+  add_login_submit("Update",'update',true);
+  echo "</form>";
+}
+
+function add_user_email_editor($userid)
+{
+  echo "<form class='user-profile email'>";
+  wp_nonce_field(USER_PROFILE_NONCE);
+  add_login_submit("Update",'update',true);
+  echo "</form>";
+}
+
+function add_user_password_editor($userid)
+{
+  echo "<form class='user-profile password'>";
+  wp_nonce_field(USER_PROFILE_NONCE);
+  add_login_submit("Update",'update',true);
+  echo "</form>";
+}
+
+function add_user_profile_editor_delete_me($userid)
 {
   log_dev("add_user_profile_editor($userid)");
   $user = User::from_userid($userid);
