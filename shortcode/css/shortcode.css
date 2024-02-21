@@ -1,4 +1,13 @@
 #tlc-ttsurvey {
+  --ttsurvey-color:#006;
+  --ttsurvey-menu-bg-color:#336;
+  --ttsurvey-menu-fg-color:#28f;
+  --ttsurvey-menu-select-color:#226;
+  --noscript-color:#800;
+  --noscript-bg-color:#fcc;
+}
+
+#tlc-ttsurvey {
   position:relative;
   color:black;
   width:100%;
@@ -6,13 +15,10 @@
   font-family:ui-sans-serif, Arial, Helvetica, sans-serif;
 }
 
-#tlc-ttsurvey {
-  --ttsurvey-color:#006;
-  --ttsurvey-menu-bg-color:#336;
-  --ttsurvey-menu-fg-color:#28f;
-  --ttsurvey-menu-select-color:#226;
-  --noscript-color:#800;
-  --noscript-bg-color:#fcc;
+@media (min-width:480px) {
+  #tlc-ttsurvey {
+    min-width:480px;
+  }
 }
 
 #tlc-ttsurvey div.noscript {
