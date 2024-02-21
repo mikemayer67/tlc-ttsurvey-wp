@@ -40,7 +40,28 @@ function setup_user_menu()
     ce.profile_modal.hide();
     update_layout(e);
   });
+
+  ce.profile_editor.find('form.name .submit').on('click',update_name);
+  ce.profile_editor.find('form.email .submit').on('click',update_email);
+  ce.profile_editor.find('form.password .submit').on('click',update_password);
 }
+
+function update_name(e) {
+  e.preventDefault();
+  alert("Update name");
+}
+
+function update_email(e) {
+  e.preventDefault();
+  alert("Update email");
+}
+
+function update_password(e) {
+  e.preventDefault();
+  alert("Update password");
+}
+
+
 
 
 function update_layout(e) {

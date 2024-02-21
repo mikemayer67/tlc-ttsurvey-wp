@@ -49,34 +49,64 @@ function add_user_profile_editor($userid)
 {
   echo "<div class='modal user-profile'>";
   echo "<div class='dialog user-profile'>";
-  add_user_name_editor($userid);
-  add_user_email_editor($userid);
-  add_user_password_editor($userid);
+  $user = User::from_userid($userid);
+  add_user_name_editor($user);
+  add_user_email_editor($user);
+  add_user_password_editor($user);
   echo "</div></div>";
 }
 
-function add_user_name_editor($userid)
+function start_editor_content($user_property)
 {
-  echo "<form class='user-profile name'>";
+  echo "<form class='user-profile $user_property'>";
   wp_nonce_field(USER_PROFILE_NONCE);
-  add_login_submit("Update",'update',true);
+  echo "<div class='editor-body $user_property'>";
+  echo "<div class='entry-box'>";
+}
+
+function end_editor_content()
+{
+  echo "</div>"; // entry-box
+  echo "<div class='button-box'>";
+  echo "<button class='cancel'>Cancel</button>";
+  echo "<button class='submit'>Update</button>";
+  echo "</div>"; // button-box
+  echo "</div>"; // editor-body
   echo "</form>";
+}
+
+function add_info_trigger($key)
+{
+  $info_link = "tlc-ttsurvey-$key-info";
+  $icon_url = plugin_url('img/icons8-info.png');
+  $info_icon = "<img src='$icon_url' width=18 height=18>";
+  echo "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+}
+
+function add_user_name_editor($user)
+{
+  $fullname = $user->fullname();
+  $trigger_key = "name-editor";
+  start_editor_content('name');
+  echo "<div class='entry-row'>";
+  echo "<label>Name:</label>";
+  echo "<input type='text' class='text-entry name' name='name' value='$fullname'>";
+  add_info_trigger($trigger_key);
+  echo "</div>"; // entry-row
+  end_editor_content();
 }
 
 function add_user_email_editor($userid)
 {
-  echo "<form class='user-profile email'>";
-  wp_nonce_field(USER_PROFILE_NONCE);
-  add_login_submit("Update",'update',true);
-  echo "</form>";
+  start_editor_content('email');
+  echo "<label>Email:</label>";
+  end_editor_content();
 }
 
 function add_user_password_editor($userid)
 {
-  echo "<form class='user-profile password'>";
-  wp_nonce_field(USER_PROFILE_NONCE);
-  add_login_submit("Update",'update',true);
-  echo "</form>";
+  start_editor_content('password');
+  end_editor_content();
 }
 
 function add_user_profile_editor_delete_me($userid)

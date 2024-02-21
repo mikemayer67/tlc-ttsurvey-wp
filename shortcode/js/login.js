@@ -450,7 +450,6 @@ function setup_elements()
   // info trigger/box handling
   ce.info_triggers = ce.form.find('.info-trigger');
   ce.info_boxes = ce.form.find('.info-box');
-  ce.info_triggers.show();
   ce.info_boxes.hide();
   if(ce.info_triggers.length) { info_setup(); }
 
