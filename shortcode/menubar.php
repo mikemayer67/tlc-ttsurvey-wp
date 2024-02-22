@@ -94,11 +94,9 @@ function add_user_name_editor($user)
   $fullname = $user->fullname();
   $trigger_key = "name-editor";
   start_editor_content('name');
-  echo "<div class='entry-row'>";
   echo "<label>Name:</label>";
   echo "<input type='text' class='text-entry name' name='name' value='$fullname'>";
   add_info_trigger($trigger_key);
-  echo "</div>"; // entry-row
   end_editor_content();
 }
 

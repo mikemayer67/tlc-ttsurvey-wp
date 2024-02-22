@@ -6,15 +6,6 @@ var menubar_fixed = false;
 
 function setup_user_menu()
 {
-  if( window.matchMedia("(max-width:480px)").matches ) {
-    const mobile_menubox = ce.menubar.find('.menubox.mobile');
-    const status_item = ce.menubar.find('.menubar-item.status');
-    const user_item = ce.menubar.find('.menubar-item.user');
-    mobile_menubox.append(status_item);
-    mobile_menubox.append(user_item);
-    mobile_menubox.show();
-  }
-
   ce.user_menu.find('.edit-user-name').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
@@ -69,8 +60,6 @@ function update_password(e) {
   e.preventDefault();
   alert("Update password");
 }
-
-
 
 
 function update_layout(e) {
@@ -168,6 +157,20 @@ function update_layout(e) {
 
 }
 
+function watch_media(e)
+{
+  var menubox;
+  if( ce.matchMedia.matches ) {
+    menubox = ce.menubar.find('.menubox.mobile');
+  } else {
+    menubox = ce.menubar.find('.menubox.main');
+  }
+  const status_item = ce.menubar.find('.menubar-item.status');
+  const user_item = ce.menubar.find('.menubar-item.user');
+  menubox.append(status_item);
+  menubox.append(user_item);
+}
+
 
 function setup_elements()
 {
@@ -178,6 +181,10 @@ function setup_elements()
   ce.profile_modal  = ce.container.find('.modal.user-profile');
   ce.profile_editor = ce.profile_modal.find('.dialog');
   ce.profile_cancel = ce.profile_editor.find('.cancel');
+
+  ce.matchMedia = window.matchMedia("(max-width:480px)");
+  ce.matchMedia.addEventListener('change',watch_media);
+  watch_media(null);
 
   jQuery(window).on('scroll',update_layout);
   jQuery(window).on('resize',update_layout);
