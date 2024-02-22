@@ -180,27 +180,43 @@
 }
 */
 
+#tlc-ttsurvey #survey .modal .editor-body .label-box {
+  display:flex;
+  justify-content:flex-end;
+}
+
+#tlc-ttsurvey #survey .modal .editor-body .label-box .info-trigger {
+  margin-left:5px;
+}
+
+#tlc-ttsurvey #survey .modal .editor-body .label-box .info-trigger img {
+  width:15px;
+  height:15px;
+  vertical-align:top;
+}
+
+#tlc-ttsurvey #survey .modal .editor-body .label-box .error {
+  margin-left:auto;
+  margin-right:1.5em;
+  align-self:flex-end;
+  font-size:small;
+  color:var(--ttsurvey-error-color);
+}
+
 #tlc-ttsurvey #survey .modal .editor-body .entry-box {
   display:flex;
-  flex-direction:row;
-  justify-content:space-between;
-  align-items:center;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body .entry-box label {
-  order:1;
+#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.error{
+  background-color:var(--ttsurvey-error-background-color);
 }
+
+
 
 #tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry {
-  order:2;
-  display:inline-block;
   width:100%;
-}
-
-#tlc-ttsurvey #survey .modal .editor-body .entry-box .info-trigger {
-  order:3;
-  margin: 0 1em 0 5px;
-  align-self:start;
+  margin:0 1em 0 1em;
+  font-size:smaller;
 }
 
 #tlc-ttsurvey #survey .modal .editor-body .button-box {

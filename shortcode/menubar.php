@@ -67,12 +67,10 @@ function start_editor_content($user_property)
   echo "<form class='user-profile $user_property'>";
   wp_nonce_field(USER_PROFILE_NONCE);
   echo "<div class='editor-body $user_property'>";
-  echo "<div class='entry-box'>";
 }
 
 function end_editor_content()
 {
-  echo "</div>"; // entry-box
   echo "<div class='button-box'>";
   echo "<button class='cancel'>Cancel</button>";
   echo "<button class='submit'>Update</button>";
@@ -81,22 +79,30 @@ function end_editor_content()
   echo "</form>";
 }
 
-function add_info_trigger($key)
+function add_label_box($label,$key)
 {
+  echo "<div class='label-box'>";
+
+  echo "<label>$label:</label>";
+
   $info_link = "tlc-ttsurvey-$key-info";
   $icon_url = plugin_url('img/icons8-info.png');
-  $info_icon = "<img src='$icon_url' width=18 height=18>";
+  $info_icon = "<img src='$icon_url'>";
   echo "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
+
+  echo "<div class='error $key'>error</div>";
+
+  echo "</div>";
 }
 
 function add_user_name_editor($user)
 {
   $fullname = $user->fullname();
-  $trigger_key = "name-editor";
   start_editor_content('name');
-  echo "<label>Name:</label>";
+  add_label_box('Name','name');
+  echo "<div class='entry-box name'>";
   echo "<input type='text' class='text-entry name' name='name' value='$fullname'>";
-  add_info_trigger($trigger_key);
+  echo "</div>";
   end_editor_content();
 }
 

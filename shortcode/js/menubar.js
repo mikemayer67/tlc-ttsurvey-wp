@@ -143,13 +143,13 @@ function update_layout(e) {
     if( menubar_fixed ) {
       ce.profile_editor.css( {
         'position':'fixed',
-        'top':page_top + 35,
+        'top':page_top + menubar_height + 5,
         'width':editor_width,
       });
     } else {
       ce.profile_editor.css( {
         'position':'absolute',
-        'top': 35,
+        'top': menubar_height + 5,
         'width':editor_width,
       });
     }
