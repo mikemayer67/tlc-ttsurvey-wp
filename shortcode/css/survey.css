@@ -38,24 +38,39 @@
   background-color:var(--ttsurvey-color);
   height: 30px;
   padding:0 8px;
+}
+
+#tlc-ttsurvey #survey .menubox {
   display:flex;
   flex-wrap:nowrap;
   justify-content:space-between;
   align-items:center;
 }
 
+/*
+#tlc-ttsurvey #survey .menubox.mobile {
+  display:none;
+}
+*/
+
 @media (max-width:480px) {
   #tlc-ttsurvey #survey nav.menubar {
-    height:90px;
+    height:60px;
+  }
+  #tlc-ttsurvey #survey .menubar-item.status,
+  #tlc-ttsurvey #survey .menubar-item.user {
+    font-size:smaller;
   }
 }
+
 
 #tlc-ttsurvey #survey .menubar-item {
   color:white;
 }
 
 #tlc-ttsurvey #survey .menu-btn {
-  background-color:var(--ttsurvey-color);
+  background-color:rgba(0,0,0,0);
+  border:none;
   height:30px;
 }
 

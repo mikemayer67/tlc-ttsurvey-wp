@@ -27,22 +27,28 @@ function add_survey_menubar($userid)
   $icon_url = plugin_url('/img/icons8-down.png');
 
   echo "<nav class='menubar'>";
-  echo "<div class='menubar-item survey-name'>$survey_name</div>";
-  echo "<div class='menubar-item status'>$status</div>";
-  echo "<div class='menubar-item user'>";
-  echo "<button class='menu-btn user'>$fullname<img src='$icon_url'></button>";
-  echo "<div class='menu user'>";
-  echo "<a class='edit-user-name'>Update Name</a>";
+  echo "<div class='menubox main'>";
+  echo "  <div class='menubar-item survey-name'>$survey_name</div>";
+  echo "  <div class='menubar-item status'>$status</div>";
+  echo "  <div class='menubar-item user'>";
+  echo "    <button class='menu-btn user'>$fullname<img src='$icon_url'></button>";
+  echo "    <div class='menu user'>";
+  echo "      <a class='edit-user-name'>Update Name</a>";
   if($email) {
-    echo "<a class='edit-user-email'>Update Email</a>";
-    echo "<a class='drop-user-email'>Remove Email</a>";
+    echo "    <a class='edit-user-email'>Update Email</a>";
+    echo "    <a class='drop-user-email'>Remove Email</a>";
   } else {
-    echo "<a class='add-user-email'>Add Email</a>";
+    echo "    <a class='add-user-email'>Add Email</a>";
   }
-  echo "<a class='change-password'>Change Password</a>";
-  echo "<hr class='menu-sep'>";
-  echo "<a href='$form_uri?logout=1'>Log Out</a>";
-  echo "</div></div></nav>";
+  echo "      <a class='change-password'>Change Password</a>";
+  echo "      <hr class='menu-sep'>";
+  echo "      <a href='$form_uri?logout=1'>Log Out</a>";
+  echo "    </div>"; // menu.user
+  echo "  </div>"; // menubar-item.user
+  echo "</div>"; // menubox.main
+  echo "<div class='menubox mobile'>";
+  echo "</div>"; //menubox.mobile
+  echo "</nav>";
 }
 
 function add_user_profile_editor($userid)

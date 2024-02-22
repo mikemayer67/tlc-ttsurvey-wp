@@ -6,6 +6,15 @@ var menubar_fixed = false;
 
 function setup_user_menu()
 {
+  if( window.matchMedia("(max-width:480px)").matches ) {
+    const mobile_menubox = ce.menubar.find('.menubox.mobile');
+    const status_item = ce.menubar.find('.menubar-item.status');
+    const user_item = ce.menubar.find('.menubar-item.user');
+    mobile_menubox.append(status_item);
+    mobile_menubox.append(user_item);
+    mobile_menubox.show();
+  }
+
   ce.user_menu.find('.edit-user-name').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
