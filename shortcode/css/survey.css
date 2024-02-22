@@ -138,47 +138,11 @@
   width:80%;
   margin-left:auto;
   margin-right:auto;
-  background-color:white;
+  background-color:var(--ttsurvey-form-background-color);
   padding:8px;
   border:solid 2px black;
   box-shadow:0 8px 16px 0 rgba(0,0,0,0.2);
 }
-
-/*
-#tlc-ttsurvey #survey .modal .editor-body {
-  display:flex;
-  flex-direction:row;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:space-between;
-}
-
-#tlc-ttsurvey #survey .modal .editor-body .entry-row {
-  display:flex;
-  align-items:center;
-  flex-wrap:nowrap;
-}
-
-@media (max-width:480px) {
-  #tlc-ttsurvey #survey .modal .editor-body {
-    flex-direction:column;
-    row-gap:10px;
-  }
-  #tlc-ttsurvey #survey .modal .editor-body .entry-row {
-    flex-wrap:wrap;
-  }
-}
-
-#tlc-ttsurvey #survey .modal .editor-body .entry-box {
-  flex-grow:2;
-
-}
-
-#tlc-ttsurvey #survey .modal .editor-body .button-box {
-  align-self:end;
-  flex-grow:0;
-}
-*/
 
 #tlc-ttsurvey #survey .modal .editor-body .label-box {
   display:flex;
@@ -207,8 +171,13 @@
   display:flex;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.error{
+#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.error {
   background-color:var(--ttsurvey-error-background-color);
+}
+
+
+#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.empty {
+  background-color:var(--ttsurvey-form-empty-field-color);
 }
 
 

@@ -41,7 +41,7 @@
 }
 
 #tlc-ttsurvey #login form {
-  background-color:#e8e8e8;
+  background-color:var(--ttsurvey-form-background-color);
   margin:0;
   padding:12px 16px;
 }
@@ -116,7 +116,7 @@
 }
 
 #tlc-ttsurvey #login form input.empty {
-  background-color:#ffffcc;
+  background-color:var(--ttsurvey-form-empty-field-color);
 }
 
 #tlc-ttsurvey #login .submit-bar button {

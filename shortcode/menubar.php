@@ -81,17 +81,22 @@ function end_editor_content()
 
 function add_label_box($label,$key)
 {
-  echo "<div class='label-box'>";
-
-  echo "<label>$label:</label>";
-
   $info_link = "tlc-ttsurvey-$key-info";
   $icon_url = plugin_url('img/icons8-info.png');
   $info_icon = "<img src='$icon_url'>";
+
+  echo "<div class='label-box'>";
+  echo "<label>$label:</label>";
   echo "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
-
   echo "<div class='error $key'>error</div>";
+  echo "</div>";
+}
 
+function add_info_box($key,$info)
+{
+  $info_link = "tlc-ttsurvey-$key-info";
+  echo "<div id='$info_link' class='info-box'>";
+  echo "<div class='info'><p>$info</p></div>";
   echo "</div>";
 }
 
@@ -101,80 +106,36 @@ function add_user_name_editor($user)
   start_editor_content('name');
   add_label_box('Name','name');
   echo "<div class='entry-box name'>";
-  echo "<input type='text' class='text-entry name' name='name' value='$fullname'>";
+  echo "<input type='text' class='text-entry name' name='name' value='$fullname' placeholder='Full Name'>";
   echo "</div>";
+  add_info_box('name',"Name Info");
   end_editor_content();
 }
 
-function add_user_email_editor($userid)
+function add_user_email_editor($user)
 {
+  $email = $user->email();
+  $empty = $email ? "" : "empty";
   start_editor_content('email');
-  echo "<label>Email:</label>";
+  add_label_box('Email','email');
+  echo "<div class='entry-box email'>";
+  echo "<input type='email' class='text-entry email $empty' name='email' value='$email' placeholder='Email Address'>";
+  echo "</div>";
+  add_info_box('email',"Email Info");
   end_editor_content();
 }
 
 function add_user_password_editor($userid)
 {
   start_editor_content('password');
+  add_label_box('Password','password');
+  echo "<div class='entry-box'>";
+  echo "<input type='password' class='text-entry primary empty' name='password' placeholder='New Password'>";
+  echo "</div><div class='entry-box'>";
+  echo "<input type='password' class='text-entry confirm empty' name='password-confirm' placeholder='Confirm Password'>";
+  echo "</div>";
+  add_info_box('password',"Password Info");
   end_editor_content();
-}
-
-function add_user_profile_editor_delete_me($userid)
-{
-  log_dev("add_user_profile_editor($userid)");
-  $user = User::from_userid($userid);
-  log_dev("ok");
-  $fullname = $user->fullname();
-  log_dev($fullname);
-  $email = $user->email();
-  log_dev($email);
-
-  echo "<div class='modal user-profile'>";
-  echo "<div class='dialog user-profile'>";
-  echo "<form class='user-profile'>";
-
-  wp_nonce_field(USER_PROFILE_NONCE);
-
-  add_login_input("fullname",array(
-    "label" => 'Name',
-    "value" => $fullname,
-    "info" => <<<INFO
-      How your name will appear on the survey summary report
-      <p class=info-list><b>must</b> contain a valid full name</p>
-      <p class=info-list><b>may</b> contain apostrophes</p>
-      <p class=info-list><b>may></b> contain hyphens</p>
-      <p class=info-list>Extra whitespace will be removed</p>
-      INFO
-  ));
-
-  add_login_input("new-password",array(
-    "name" => "password",
-    "optional" => True,
-    "info" => <<<INFO
-      Used to log into the survey
-      <p class=info-list><b>must</b> be between 8 and 128 characters</p>
-      <p class=info-list><b>must</b> contain at least one letter</p>
-      <p class=info-list><b>may</b> contain: !@%^*-_=~,.</p>
-      <p class=info-list><b>may</b> contain spaces</p>
-      INFO
-  ));
-
-  add_login_input("email",array(
-    "optional" => True, 
-    "value" => $email,
-    "info" => <<<INFO
-      The email address is <b>optional</b>. It will only be used in conjunction with 
-      this survey. It will be used to send you:
-      <p class=info-list>confirmation of your registration</p>
-      <p class=info-list>notifcations on your survey state</p>
-      <p class=info-list>login help (on request)</p>
-      INFO
-  ));
-
-  add_login_submit("Update",'update',true);
-
-
-  echo "</form></div></div>";
 }
 
 function enqueue_menubar_script()

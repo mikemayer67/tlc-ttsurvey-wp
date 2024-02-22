@@ -5,6 +5,8 @@
   --ttsurvey-menu-select-color:#226;
   --ttsurvey-error-color:#800;
   --ttsurvey-error-background-color:#fed;
+  --ttsurvey-form-background-color:#e8e8e8;
+  --ttsurvey-form-empty-field-color:#ffffcc;
   --noscript-color:#800;
   --noscript-bg-color:#fcc;
 }
