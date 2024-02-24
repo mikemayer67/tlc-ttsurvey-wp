@@ -97,11 +97,12 @@ function add_login_input($type,$kwargs=array())
 
   $empty = $optional ? '' : 'empty';
   $required = $optional ? "placeholder='[optional]'" : 'required';
+  $ac = "autocomplete='$type'";
   
   if($type=='new-password') 
   {
-    echo "<input id='$id' type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
-    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required autocomplete='new-password'>";
+    echo "<input id='$id' type='password' class='text-entry entry empty primary' name='$name' required $ac>";
+    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required $ac>";
   }
   else
   {
@@ -110,7 +111,7 @@ function add_login_input($type,$kwargs=array())
     case 'email':                    break;
     default:         $type = 'text'; break;
     }
-    echo "<input id='$id' type='$type' class='text-entry $empty' name='$name' $value $required autocomplete='$type'>";
+    echo "<input id='$id' type='$type' class='text-entry $empty' name='$name' $value $required $ac>";
   }
 
   # add info box
