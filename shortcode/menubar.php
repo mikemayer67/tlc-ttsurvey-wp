@@ -55,17 +55,19 @@ function add_user_profile_editor($userid)
 {
   echo "<div class='modal user-profile'>";
   echo "<div class='dialog user-profile'>";
+  echo "<form class='user-profile'>";
+  wp_nonce_field(USER_PROFILE_NONCE);
   $user = User::from_userid($userid);
   add_user_name_editor($user);
   add_user_email_editor($user);
   add_user_password_editor($user);
-  echo "</div></div>";
+  echo "</form>";
+  echo "</div>"; // dialog
+  echo "</div>"; // modal
 }
 
 function start_editor_content($user_property)
 {
-  echo "<form class='user-profile $user_property'>";
-  wp_nonce_field(USER_PROFILE_NONCE);
   echo "<div class='editor-body $user_property'>";
 }
 
@@ -76,7 +78,6 @@ function end_editor_content()
   echo "<button class='submit'>Update</button>";
   echo "</div>"; // button-box
   echo "</div>"; // editor-body
-  echo "</form>";
 }
 
 function add_label_box($label,$key)
@@ -86,7 +87,7 @@ function add_label_box($label,$key)
   $info_icon = "<img src='$icon_url'>";
 
   echo "<div class='label-box'>";
-  echo "<label>$label:</label>";
+  echo "<label for='tlcsurvey-entry-box-$key'>$label:</label>";
   echo "<a class='info-trigger' data-target='$info_link'>$info_icon</a>";
   echo "<div class='error $key'>error</div>";
   echo "</div>";
@@ -106,7 +107,7 @@ function add_user_name_editor($user)
   start_editor_content('name');
   add_label_box('Name','name');
   echo "<div class='entry-box name'>";
-  echo "<input type='text' class='text-entry name' name='name' value='$fullname' placeholder='Full Name'>";
+  echo "<input id='tlcsurvey-entry-box-name' type='text' class='text-entry name' name='name' value='$fullname' placeholder='Full Name' autocomplete='name'>";
   echo "</div>";
   add_info_box('name',"Name Info");
   end_editor_content();
@@ -119,7 +120,7 @@ function add_user_email_editor($user)
   start_editor_content('email');
   add_label_box('Email','email');
   echo "<div class='entry-box email'>";
-  echo "<input type='email' class='text-entry email $empty' name='email' value='$email' placeholder='Email Address'>";
+  echo "<input id='tlcsurvey-entry-box-email' type='email' class='text-entry email $empty' name='email' value='$email' placeholder='Email Address' autocomplete='email'>";
   echo "</div>";
   add_info_box('email',"Email Info");
   end_editor_content();
@@ -130,9 +131,9 @@ function add_user_password_editor($userid)
   start_editor_content('password');
   add_label_box('Password','password');
   echo "<div class='entry-box'>";
-  echo "<input type='password' class='text-entry primary empty' name='password' placeholder='New Password'>";
+  echo "<input id='tlcsurvey-entry-box-password' type='password' class='text-entry primary empty' name='password' placeholder='New Password' autocomplete='new-password'>";
   echo "</div><div class='entry-box'>";
-  echo "<input type='password' class='text-entry confirm empty' name='password-confirm' placeholder='Confirm Password'>";
+  echo "<input type='password' class='text-entry confirm empty' name='password-confirm' placeholder='Confirm Password' autocomplete='new-password'>";
   echo "</div>";
   add_info_box('password',"Password Info");
   end_editor_content();

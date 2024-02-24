@@ -131,7 +131,7 @@
 }
 
 #tlc-ttsurvey #survey .dialog {
-  position:absolute;
+  position:relative;
   top:35px;
   left:0;
   right:0;
@@ -142,6 +142,14 @@
   padding:8px;
   border:solid 2px black;
   box-shadow:0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+#tlc-ttsurvey #survey .modal form {
+  position:relative;
+}
+
+#tlc-ttsurvey #survey .modal .editor-body {
+  position:relative;
 }
 
 #tlc-ttsurvey #survey .modal .editor-body .label-box {

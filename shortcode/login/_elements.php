@@ -72,6 +72,7 @@ function add_login_input($type,$kwargs=array())
   $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
   $info = $kwargs['info'] ?? null;
+  $id = "tlcsurvey-input-$name";
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
@@ -79,7 +80,7 @@ function add_login_input($type,$kwargs=array())
   # add label box
 
   echo "<div class='label-box'>";
-  echo "<label>$label</label>";
+  echo "<label for='$id'>$label</label>";
   if($info) { 
     $info_link = "tlc-ttsurvey-$name-info";
     $icon_url = plugin_url('img/icons8-info.png');
@@ -99,7 +100,7 @@ function add_login_input($type,$kwargs=array())
   
   if($type=='new-password') 
   {
-    echo "<input type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
+    echo "<input id='$id' type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
     echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required autocomplete='new-password'>";
   }
   else
@@ -109,7 +110,7 @@ function add_login_input($type,$kwargs=array())
     case 'email':                    break;
     default:         $type = 'text'; break;
     }
-    echo "<input type='$type' class='text-entry $empty' name='$name' $value $required>";
+    echo "<input id='$id' type='$type' class='text-entry $empty' name='$name' $value $required autocomplete='$type'>";
   }
 
   # add info box
@@ -131,13 +132,14 @@ function add_login_checkbox($name, $kwargs=array())
   $label = $kwargs['label'] ?? ucwords($name);
   $checked = stripslashes($kwargs['value'] ?? False) ? 'checked' : '';
   $info = $kwargs['info'] ?? null;
+  $id = "tlcsurvey-cb-$name";
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
   
   echo "<div class='label-box'>";
-  echo "<input type='checkbox' name='$name' $checked>";
-  echo "<label>$label</label>";
+  echo "<input id='$id' type='checkbox' name='$name' $checked>";
+  echo "<label for='$id'>$label</label>";
 
   if($info)
   {

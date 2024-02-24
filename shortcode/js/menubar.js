@@ -9,29 +9,29 @@ function setup_user_menu()
   ce.user_menu.find('.edit-user-name').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
-    ce.profile_modal.find('form').hide();
-    ce.profile_modal.find('form.name').show();
+    ce.profile_modal.find('.editor-body').hide();
+    ce.profile_modal.find('.editor-body.name').show();
     update_layout(e);
   });
   ce.user_menu.find('.edit-user-email').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
-    ce.profile_modal.find('form').hide();
-    ce.profile_modal.find('form.email').show();
+    ce.profile_modal.find('.editor-body').hide();
+    ce.profile_modal.find('.editor-body.email').show();
     update_layout(e);
   });
   ce.user_menu.find('.add-user-email').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
-    ce.profile_modal.find('form').hide();
-    ce.profile_modal.find('form.email').show();
+    ce.profile_modal.find('.editor-body').hide();
+    ce.profile_modal.find('.editor-body.email').show();
     update_layout(e);
   });
   ce.user_menu.find('.change-password').on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.show();
-    ce.profile_modal.find('form').hide();
-    ce.profile_modal.find('form.password').show();
+    ce.profile_modal.find('.editor-body').hide();
+    ce.profile_modal.find('.editor-body.password').show();
     update_layout(e);
   });
 
@@ -41,9 +41,9 @@ function setup_user_menu()
     update_layout(e);
   });
 
-  ce.profile_editor.find('form.name .submit').on('click',update_name);
-  ce.profile_editor.find('form.email .submit').on('click',update_email);
-  ce.profile_editor.find('form.password .submit').on('click',update_password);
+  ce.profile_editor.find('.editor-body.name .submit').on('click',update_name);
+  ce.profile_editor.find('.editor-body.email .submit').on('click',update_email);
+  ce.profile_editor.find('.editor-body.password .submit').on('click',update_password);
 }
 
 function update_name(e) {
@@ -148,7 +148,7 @@ function update_layout(e) {
       });
     } else {
       ce.profile_editor.css( {
-        'position':'absolute',
+        'position':'relative',
         'top': menubar_height + 5,
         'width':editor_width,
       });
@@ -192,8 +192,36 @@ function setup_elements()
   setup_user_menu();
 }
 
+function info_setup()
+{
+  jQuery('#tlc-ttsurvey .info-box').hide();
+  jQuery('#tlc-ttsurvey .info-trigger').each(
+    function() {
+      var trigger = jQuery(this)
+      var tgt_id = trigger.data('target');
+      var tgt = jQuery('#'+tgt_id);
+      trigger.on( 'click', function() { 
+        if(tgt.hasClass('visible')) {
+          tgt.removeClass('visible').hide();
+          jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
+        } else {
+          jQuery('#tlc-ttsurvey .info-box').removeClass('visible').hide();
+          tgt.addClass('visible').show();
+          jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',14);
+        }
+      });
+
+      tgt.on( 'click', function() { 
+        tgt.removeClass('visible').hide();
+        jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
+      });
+    }
+  );
+}
+
 jQuery(document).ready(
   function($) {
     setup_elements();
+    info_setup();
   }
 );
