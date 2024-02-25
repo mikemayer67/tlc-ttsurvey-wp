@@ -6,6 +6,11 @@
  *******************************************************************************
  *******************************************************************************/
 
+@media (min-width:480px) {
+  #tlc-ttsurvey {
+    min-width:480px;
+  }
+}
 
 #tlc-ttsurvey #survey {
   --hover-color: #72aee6;
@@ -143,6 +148,11 @@
   border:solid 2px black;
   box-shadow:0 8px 16px 0 rgba(0,0,0,0.2);
 }
+@media (max-width:480px) {
+  #tlc-ttsurvey #survey .dialog {
+    padding:5px;
+  }
+}
 
 #tlc-ttsurvey #survey .modal form {
   position:relative;
@@ -167,6 +177,33 @@
   vertical-align:top;
 }
 
+#tlc-ttsurvey #survey .modal form div.info {
+  margin-left:2em;
+  width:calc(100% - 3em);
+  border-style:inset;
+  border-radius:10px;
+  border-width:1px;
+}
+@media (max-width:480px)
+{
+  #tlc-ttsurvey #survey .modal form div.info {
+    margin-left:1em;
+    width:calc(100% - 2em);
+  }
+  #tlc-ttsurvey #survey .modal form .info p {
+    font-size:x-small;
+  }
+}
+@media (max-width:360px)
+{
+  #tlc-ttsurvey #survey .modal form div.info {
+    margin-left:8px;
+    width:calc(100% - 16px);
+  }
+  #tlc-ttsurvey #survey .modal form .info p {
+    font-size:xx-small;
+  }
+}
 #tlc-ttsurvey #survey .modal .editor-body .label-box .error {
   margin-left:auto;
   margin-right:1.5em;
@@ -191,9 +228,17 @@
 
 
 #tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry {
-  width:100%;
-  margin:0 1em 0 1em;
+  margin-left:1em;
+  width:calc(100% - 2em);
   font-size:smaller;
+}
+
+@media (max-width:480px) {
+  #tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry {
+    margin-left:8px;
+    width:calc(100% - 16px);
+    font-size:smaller;
+  }
 }
 
 #tlc-ttsurvey #survey .modal .editor-body .button-box {

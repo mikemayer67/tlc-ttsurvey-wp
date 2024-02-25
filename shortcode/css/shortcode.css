@@ -19,12 +19,6 @@
   font-family:ui-sans-serif, Arial, Helvetica, sans-serif;
 }
 
-@media (min-width:480px) {
-  #tlc-ttsurvey {
-    min-width:480px;
-  }
-}
-
 #tlc-ttsurvey div.noscript {
   background-color:white;
   width: min(100%,400px);
@@ -99,7 +93,13 @@
 {
   margin:0 0 5px 0;
   font-size:small;
-  line-height: 1rem;
+}
+@media (max-width:380px)
+{
+  #tlc-ttsurvey form .info p {
+    margin:0;
+    font-size:x-small;
+  }
 }
 
 #tlc-ttsurvey form .info .info-list

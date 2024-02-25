@@ -226,3 +226,49 @@ function add_login_links($links)
   echo "</div>";
 }
 
+function info_text($key) 
+{
+  $rval = "";
+  switch($key) {
+  case 'userid':
+    $rval = <<<INFO
+      Used to log into the survey
+      <p class=info-list><b>must</b> be 8-16 characters</p>
+      <p class=info-list><b>must</b> start with a letter</p>
+      <p class=info-list><b>must</b> contain only letters and numbers</p>
+      INFO;
+    break;
+
+  case 'new-password':
+  case 'password':
+    $rval = <<<INFO
+      Used to log into the survey
+      <p class=info-list><b>must</b> be 8-128 characters</p>
+      <p class=info-list><b>must</b> contain at least one letter</p>
+      <p class=info-list><b>may</b> contain: !@%^*-_=~,.</p>
+      <p class=info-list><b>may</b> contain spaces</p>
+      INFO;
+    break;
+
+  case 'fullname':
+    $rval = <<<INFO
+      How your name will appear on the survey summary report
+      <p class=info-list><b>must</b> contain a valid full name</p>
+      <p class=info-list><b>may</b> contain apostrophes</p>
+      <p class=info-list><b>may</b> contain hyphens</p>
+      <p class=info-list>Extra whitespace will be removed</p>
+      INFO;
+    break;
+
+  case 'email':
+    $rval = <<<INFO
+      The email address is <b>optional</b>. It will only be used in conjunction with 
+      this survey. It will be used to send you:
+      <p class=info-list>confirmation of your registration</p>
+      <p class=info-list>notifcations on your survey state</p>
+      <p class=info-list>login help (on request)</p>
+      INFO;
+    break;
+  }
+  return $rval;
+}
