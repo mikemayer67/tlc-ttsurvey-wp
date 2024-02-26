@@ -4,11 +4,24 @@ var menubar_top = -1;
 var menubar_fixed = false;
 var profile_keyup_timer = null;
 
+function ajax_query( query, data, response_handler )
+{
+  data.action = 'tlc_ttsurvey';
+  data.nonce = menubar_vars.nonce;
+  data.query = 'shortcode/' + query;
+
+  jQuery.post(menubar_vars.ajaxurl, data, response_handler, 'json');
+}
+
 
 function setup_user_menu()
 {
   ce.user_menu.find('.edit-user-name').on('click', function(e) {
     e.preventDefault();
+    ce.name_entry.val(ce.name_entry[0].dataset.default);
+    ce.name_entry.removeClass(['invalid','empty']);
+    ce.name_error.html('');
+    ce.name_submit.prop('disabled',true);
     ce.profile_modal.show();
     ce.profile_modal.find('.editor-body').hide();
     ce.profile_modal.find('.editor-body.name').show();
@@ -16,6 +29,10 @@ function setup_user_menu()
   });
   ce.user_menu.find('.edit-user-email').on('click', function(e) {
     e.preventDefault();
+    ce.email_entry.val(ce.email_entry[0].dataset.default);
+    ce.email_entry.removeClass(['invalid','empty']);
+    ce.email_error.html('');
+    ce.email_submit.prop('disabled',true);
     ce.profile_modal.show();
     ce.profile_modal.find('.editor-body').hide();
     ce.profile_modal.find('.editor-body.email').show();
@@ -23,6 +40,10 @@ function setup_user_menu()
   });
   ce.user_menu.find('.add-user-email').on('click', function(e) {
     e.preventDefault();
+    ce.email_entry.val('');
+    ce.email_entry.removeClass('invalid').addClass('empty');
+    ce.email_error.html('');
+    ce.email_submit.prop('disabled',true);
     ce.profile_modal.show();
     ce.profile_modal.find('.editor-body').hide();
     ce.profile_modal.find('.editor-body.email').show();
@@ -30,6 +51,10 @@ function setup_user_menu()
   });
   ce.user_menu.find('.change-password').on('click', function(e) {
     e.preventDefault();
+    ce.password_entry.val('');
+    ce.password_entry.removeClass('invalid').addClass('empty');
+    ce.password_error.html('');
+    ce.password_submit.prop('disabled',true);
     ce.profile_modal.show();
     ce.profile_modal.find('.editor-body').hide();
     ce.profile_modal.find('.editor-body.password').show();
@@ -51,8 +76,13 @@ function setup_profile_editor()
   });
 
   ce.email_entry.on('input',function() {
-    ce.name_submit.prop('disabled',true);
+    ce.email_submit.prop('disabled',true);
     validate_profile_input(validate_email);
+  });
+
+  ce.password_entry.on('input',function() {
+    ce.password_submit.prop('disabled',true);
+    validate_profile_input(validate_password);
   });
 
   ce.name_submit.on('click',update_name);
@@ -75,11 +105,68 @@ function validate_profile_input(validation_function)
 function validate_name()
 {
   console.log('validate_name');
+  ajax_query(
+    'validate_profile_update',
+    {
+      key:'fullname',
+      value:ce.name_entry.val(),
+    },
+    function(response) {
+      ce.name_entry.removeClass(['invalid','empty']);
+      if(response.success) {
+        ce.name_error.html('');
+        if(ce.name_entry.val() != ce.name_entry[0].dataset.default) {
+          ce.name_submit.prop('disabled',false);
+        }
+      }
+      else if(response.data == "#empty") 
+      {
+        ce.name_error.html('');
+        ce.name_entry.addClass('empty');
+      }
+      else 
+      {
+        ce.name_error.html(response.data);
+        ce.name_entry.addClass('invalid');
+      }
+    }
+  );
 }
 
 function validate_email()
 {
   console.log('validate_email');
+  ajax_query(
+    'validate_profile_update',
+    {
+      key:'email',
+      value:ce.email_entry.val(),
+    },
+    function(response) {
+      ce.email_entry.removeClass(['invalid','empty']);
+      if(response.success) {
+        ce.email_error.html('');
+        if(ce.email_entry.val() != ce.email_entry[0].dataset.default) {
+          ce.email_submit.prop('disabled',false);
+        }
+      }
+      else if(response.data == "#empty") 
+      {
+        ce.email_error.html('');
+        ce.email_entry.addClass('empty');
+      }
+      else 
+      {
+        ce.email_error.html(response.data);
+        ce.email_entry.addClass('invalid');
+      }
+    }
+  );
+}
+
+function validate_password()
+{
+  console.log('validate_password');
 }
 
 function update_name(e) {
@@ -226,8 +313,7 @@ function setup_elements()
 
   ce.name_entry = ce.name_editor.find('.text-entry');
   ce.email_entry = ce.email_editor.find('.text-entry');
-  ce.password_primary_entry = ce.password_editor.find('.text-entry.primary');
-  ce.password_confirm_entry = ce.password_editor.find('.text-entry.confirm');
+  ce.password_entry = ce.password_editor.find('.text-entry');
 
   ce.name_cancel = ce.name_editor.find('.cancel');
   ce.email_cancel = ce.email_editor.find('.cancel');
@@ -236,6 +322,10 @@ function setup_elements()
   ce.name_submit = ce.name_editor.find('.submit');
   ce.email_submit = ce.email_editor.find('.submit');
   ce.password_submit = ce.password_editor.find('.submit');
+
+  ce.name_error = ce.name_editor.find('.error');
+  ce.email_error = ce.email_editor.find('.error');
+  ce.password_error = ce.password_editor.find('.error');
 
   ce.matchMedia = window.matchMedia("(max-width:480px)");
   ce.matchMedia.addEventListener('change',watch_media);

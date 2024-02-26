@@ -107,7 +107,7 @@ function add_user_name_editor($user)
   start_editor_content('name');
   add_label_box('Name','name');
   echo "<div class='entry-box name'>";
-  echo "<input id='tlcsurvey-entry-box-name' type='text' class='text-entry name' name='name' value='$fullname' placeholder='Full Name' autocomplete='name'>";
+  echo "<input id='tlcsurvey-entry-box-name' type='text' class='text-entry name' name='name' value='$fullname' data-default='$fullname' placeholder='Full Name' autocomplete='name'>";
   echo "</div>";
   add_info_box('name',info_text('fullname'));
   end_editor_content();
@@ -120,7 +120,7 @@ function add_user_email_editor($user)
   start_editor_content('email');
   add_label_box('Email','email');
   echo "<div class='entry-box email'>";
-  echo "<input id='tlcsurvey-entry-box-email' type='email' class='text-entry email $empty' name='email' value='$email' placeholder='Email Address' autocomplete='email'>";
+  echo "<input id='tlcsurvey-entry-box-email' type='email' class='text-entry email $empty' name='email' value='$email' data-default='$email' placeholder='Email Address' autocomplete='email'>";
   echo "</div>";
   add_info_box('email',info_text('email'));
   end_editor_content();

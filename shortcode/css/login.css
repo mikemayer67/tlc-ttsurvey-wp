@@ -130,6 +130,7 @@
 {
   #tlc-ttsurvey #login form input.text-entry {
     margin-left:5px;
+    box-sizing:border-box;
     width:calc(100% - 5px);
   }
 }

@@ -216,7 +216,7 @@
   display:flex;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.error {
+#tlc-ttsurvey #survey .modal .editor-body .entry-box .text-entry.invalid {
   background-color:var(--ttsurvey-error-background-color);
 }
 
