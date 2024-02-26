@@ -2,6 +2,7 @@ var ce = {};
 
 var menubar_top = -1;
 var menubar_fixed = false;
+var profile_keyup_timer = null;
 
 
 function setup_user_menu()
@@ -34,16 +35,51 @@ function setup_user_menu()
     ce.profile_modal.find('.editor-body.password').show();
     update_layout(e);
   });
+}
 
+function setup_profile_editor()
+{
   ce.profile_cancel.on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.hide();
     update_layout(e);
   });
 
-  ce.profile_editor.find('.editor-body.name .submit').on('click',update_name);
-  ce.profile_editor.find('.editor-body.email .submit').on('click',update_email);
-  ce.profile_editor.find('.editor-body.password .submit').on('click',update_password);
+  ce.name_entry.on('input',function() {
+    ce.name_submit.prop('disabled',true);
+    validate_profile_input(validate_name);
+  });
+
+  ce.email_entry.on('input',function() {
+    ce.name_submit.prop('disabled',true);
+    validate_profile_input(validate_email);
+  });
+
+  ce.name_submit.on('click',update_name);
+  ce.email_submit.on('click',update_email);
+  ce.password_submit.on('click',update_password);
+}
+
+function validate_profile_input(validation_function)
+{
+  if(profile_keyup_timer) { clearTimeout(profile_keyup_timer); }
+  profile_keyup_timer = setTimeout(
+    function() {
+      profile_keyup_timer = null;
+      validation_function();
+    },
+    500,
+  );
+}
+
+function validate_name()
+{
+  console.log('validate_name');
+}
+
+function validate_email()
+{
+  console.log('validate_email');
 }
 
 function update_name(e) {
@@ -178,9 +214,28 @@ function setup_elements()
   ce.wpadminbar = jQuery('#wpadminbar');
   ce.menubar = ce.container.find('nav.menubar');
   ce.user_menu = ce.menubar.find('.menu.user');
+
   ce.profile_modal  = ce.container.find('.modal.user-profile');
   ce.profile_editor = ce.profile_modal.find('.dialog');
   ce.profile_cancel = ce.profile_editor.find('.cancel');
+  ce.profile_submit = ce.profile_editor.find('.submit');
+
+  ce.name_editor = ce.profile_editor.find('.editor-body.name');
+  ce.email_editor = ce.profile_editor.find('.editor-body.email');
+  ce.password_editor = ce.profile_editor.find('.editor-body.password');
+
+  ce.name_entry = ce.name_editor.find('.text-entry');
+  ce.email_entry = ce.email_editor.find('.text-entry');
+  ce.password_primary_entry = ce.password_editor.find('.text-entry.primary');
+  ce.password_confirm_entry = ce.password_editor.find('.text-entry.confirm');
+
+  ce.name_cancel = ce.name_editor.find('.cancel');
+  ce.email_cancel = ce.email_editor.find('.cancel');
+  ce.password_cancel = ce.password_editor.find('.cancel');
+
+  ce.name_submit = ce.name_editor.find('.submit');
+  ce.email_submit = ce.email_editor.find('.submit');
+  ce.password_submit = ce.password_editor.find('.submit');
 
   ce.matchMedia = window.matchMedia("(max-width:480px)");
   ce.matchMedia.addEventListener('change',watch_media);
@@ -188,9 +243,8 @@ function setup_elements()
 
   jQuery(window).on('scroll',update_layout);
   jQuery(window).on('resize',update_layout);
-
-  setup_user_menu();
 }
+
 
 function info_setup()
 {
@@ -222,6 +276,8 @@ function info_setup()
 jQuery(document).ready(
   function($) {
     setup_elements();
+    setup_user_menu();
+    setup_profile_editor();
     info_setup();
   }
 );
