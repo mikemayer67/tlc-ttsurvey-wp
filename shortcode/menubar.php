@@ -61,6 +61,10 @@ function add_user_profile_editor($userid)
   add_user_name_editor($user);
   add_user_email_editor($user);
   add_user_password_editor($user);
+  echo "<div class='button-box'>";
+  echo "<button class='cancel'>Cancel</button>";
+  echo "<button class='submit'>Update</button>";
+  echo "</div>"; // button-box
   echo "</form>";
   echo "</div>"; // dialog
   echo "</div>"; // modal
@@ -73,10 +77,6 @@ function start_editor_content($user_property)
 
 function end_editor_content()
 {
-  echo "<div class='button-box'>";
-  echo "<button class='cancel'>Cancel</button>";
-  echo "<button class='submit'>Update</button>";
-  echo "</div>"; // button-box
   echo "</div>"; // editor-body
 }
 

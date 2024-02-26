@@ -241,18 +241,26 @@
   }
 }
 
-#tlc-ttsurvey #survey .modal .editor-body .button-box {
-  display:flex;
-  justify-content:flex-end;
-  margin-top:10px;
-}
-
 #tlc-ttsurvey #survey .modal .editor-body label {
   font-weight:bolder;
   font-size:smaller;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button {
+#tlc-ttsurvey #survey .modal .editor-body .text-entry {
+  display:block;
+  padding:4px;
+  margin-left:1em;
+  border:1px inset #ccc;
+}
+
+
+#tlc-ttsurvey #survey .modal form .button-box {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:10px;
+}
+
+#tlc-ttsurvey #survey .modal form button {
   border:none;
   padding:4px 8px;
   margin:0 0 0 8px;
@@ -264,36 +272,28 @@
   font-size:smaller;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button.submit {
+#tlc-ttsurvey #survey .modal form button.submit {
   color:#fff;
   background-color:var(--ttsurvey-color);
   font-weight:bolder;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button.cancel {
+#tlc-ttsurvey #survey .modal form button.cancel {
   color:#000;
   background-color:#f1f1f1;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button:active  {
+#tlc-ttsurvey #survey .modal form button:active  {
   opacity:0.5;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button:hover  {
+#tlc-ttsurvey #survey .modal form button:hover  {
   color:#000!important;
   background-color:#ccc!important;
 }
 
-#tlc-ttsurvey #survey .modal .editor-body button:disabled  {
+#tlc-ttsurvey #survey .modal form button:disabled  {
   cursor:not-allowed;
   opacity:0.3;
-}
-
-
-#tlc-ttsurvey #survey .modal .editor-body .text-entry {
-  display:block;
-  padding:4px;
-  margin-left:1em;
-  border:1px inset #ccc;
 }
 

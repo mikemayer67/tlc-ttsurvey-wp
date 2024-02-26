@@ -16,172 +16,107 @@ function ajax_query( query, data, response_handler )
 
 function setup_user_menu()
 {
-  ce.user_menu.find('.edit-user-name').on('click', function(e) {
-    e.preventDefault();
-    ce.name_entry.val(ce.name_entry[0].dataset.default);
-    ce.name_entry.removeClass(['invalid','empty']);
-    ce.name_error.html('');
-    ce.name_submit.prop('disabled',true);
-    ce.profile_modal.show();
-    ce.profile_modal.find('.editor-body').hide();
-    ce.profile_modal.find('.editor-body.name').show();
-    update_layout(e);
-  });
-  ce.user_menu.find('.edit-user-email').on('click', function(e) {
-    e.preventDefault();
-    ce.email_entry.val(ce.email_entry[0].dataset.default);
-    ce.email_entry.removeClass(['invalid','empty']);
-    ce.email_error.html('');
-    ce.email_submit.prop('disabled',true);
-    ce.profile_modal.show();
-    ce.profile_modal.find('.editor-body').hide();
-    ce.profile_modal.find('.editor-body.email').show();
-    update_layout(e);
-  });
-  ce.user_menu.find('.add-user-email').on('click', function(e) {
-    e.preventDefault();
-    ce.email_entry.val('');
-    ce.email_entry.removeClass('invalid').addClass('empty');
-    ce.email_error.html('');
-    ce.email_submit.prop('disabled',true);
-    ce.profile_modal.show();
-    ce.profile_modal.find('.editor-body').hide();
-    ce.profile_modal.find('.editor-body.email').show();
-    update_layout(e);
-  });
-  ce.user_menu.find('.change-password').on('click', function(e) {
-    e.preventDefault();
-    ce.password_entry.val('');
-    ce.password_entry.removeClass('invalid').addClass('empty');
-    ce.password_error.html('');
-    ce.password_submit.prop('disabled',true);
-    ce.profile_modal.show();
-    ce.profile_modal.find('.editor-body').hide();
-    ce.profile_modal.find('.editor-body.password').show();
-    update_layout(e);
-  });
+  ce.user_menu.find('.edit-user-name').on('click', function(e) { start_editor(e,'name','edit'); } );
+  ce.user_menu.find('.edit-user-email').on('click', function(e) { start_editor(e,'email','edit'); } );
+  ce.user_menu.find('.add-user-email').on('click', function(e) { start_editor(e,'email','add'); } );
+  ce.user_menu.find('.change-password').on('click', function(e) { start_editor(e,'password','change'); } );
 }
+
+function start_editor(e,key,action)
+{
+  e.preventDefault();
+
+  ce.pe_submit.prop('disabled',true);
+  ce.profile_editor[0].dataset.target = key;
+  ce.profile_editor[0].dataset.action = action;
+
+  var entry = ce.pe_entry[key];
+  if(action == 'edit') {
+    entry.val(entry[0].dataset.default);
+    entry.removeClass(['invalid','empty']);
+  } else {
+    entry.val('');
+    entry.removeClass('invalid').addClass('empty');
+  }
+
+  ce.pe_error.html('');
+
+  ce.profile_modal.show();
+  ce.profile_modal.find('.editor-body').hide();
+  ce.profile_modal.find(`.editor-body.${key}`).show();
+
+  update_layout(e);
+}
+
 
 function setup_profile_editor()
 {
-  ce.profile_cancel.on('click', function(e) {
+  ce.pe_cancel.on('click', function(e) {
     e.preventDefault();
     ce.profile_modal.hide();
     update_layout(e);
   });
 
-  ce.name_entry.on('input',function() {
-    ce.name_submit.prop('disabled',true);
-    validate_profile_input(validate_name);
-  });
+  for( var key in ce.pe_entry ) {
+    var entry = ce.pe_entry[key];
+    entry.on('input',
+      function() { 
+        if(profile_keyup_timer) { 
+          clearTimeout(profile_keyup_timer); 
+        }
+        profile_keyup_timer = setTimeout( 
+          function() {
+            profile_keyup_timer = null;
+            validate_profile_entry(key);
+          },
+          500,
+        );
+      }
+    );
+  }
 
-  ce.email_entry.on('input',function() {
-    ce.email_submit.prop('disabled',true);
-    validate_profile_input(validate_email);
-  });
-
-  ce.password_entry.on('input',function() {
-    ce.password_submit.prop('disabled',true);
-    validate_profile_input(validate_password);
-  });
-
-  ce.name_submit.on('click',update_name);
-  ce.email_submit.on('click',update_email);
-  ce.password_submit.on('click',update_password);
+  ce.pe_submit.prop('disabled',true);
+  ce.pe_submit.on('click'.update_profile_entry);
 }
 
-function validate_profile_input(validation_function)
+function validate_profile_entry(key)
 {
-  if(profile_keyup_timer) { clearTimeout(profile_keyup_timer); }
-  profile_keyup_timer = setTimeout(
-    function() {
-      profile_keyup_timer = null;
-      validation_function();
-    },
-    500,
-  );
-}
+  console.log(`validate ${key}`);
 
-function validate_name()
-{
-  console.log('validate_name');
+  var entry = ce.pe_entry[key];
+  var error = ce.pe_error[key];
+
   ajax_query(
     'validate_profile_update',
     {
-      key:'fullname',
-      value:ce.name_entry.val(),
+      key:key,
+      value:entry.val(),
     },
     function(response) {
-      ce.name_entry.removeClass(['invalid','empty']);
+      entry.removeClass(['invalid','empty']);
       if(response.success) {
-        ce.name_error.html('');
-        if(ce.name_entry.val() != ce.name_entry[0].dataset.default) {
-          ce.name_submit.prop('disabled',false);
+        error.html('');
+        if(entry.val() != entry[0].dataset.default) {
+          ce.pe_submit.prop('disabled',false);
         }
       }
       else if(response.data == "#empty") 
       {
-        ce.name_error.html('');
-        ce.name_entry.addClass('empty');
+        error.html('');
+        entry.addClass('empty');
       }
       else 
       {
-        ce.name_error.html(response.data);
-        ce.name_entry.addClass('invalid');
+        error.html(response.data);
+        entry.addClass('invalid');
       }
     }
   );
 }
 
-function validate_email()
+function update_profile_entry(e)
 {
-  console.log('validate_email');
-  ajax_query(
-    'validate_profile_update',
-    {
-      key:'email',
-      value:ce.email_entry.val(),
-    },
-    function(response) {
-      ce.email_entry.removeClass(['invalid','empty']);
-      if(response.success) {
-        ce.email_error.html('');
-        if(ce.email_entry.val() != ce.email_entry[0].dataset.default) {
-          ce.email_submit.prop('disabled',false);
-        }
-      }
-      else if(response.data == "#empty") 
-      {
-        ce.email_error.html('');
-        ce.email_entry.addClass('empty');
-      }
-      else 
-      {
-        ce.email_error.html(response.data);
-        ce.email_entry.addClass('invalid');
-      }
-    }
-  );
-}
-
-function validate_password()
-{
-  console.log('validate_password');
-}
-
-function update_name(e) {
-  e.preventDefault();
-  alert("Update name");
-}
-
-function update_email(e) {
-  e.preventDefault();
-  alert("Update email");
-}
-
-function update_password(e) {
-  e.preventDefault();
-  alert("Update password");
+  console.log('update profile entry');
 }
 
 
@@ -304,28 +239,21 @@ function setup_elements()
 
   ce.profile_modal  = ce.container.find('.modal.user-profile');
   ce.profile_editor = ce.profile_modal.find('.dialog');
-  ce.profile_cancel = ce.profile_editor.find('.cancel');
-  ce.profile_submit = ce.profile_editor.find('.submit');
 
-  ce.name_editor = ce.profile_editor.find('.editor-body.name');
-  ce.email_editor = ce.profile_editor.find('.editor-body.email');
-  ce.password_editor = ce.profile_editor.find('.editor-body.password');
-
-  ce.name_entry = ce.name_editor.find('.text-entry');
-  ce.email_entry = ce.email_editor.find('.text-entry');
-  ce.password_entry = ce.password_editor.find('.text-entry');
-
-  ce.name_cancel = ce.name_editor.find('.cancel');
-  ce.email_cancel = ce.email_editor.find('.cancel');
-  ce.password_cancel = ce.password_editor.find('.cancel');
-
-  ce.name_submit = ce.name_editor.find('.submit');
-  ce.email_submit = ce.email_editor.find('.submit');
-  ce.password_submit = ce.password_editor.find('.submit');
-
-  ce.name_error = ce.name_editor.find('.error');
-  ce.email_error = ce.email_editor.find('.error');
-  ce.password_error = ce.password_editor.find('.error');
+  ce.pe_cancel = ce.profile_editor.find('.cancel');
+  ce.pe_submit = ce.profile_editor.find('.submit');
+  ce.pe_editor = [];
+  ce.pe_entry = [];
+  ce.pe_error = [];
+  let keys = ['name','email','password'];
+  keys.forEach( function(key) {
+    var editor = ce.profile_editor.find(`.editor-body.${key}`);
+    ce.pe_editor[key] = editor;
+    var entry = editor.find('text-entry');
+    ce.pe_entry[key] = entry;
+    var error = editor.find('error');
+    ce.pe_error[key] = error;
+  });
 
   ce.matchMedia = window.matchMedia("(max-width:480px)");
   ce.matchMedia.addEventListener('change',watch_media);
