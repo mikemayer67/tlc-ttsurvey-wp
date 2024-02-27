@@ -20,6 +20,7 @@ function add_survey_menubar($userid)
   $user = User::from_userid($userid);
   $fullname = $user->fullname();
   $email = $user->email();
+  $has_email = $email ? true : false;
 
   $status = "Status";
 
@@ -32,14 +33,11 @@ function add_survey_menubar($userid)
   echo "  <div class='menubar-item status'>$status</div>";
   echo "  <div class='menubar-item user'>";
   echo "    <button class='menu-btn user'><span class='name'>$fullname</span><img src='$icon_url'></button>";
-  echo "    <div class='menu user'>";
+  echo "    <div class='menu user' data-email='$has_email'>";
   echo "      <a class='edit-user-name'>Update Name</a>";
-  if($email) {
-    echo "    <a class='edit-user-email'>Update Email</a>";
-    echo "    <a class='drop-user-email'>Remove Email</a>";
-  } else {
-    echo "    <a class='add-user-email'>Add Email</a>";
-  }
+  echo "      <a class='edit-user-email'>Update Email</a>";
+  echo "      <a class='drop-user-email'>Remove Email</a>";
+  echo "      <a class='add-user-email'>Add Email</a>";
   echo "      <a class='change-password'>Change Password</a>";
   echo "      <hr class='menu-sep'>";
   echo "      <a href='$form_uri?logout=1'>Log Out</a>";

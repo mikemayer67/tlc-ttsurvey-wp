@@ -340,6 +340,7 @@ class User {
 
     $email = $this->email();
     if($email) {
+      log_info("Sent updated fullname to: $email");
       require_once plugin_path('include/sendmail.php');
       sendmail_profile($email, $this->userid(), 'name', $old_fullname, $fullname);
     }
@@ -362,10 +363,12 @@ class User {
     $this->commit();
 
     if($email) {
+      log_info("Sent updated email address to new address: $email");
       require_once plugin_path('include/sendmail.php');
       sendmail_profile($email, $this->userid(), 'email address', $old_email, $email);
     }
     if($old_email) {
+      log_info("Sent updated email address to old address: $old_email");
       require_once plugin_path('include/sendmail.php');
       sendmail_profile($old_email, $this->userid(), 'email address', $old_email, $email);
     }

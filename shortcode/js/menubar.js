@@ -228,14 +228,22 @@ function update_profile_entry(e)
     },
     function(response) {
       if(response.success) {
-        if(action == "edit") {
+        if(key != "password") {
           entry[0].dataset.default = value;
         }
         if(key == "name") {
           ce.user_menu_name.html(value);
         }
         else if(key == "email") {
-          alert("Send out confirmation email");
+          if(value) {
+            ce.edit_user_email.show();
+            ce.drop_user_email.show();
+            ce.add_user_email.hide();
+          } else {
+            ce.edit_user_email.hide();
+            ce.drop_user_email.hide();
+            ce.add_user_email.show();
+          }
         }
         ce.profile_modal.hide();
         update_layout(e);
@@ -245,7 +253,6 @@ function update_profile_entry(e)
     }
   );
 }
-
 
 function handle_pe_cancel(e)
 {
@@ -270,6 +277,34 @@ function handle_pe_input(e)
     500
   );
 }
+
+function drop_user_email(e)
+{
+  e.preventDefault();
+  const ans = confirm("You will no longer receive updates on the status of your survey");
+  if(ans) {
+    ajax_query(
+      'drop_user_email',
+      {},
+      function(response) {
+        if(response.success) {
+          var entry = ce.profile_editor.find('.editor-body.email .text-entry')
+          entry[0].dataset.default = "";
+          ce.edit_user_email.hide();
+          ce.drop_user_email.hide();
+          ce.add_user_email.show();
+          alert("Email address removed");
+        } else {
+          alert("Failed to remove email address");
+        }
+      }
+    );
+  }
+}
+
+/******************************************************************************
+* Info handlers
+******************************************************************************/
 
 function setup_info_trigger()
 {
@@ -321,10 +356,24 @@ function setup_elements()
 
   // menubar
 
-  ce.user_menu.find('.edit-user-name').on('click', function(e) { start_editor(e,'name','edit'); } );
-  ce.user_menu.find('.edit-user-email').on('click', function(e) { start_editor(e,'email','edit'); } );
-  ce.user_menu.find('.add-user-email').on('click', function(e) { start_editor(e,'email','add'); } );
-  ce.user_menu.find('.change-password').on('click', function(e) { start_editor(e,'password','change'); } );
+  ce.edit_user_name  = ce.user_menu.find('.edit-user-name');
+  ce.edit_user_email = ce.user_menu.find('.edit-user-email');
+  ce.add_user_email  = ce.user_menu.find('.add-user-email');
+  ce.drop_user_email = ce.user_menu.find('.drop-user-email');
+  ce.change_password = ce.user_menu.find('.change-password');
+
+  ce.edit_user_name.on( 'click', function(e) { start_editor(e,'name','edit'); } );
+  ce.edit_user_email.on('click', function(e) { start_editor(e,'email','edit'); } );
+  ce.add_user_email.on( 'click', function(e) { start_editor(e,'email','add'); } );
+  ce.drop_user_email.on('click', function(e) { drop_user_email(e); } );
+  ce.change_password.on('click', function(e) { start_editor(e,'password','change'); } );
+
+  if( ce.user_menu.data('email') ) {
+    ce.add_user_email.hide();
+  } else {
+    ce.edit_user_email.hide();
+    ce.drop_user_email.hide();
+  }
 
   // profile editor
 
