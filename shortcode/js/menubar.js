@@ -213,7 +213,20 @@ function validate_profile_entry(entry)
 
 function update_profile_entry(e)
 {
-  console.log('update profile entry');
+  e.preventDefault();
+  const key = ce.profile_editor[0].dataset.target;
+  const action = ce.profile_editor[0].dataset.action;
+
+  ajax_query(
+    'update_profile',
+    {
+      key:(key=="name"?"fullname":key),
+      value:ce.profile_editor.find(`.editor-body.${key}`).find('.text-entry').val(),
+    },
+    function(response) {
+      console.log(response);
+    }
+  );
 }
 
 
@@ -301,7 +314,7 @@ function setup_elements()
   ce.pe_entry.on('input', handle_pe_input);
 
   ce.pe_submit.prop('disabled',true);
-  ce.pe_submit.on('click'.update_profile_entry);
+  ce.pe_submit.on('click',update_profile_entry);
 
   // info
 
