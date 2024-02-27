@@ -78,6 +78,11 @@ class CookieJar
     return $this->_active_userid;
   }
 
+  public function get_active_token()
+  {
+    return $this->_active_token;
+  }
+
   private function _set_cookie($key,$value,$expires)
   {  
     if($this->_ajax) {
@@ -136,6 +141,12 @@ class CookieJar
 function active_userid()
 {
   $rval = CookieJar::instance()->get_active_userid();
+  return $rval;
+}
+
+function active_token()
+{
+  $rval = CookieJar::instance()->get_active_token();
   return $rval;
 }
 
