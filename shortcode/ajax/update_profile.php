@@ -32,7 +32,7 @@ if($key == 'fullname') {
   $rval = $user->set_fullname($value);
 } else if($key == 'email') {
   $rval = $user->set_email($value);
-} else if($keey == 'password') {
+} else if($key == 'password') {
   $rval = $user->set_password($value);
 }
 

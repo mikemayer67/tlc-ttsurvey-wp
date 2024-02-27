@@ -58,6 +58,16 @@ const SENDMAIL_TEMPLATES = array(
       ),
     ),
   ),
+  'profile' => array(
+    'label' => 'Updated Profile',
+    'when' => 'a user updates their profile',
+    'demo_data' => array(
+      'userid' => 'tsmith13',
+      'changed' => 'email address',
+      'from' => 't.smith@t3mail.net',
+      'to' => 'theresa.smith@3mail.net',
+    ),
+  ),
 );
 
 const LOGIN_RECOVERY_TIMEOUT = 900;
