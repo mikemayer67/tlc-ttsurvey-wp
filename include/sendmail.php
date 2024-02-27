@@ -76,7 +76,7 @@ function sendmail_welcome($email, $userid, $fullname)
 
 function sendmail_profile($email,$userid,$changed,$from,$to)
 {
-  log_info("Send profile update to $userid: $email");
+  log_dev("Send profile update to $userid: $email");
 
   return _sendmail_send(
     $email,
