@@ -228,14 +228,14 @@ function update_profile_entry(e)
     },
     function(response) {
       if(response.success) {
-        if(action == "edit") {
+        if(key != "password") {
           entry[0].dataset.default = value;
         }
         if(key == "name") {
           ce.user_menu_name.html(value);
         }
         else if(key == "email") {
-          alert("Send out confirmation email");
+          alert("Adjust user menu");
         }
         ce.profile_modal.hide();
         update_layout(e);
