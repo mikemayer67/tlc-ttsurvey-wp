@@ -31,7 +31,7 @@ function add_survey_menubar($userid)
   echo "  <div class='menubar-item survey-name'>$survey_name</div>";
   echo "  <div class='menubar-item status'>$status</div>";
   echo "  <div class='menubar-item user'>";
-  echo "    <button class='menu-btn user'>$fullname<img src='$icon_url'></button>";
+  echo "    <button class='menu-btn user'><span class='name'>$fullname</span><img src='$icon_url'></button>";
   echo "    <div class='menu user'>";
   echo "      <a class='edit-user-name'>Update Name</a>";
   if($email) {

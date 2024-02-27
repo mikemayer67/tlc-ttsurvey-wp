@@ -217,14 +217,31 @@ function update_profile_entry(e)
   const key = ce.profile_editor[0].dataset.target;
   const action = ce.profile_editor[0].dataset.action;
 
+  var entry = ce.profile_editor.find(`.editor-body.${key} .text-entry`);
+  const value = entry.val();
+
   ajax_query(
     'update_profile',
     {
       key:(key=="name"?"fullname":key),
-      value:ce.profile_editor.find(`.editor-body.${key}`).find('.text-entry').val(),
+      value:value,
     },
     function(response) {
-      console.log(response);
+      if(response.success) {
+        if(action == "edit") {
+          entry[0].dataset.default = value;
+        }
+        if(key == "name") {
+          ce.user_menu_name.html(value);
+        }
+        else if(key == "email") {
+          alert("Send out confirmation email");
+        }
+        ce.profile_modal.hide();
+        update_layout(e);
+      } else {
+        alert(response.data);
+      }
     }
   );
 }
@@ -285,6 +302,7 @@ function setup_elements()
   ce.wpadminbar = jQuery('#wpadminbar');
   ce.menubar = ce.container.find('nav.menubar');
   ce.user_menu = ce.menubar.find('.menu.user');
+  ce.user_menu_name = ce.menubar.find('.menu-btn.user span.name');
 
   ce.profile_modal  = ce.container.find('.modal.user-profile');
   ce.profile_editor = ce.profile_modal.find('.dialog');
