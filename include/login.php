@@ -13,8 +13,9 @@ require_once plugin_path('include/users.php');
 require_once plugin_path('include/validation.php');
 require_once plugin_path('shortcode/setup.php');
 
-const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active';
-const ACCESS_TOKEN_COOKIE = 'tlc-ttsurvey-tokens';
+const ACTIVE_USER_COOKIE = 'tlc-ttsurvey-active-user';
+const ACTIVE_TOKEN_COOKIE = 'tlc-ttsurvey-active-token';
+const CACHED_TOKENS_COOKIE = 'tlc-ttsurvey-cached-tokens';
 
 /**
  * CookieJar is used to manage the login cookies.
@@ -37,7 +38,8 @@ class CookieJar
   private static $_instance = null;
   private $_ajax = false;
   private $_active_userid = null;
-  private $_access_tokens = null;
+  private $_active_token = null;
+  private $_cached_tokens = null;
 
   public static function instance($ajax=false)
   {
@@ -53,18 +55,19 @@ class CookieJar
   private function __construct()
   {
     $this->_active_userid = stripslashes($_COOKIE[ACTIVE_USER_COOKIE]??"");
-    $this->_access_tokens = array();
-    $tokens = stripslashes($_COOKIE[ACCESS_TOKEN_COOKIE]??"");
+    $this->_active_token  = stripslashes($_COOKIE[ACTIVE_TOKEN_COOKIE]??"");
+    $tokens = stripslashes($_COOKIE[CACHED_TOKENS_COOKIE]??"");
 
     #reset cookie timeout
-    setcookie(ACCESS_TOKEN_COOKIE, $tokens, time() + 86400*365, '/');
+    setcookie(CACHED_TOKENS_COOKIE, $tokens, time() + 86400*365, '/');
 
+    $this->_cached_tokens = array();
     $tokens = json_decode($tokens,true);
     if($tokens) {
       foreach( $tokens as $userid=>$token ) {
         if(validate_user_access_token($userid,$token))
         {
-          $this->_access_tokens[$userid] = $token;
+          $this->_cached_tokens[$userid] = $token;
         }
       }
     }
@@ -73,6 +76,11 @@ class CookieJar
   public function get_active_userid()
   {
     return $this->_active_userid;
+  }
+
+  public function get_active_token()
+  {
+    return $this->_active_token;
   }
 
   private function _set_cookie($key,$value,$expires)
@@ -85,32 +93,35 @@ class CookieJar
     return true;
   }
 
-  public function set_active_userid($userid)
+  public function set_active_userid($userid,$token)
   {
     $this->_active_userid = $userid;
-    return $this->_set_cookie(ACTIVE_USER_COOKIE,$userid,0);
+    return array(
+      $this->_set_cookie(ACTIVE_USER_COOKIE,$userid,0),
+      $this->_set_cookie(ACTIVE_TOKEN_COOKIE,$token,0)
+    );
   }
 
   public function clear_active_userid()
   {
-    return $this->set_active_userid(null);
+    return $this->set_active_userid(null,null);
   }
 
   public function get_access_token($userid)
   {
-    return $this->_access_tokens[$userid] ?? null;
+    return $this->_cached_tokens[$userid] ?? null;
   }
 
   public function set_access_token($userid,$token)
   {
     if($token) {
-      $this->_access_tokens[$userid] = $token;
+      $this->_cached_tokens[$userid] = $token;
     } else {
-      unset($this->_access_tokens[$userid]);
+      unset($this->_cached_tokens[$userid]);
     }
     return $this->_set_cookie( 
-      ACCESS_TOKEN_COOKIE, 
-      json_encode($this->_access_tokens), 
+      CACHED_TOKENS_COOKIE, 
+      json_encode($this->_cached_tokens), 
       time() + 86400*365,
     );
   }
@@ -122,7 +133,7 @@ class CookieJar
 
   public function access_tokens()
   {
-    return $this->_access_tokens;
+    return $this->_cached_tokens;
   }
 }
 
@@ -130,6 +141,12 @@ class CookieJar
 function active_userid()
 {
   $rval = CookieJar::instance()->get_active_userid();
+  return $rval;
+}
+
+function active_token()
+{
+  $rval = CookieJar::instance()->get_active_token();
   return $rval;
 }
 
@@ -145,15 +162,17 @@ function logout_active_user()
   return CookieJar::instance()->clear_active_userid();
 }
 
-function start_survey_as($userid)
+function start_survey_as($user)
 {
-  return CookieJar::instance()->set_active_userid($userid);
+  $userid = $user->userid();
+  $token = $user->token();
+  return CookieJar::instance()->set_active_userid($userid,$token);
 }
 
 function resume_survey_as($userid,$token)
 {
   if( validate_user_access_token($userid,$token) ) { 
-    return CookieJar::instance()->set_active_userid($userid);
+    return CookieJar::instance()->set_active_userid($userid,$token);
   }
   return false;
 }
@@ -235,6 +254,8 @@ function handle_login()
 function login_with_password($userid,$password,$remember)
 {
   $user = User::from_userid($userid);
+  $token = $user->access_token();
+
   if(!$user) {
     return array('success'=>false, 'error'=>'Invalid userid');
   }
@@ -242,9 +263,8 @@ function login_with_password($userid,$password,$remember)
     return array('success'=>false, 'error'=>'Incorrect password');
   }
   $jar = CookieJar::instance();
-  $cookies = array( $jar->set_active_userid($userid) );
+  $cookies = $jar->set_active_userid($userid,$token);
   if($remember) {
-    $token = $user->access_token();
     $cookies[] = remember_user_token($userid,$token);
   } else {
     $cookies[] = forget_user_token($userid);
@@ -268,18 +288,18 @@ function login_with_token($userid_token)
 {
   list($userid,$token) = explode(':',$userid_token);
 
-  $cookie = resume_survey_as($userid,$token);
-  if($cookie) {
+  $cookies = resume_survey_as($userid,$token);
+  if($cookies) {
     return array(
       'success'=>true,
-      'cookies'=>array($cookie),
+      'cookies'=>$cookies,
     );
   } else {
-    $cookie = forget_user_token($userid);
+    $cookies = forget_user_token($userid);
     return array(
       'success'=>false,
       'error'=>"expired user token",
-      'cookies'=>array($cookie),
+      'cookies'=>$cookies,
     );
   }
 }
@@ -357,7 +377,7 @@ function register_new_user($userid, $password, $pwconfirm, $fullname, $email, $r
 
   log_info("Registered new user $fullname with userid $userid and token $token");
 
-  $cookies = array( start_survey_as($userid) );
+  $cookies = array( start_survey_as($user) );
   if($remember) {
     $cookies[] = remember_user_token($userid,$token); 
   }

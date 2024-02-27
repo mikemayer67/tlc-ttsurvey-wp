@@ -24,7 +24,14 @@ if(!validate_user_input($key,$value,$error)) {
 }
 
 $userid = active_userid();
-// @@@ Issue!122 token = active_token();
+$token = active_token();
+
+if(!validate_user_access_token($userid,$token)) {
+  log_warning("Invalid userid/token attempted for update_profile ($userid/$token)");
+  wp_send_json_error();
+  wp_die();
+}
+
 $user = User::from_userid($userid);
 
 $rval = false;
