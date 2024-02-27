@@ -9,7 +9,10 @@ if( ! defined('WPINC') ) { die; }
 
 require_once plugin_path('include/const.php');
 require_once plugin_path('include/logger.php');
-require_once plugin_path('shortcode/survey/menubar.php');
+require_once plugin_path('shortcode/menubar.php');
+
+wp_enqueue_style('tlc-ttsurvey-survey', plugin_url('shortcode/css/survey.css'));
+wp_enqueue_style('tlc-ttsurvey-menubar', plugin_url('shortcode/css/menubar.css'));
 
 function add_survey_content($userid=null)
 {
@@ -27,7 +30,9 @@ function add_survey_content($userid=null)
   $form_uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
   echo "<div id='survey'>";
+
   add_survey_menubar($userid);
+  add_user_profile_editor($userid);
 
   for($x=0; $x<=20; $x++) {
     echo "<p>Line $x</p>";
@@ -35,32 +40,12 @@ function add_survey_content($userid=null)
   echo "</div>";
   echo "</form>";
 
-  for($x=0; $x<=10; $x++) {
+  for($x=0; $x<=20; $x++) {
     echo "<p>Post Line $x</p>";
   }
 
+  enqueue_menubar_script();
+//  enqueue_survey_script();
+
   return true;
 }
-
-function enqueue_survey_script()
-{
-  wp_register_script(
-    'tlc_ttsurvey_script',
-    plugin_url('shortcode/js/survey.js'),
-    array('jquery'),
-    '1.0.3',
-    true
-  );
-
-  wp_localize_script(
-    'tlc_ttsurvey_script',
-    'survey_vars',
-    array(
-      'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce' => array('survey',wp_create_nonce('survey')),
-    ),
-  );
-
-  wp_enqueue_script('tlc_ttsurvey_script');
-}
-

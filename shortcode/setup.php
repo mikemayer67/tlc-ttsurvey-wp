@@ -144,13 +144,10 @@ function add_shortcode_content()
   $page = current_shortcode_page();
   $userid = active_userid();
 
-  log_dev("current_shortcode_page=$page / userid=$userid");
-
   $content_loaded = false;
   if($userid && !$page) {
     require_once plugin_path("shortcode/survey.php");
     if(add_survey_content($userid)) {
-      enqueue_survey_script();
       return;
     }
   }

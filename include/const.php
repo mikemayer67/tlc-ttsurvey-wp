@@ -8,6 +8,7 @@ const DATA_NONCE         = 'tlc-ttsurve-data';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
 const LOGIN_FORM_NONCE   = 'tlc-ttsurvey-login';
 const SURVEY_FORM_NONCE  = 'tlc-ttsurvey-survey-form';
+const USER_PROFILE_NONCE = 'tlc-ttsurvey-user-profile';
 
 const PLUGIN_LOG_FILE    = 'plugin.log';
 
@@ -55,6 +56,16 @@ const SENDMAIL_TEMPLATES = array(
         'hiskey' => array('fullname'=>'Thomas Smith', 'userid'=>'tsmith13'),
         'herkey' => array('fullname'=>'Theresa Smith', 'userid'=>'thsmith28'),
       ),
+    ),
+  ),
+  'profile' => array(
+    'label' => 'Updated Profile',
+    'when' => 'a user updates their profile',
+    'demo_data' => array(
+      'userid' => 'tsmith13',
+      'changed' => 'email address',
+      'from' => 't.smith@t3mail.net',
+      'to' => 'theresa.smith@3mail.net',
     ),
   ),
 );

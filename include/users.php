@@ -334,8 +334,16 @@ class User {
       log_warning("Cannot update name for $this->_userid: invalid name ($fullname)");
       return false;
     }
+    $old_fullname = $this->fullname();
     $this->_data['fullname'] = $fullname;
     $this->commit();
+
+    $email = $this->email();
+    if($email) {
+      require_once plugin_path('include/sendmail.php');
+      sendmail_profile($email, $this->userid(), 'name', $old_fullname, $fullname);
+    }
+
     return true;
   }
 
@@ -345,12 +353,23 @@ class User {
       log_warning("Cannot update email for $this->_userid: invalid email ($email)");
       return false;
     }
+    $old_email = $this->email();
     if($email) {
       $this->_data['email'] = $email;
     } else {
       unset($this->_data['email']);
     }
     $this->commit();
+
+    if($email) {
+      require_once plugin_path('include/sendmail.php');
+      sendmail_profile($email, $this->userid(), 'email address', $old_email, $email);
+    }
+    if($old_email) {
+      require_once plugin_path('include/sendmail.php');
+      sendmail_profile($old_email, $this->userid(), 'email address', $old_email, $email);
+    }
+
     return true;
   }
 
@@ -367,6 +386,13 @@ class User {
     }
     $this->_data['pw_hash'] = password_hash($password,PASSWORD_DEFAULT);
     $this->commit();
+
+    $email = $this->email();
+    if($email) {
+      require_once plugin_path('include/sendmail.php');
+      sendmail_profile($email, $this->userid(), 'password', '(undisclosed)', '(undisclosed)');
+    }
+
     return true;
   }
 

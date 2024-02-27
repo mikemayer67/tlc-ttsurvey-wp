@@ -72,6 +72,7 @@ function add_login_input($type,$kwargs=array())
   $value = stripslashes($kwargs['value'] ?? null);
   $optional = $kwargs['optional'] ?? False;
   $info = $kwargs['info'] ?? null;
+  $id = "tlcsurvey-input-$name";
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
@@ -79,7 +80,7 @@ function add_login_input($type,$kwargs=array())
   # add label box
 
   echo "<div class='label-box'>";
-  echo "<label>$label</label>";
+  echo "<label for='$id'>$label</label>";
   if($info) { 
     $info_link = "tlc-ttsurvey-$name-info";
     $icon_url = plugin_url('img/icons8-info.png');
@@ -96,11 +97,12 @@ function add_login_input($type,$kwargs=array())
 
   $empty = $optional ? '' : 'empty';
   $required = $optional ? "placeholder='[optional]'" : 'required';
+  $ac = "autocomplete='$type'";
   
   if($type=='new-password') 
   {
-    echo "<input type='password' class='text-entry entry empty primary' name='$name' required autocomplete='new-password'>";
-    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required autocomplete='new-password'>";
+    echo "<input id='$id' type='password' class='text-entry entry empty primary' name='$name' required $ac>";
+    echo "<input type='password' class='text-entry entry empty confirm' name='$name-confirm' required $ac>";
   }
   else
   {
@@ -109,7 +111,7 @@ function add_login_input($type,$kwargs=array())
     case 'email':                    break;
     default:         $type = 'text'; break;
     }
-    echo "<input type='$type' class='text-entry $empty' name='$name' $value $required>";
+    echo "<input id='$id' type='$type' class='text-entry $empty' name='$name' $value $required $ac>";
   }
 
   # add info box
@@ -131,13 +133,14 @@ function add_login_checkbox($name, $kwargs=array())
   $label = $kwargs['label'] ?? ucwords($name);
   $checked = stripslashes($kwargs['value'] ?? False) ? 'checked' : '';
   $info = $kwargs['info'] ?? null;
+  $id = "tlcsurvey-cb-$name";
 
   echo "<!-- $label -->";
   echo "<div class='input $name'>";
   
   echo "<div class='label-box'>";
-  echo "<input type='checkbox' name='$name' $checked>";
-  echo "<label>$label</label>";
+  echo "<input id='$id' type='checkbox' name='$name' $checked>";
+  echo "<label for='$id'>$label</label>";
 
   if($info)
   {
@@ -223,3 +226,49 @@ function add_login_links($links)
   echo "</div>";
 }
 
+function info_text($key) 
+{
+  $rval = "";
+  switch($key) {
+  case 'userid':
+    $rval = <<<INFO
+      Used to log into the survey
+      <p class=info-list><b>must</b> be 8-16 characters</p>
+      <p class=info-list><b>must</b> start with a letter</p>
+      <p class=info-list><b>must</b> contain only letters and numbers</p>
+      INFO;
+    break;
+
+  case 'new-password':
+  case 'password':
+    $rval = <<<INFO
+      Used to log into the survey
+      <p class=info-list><b>must</b> be 8-128 characters</p>
+      <p class=info-list><b>must</b> contain at least one letter</p>
+      <p class=info-list><b>may</b> contain: !@%^*-_=~,.</p>
+      <p class=info-list><b>may</b> contain spaces</p>
+      INFO;
+    break;
+
+  case 'fullname':
+    $rval = <<<INFO
+      How your name will appear on the survey summary report
+      <p class=info-list><b>must</b> contain a valid full name</p>
+      <p class=info-list><b>may</b> contain apostrophes</p>
+      <p class=info-list><b>may</b> contain hyphens</p>
+      <p class=info-list>Extra whitespace will be removed</p>
+      INFO;
+    break;
+
+  case 'email':
+    $rval = <<<INFO
+      The email address is <b>optional</b>. It will only be used in conjunction with 
+      this survey. It will be used to send you:
+      <p class=info-list>confirmation of your registration</p>
+      <p class=info-list>notifcations on your survey state</p>
+      <p class=info-list>login help (on request)</p>
+      INFO;
+    break;
+  }
+  return $rval;
+}
