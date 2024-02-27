@@ -79,20 +79,24 @@ function update_layout(e) {
 
   if( editor_bottom > survey_bottom - 5 ) {
     if( menubar_fixed || (editor_height < survey_height - menubar_height - 5 )) {
+      console.log(`hide: editor_bottom:${editor_bottom} > survey_bottom:${survey_bottom}`)
       ce.profile_editor.hide();
     } else {
+      console.log(`grow_container: editor_bottom:${editor_bottom} > survey_bottom:${survey_bottom}`)
       ce.profile_editor.show();
       ce.container.css({'height': editor_height + menubar_height + 5});
     }
   } else {
     ce.profile_editor.show();
     if( menubar_fixed ) {
+      console.log(`fixed PE: page_top=${page_top} menubar_top=${menubar_top} top=${page_top + menubar_height + 5}`);
       ce.profile_editor.css( {
         'position':'fixed',
         'top':page_top + menubar_height + 5,
         'width':editor_width,
       });
     } else {
+      console.log(`relative PE: page_top=${page_top} menubar_top=${menubar_top} top=${menubar_height + 5}`);
       ce.profile_editor.css( {
         'position':'relative',
         'top': menubar_height + 5,

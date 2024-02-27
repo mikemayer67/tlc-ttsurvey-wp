@@ -52,6 +52,7 @@ function add_survey_menubar($userid)
 function add_user_profile_editor($userid)
 {
   echo "<div class='modal user-profile'>";
+  echo "<div class='modal-blur'></div>";
   echo "<div class='dialog user-profile'>";
   echo "<form class='user-profile'>";
   wp_nonce_field(USER_PROFILE_NONCE);
