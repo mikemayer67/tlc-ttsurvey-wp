@@ -165,22 +165,34 @@ function validate_profile_entry(entry)
 {
   var key = entry.attr('name');
 
-  console.log(`validate ${key}`);
+  var query_data = null;
+  var editor = null;
+  if( key == "name" ) {
+    editor = ce.profile_editor.find('.editor-body.name');
+    query_data = { key:'fullname', value:entry.val() };
+  } else if( key == "email" ) {
+    editor = ce.profile_editor.find('.editor-body.email');
+    query_data = { key:'email', value:entry.val() };
+  } else if ( (key == 'password') || (key == 'password-confirm') ) {
+    editor = ce.profile_editor.find('.editor-body.password');
+    query_data = {
+      key:'password',
+      value: ce.profile_editor.find('.editor-body.password input.primary').val(),
+      confirm: ce.profile_editor.find('.editor-body.password input.confirm').val(),
+    };
+  }
 
-  var entry = ce.pe_entry[key];
-  var error = ce.profile_editor.find(`.editor-body.${key}`).find('.error');
+  const default_val = entry[0].dataset.default;
+  var error = editor.find('.error');
+  var entries = editor.find('.text-entry');
 
   ajax_query(
     'validate_profile_update',
-    {
-      key:(key=='name'?'fullname':key),
-      value:entry.val(),
-    },
+    query_data,
     function(response) {
-      entry.removeClass(['invalid','empty']);
+      entries.removeClass(['invalid','empty']);
       if(response.success) {
         error.html('');
-        default_val = entry[0].dataset.default;
         if(entry.val() != default_val) {
           ce.pe_submit.prop('disabled',false);
         }
@@ -188,12 +200,12 @@ function validate_profile_entry(entry)
       else if(response.data == "#empty") 
       {
         error.html('');
-        entry.addClass('empty');
+        entries.addClass('empty');
       }
       else 
       {
         error.html(response.data);
-        entry.addClass('invalid');
+        entries.addClass('invalid');
       }
     }
   );
@@ -214,6 +226,8 @@ function handle_pe_cancel(e)
 
 function handle_pe_input(e)
 {
+  ce.pe_submit.prop('disabled',true);
+
   var entry = jQuery(this);
   if(profile_keyup_timer) {
     clearTimeout(profile_keyup_timer);
@@ -241,6 +255,11 @@ function setup_info_trigger()
       jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',14);
     }
   });
+
+  tgt.on( 'click', function() { 
+    tgt.removeClass('visible').hide();
+    jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
+  });
 }
 
 /******************************************************************************
@@ -260,7 +279,7 @@ function setup_elements()
   ce.pe_cancel = ce.profile_editor.find('.cancel');
   ce.pe_submit = ce.profile_editor.find('.submit');
   ce.pe_editor = ce.profile_editor.find('.editor-body');
-  ce.pe_entry = ce.profile_editor.find('.text-edit');
+  ce.pe_entry = ce.profile_editor.find('.text-entry');
 
   ce.matchMedia = window.matchMedia("(max-width:480px)");
   ce.matchMedia.addEventListener('change',watch_media);

@@ -27,7 +27,7 @@ if($key == 'password') {
     wp_send_json_error("missing confirmation");
     wp_die();
   }
-  if($confirm != $password) {
+  if($confirm != $value) {
     wp_send_json_error("confirmation doesn't match");
     wp_die();
   }
