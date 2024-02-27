@@ -4,121 +4,9 @@ var menubar_top = -1;
 var menubar_fixed = false;
 var profile_keyup_timer = null;
 
-function ajax_query( query, data, response_handler )
-{
-  data.action = 'tlc_ttsurvey';
-  data.nonce = menubar_vars.nonce;
-  data.query = 'shortcode/' + query;
-
-  jQuery.post(menubar_vars.ajaxurl, data, response_handler, 'json');
-}
-
-
-function setup_user_menu()
-{
-  ce.user_menu.find('.edit-user-name').on('click', function(e) { start_editor(e,'name','edit'); } );
-  ce.user_menu.find('.edit-user-email').on('click', function(e) { start_editor(e,'email','edit'); } );
-  ce.user_menu.find('.add-user-email').on('click', function(e) { start_editor(e,'email','add'); } );
-  ce.user_menu.find('.change-password').on('click', function(e) { start_editor(e,'password','change'); } );
-}
-
-function start_editor(e,key,action)
-{
-  e.preventDefault();
-
-  ce.pe_submit.prop('disabled',true);
-  ce.profile_editor[0].dataset.target = key;
-  ce.profile_editor[0].dataset.action = action;
-
-  var entry = ce.pe_entry[key];
-  if(action == 'edit') {
-    entry.val(entry[0].dataset.default);
-    entry.removeClass(['invalid','empty']);
-  } else {
-    entry.val('');
-    entry.removeClass('invalid').addClass('empty');
-  }
-
-  ce.pe_error.html('');
-
-  ce.profile_modal.show();
-  ce.profile_modal.find('.editor-body').hide();
-  ce.profile_modal.find(`.editor-body.${key}`).show();
-
-  update_layout(e);
-}
-
-
-function setup_profile_editor()
-{
-  ce.pe_cancel.on('click', function(e) {
-    e.preventDefault();
-    ce.profile_modal.hide();
-    update_layout(e);
-  });
-
-  for( var key in ce.pe_entry ) {
-    var entry = ce.pe_entry[key];
-    entry.on('input',
-      function() { 
-        if(profile_keyup_timer) { 
-          clearTimeout(profile_keyup_timer); 
-        }
-        profile_keyup_timer = setTimeout( 
-          function() {
-            profile_keyup_timer = null;
-            validate_profile_entry(key);
-          },
-          500,
-        );
-      }
-    );
-  }
-
-  ce.pe_submit.prop('disabled',true);
-  ce.pe_submit.on('click'.update_profile_entry);
-}
-
-function validate_profile_entry(key)
-{
-  console.log(`validate ${key}`);
-
-  var entry = ce.pe_entry[key];
-  var error = ce.pe_error[key];
-
-  ajax_query(
-    'validate_profile_update',
-    {
-      key:key,
-      value:entry.val(),
-    },
-    function(response) {
-      entry.removeClass(['invalid','empty']);
-      if(response.success) {
-        error.html('');
-        if(entry.val() != entry[0].dataset.default) {
-          ce.pe_submit.prop('disabled',false);
-        }
-      }
-      else if(response.data == "#empty") 
-      {
-        error.html('');
-        entry.addClass('empty');
-      }
-      else 
-      {
-        error.html(response.data);
-        entry.addClass('invalid');
-      }
-    }
-  );
-}
-
-function update_profile_entry(e)
-{
-  console.log('update profile entry');
-}
-
+/******************************************************************************
+* Layout handlers
+******************************************************************************/
 
 function update_layout(e) {
   var page_top = 0;
@@ -230,6 +118,135 @@ function watch_media(e)
 }
 
 
+/******************************************************************************
+* Editor handlers
+******************************************************************************/
+
+function ajax_query( query, data, response_handler )
+{
+  data.action = 'tlc_ttsurvey';
+  data.nonce = menubar_vars.nonce;
+  data.query = 'shortcode/' + query;
+
+  jQuery.post(menubar_vars.ajaxurl, data, response_handler, 'json');
+}
+
+
+function start_editor(e,key,action)
+{
+  e.preventDefault();
+
+  ce.pe_submit.prop('disabled',true);
+  ce.profile_editor[0].dataset.target = key;
+  ce.profile_editor[0].dataset.action = action;
+
+  var editor = ce.profile_editor.find(`.editor-body.${key}`);
+  var entry = editor.find('.text-entry');
+  var error = editor.find('.error');
+
+  if(action == 'edit') {
+    entry.val(entry[0].dataset.default);
+    entry.removeClass(['invalid','empty']);
+  } else {
+    entry.val('');
+    entry.removeClass('invalid').addClass('empty');
+  }
+
+  error.html('');
+
+  ce.profile_modal.show();
+  ce.profile_modal.find('.editor-body').hide();
+  editor.show();
+
+  update_layout(e);
+}
+
+function validate_profile_entry(entry)
+{
+  var key = entry.attr('name');
+
+  console.log(`validate ${key}`);
+
+  var entry = ce.pe_entry[key];
+  var error = ce.profile_editor.find(`.editor-body.${key}`).find('.error');
+
+  ajax_query(
+    'validate_profile_update',
+    {
+      key:(key=='name'?'fullname':key),
+      value:entry.val(),
+    },
+    function(response) {
+      entry.removeClass(['invalid','empty']);
+      if(response.success) {
+        error.html('');
+        default_val = entry[0].dataset.default;
+        if(entry.val() != default_val) {
+          ce.pe_submit.prop('disabled',false);
+        }
+      }
+      else if(response.data == "#empty") 
+      {
+        error.html('');
+        entry.addClass('empty');
+      }
+      else 
+      {
+        error.html(response.data);
+        entry.addClass('invalid');
+      }
+    }
+  );
+}
+
+function update_profile_entry(e)
+{
+  console.log('update profile entry');
+}
+
+
+function handle_pe_cancel(e)
+{
+  e.preventDefault();
+  ce.profile_modal.hide();
+  update_layout(e);
+}
+
+function handle_pe_input(e)
+{
+  var entry = jQuery(this);
+  if(profile_keyup_timer) {
+    clearTimeout(profile_keyup_timer);
+  }
+  profile_keyup_timer = setTimeout( 
+    function() {
+      profile_keyup_timer = null;
+      validate_profile_entry(entry);
+    }, 
+    500
+  );
+}
+
+function setup_info_trigger()
+{
+  var trigger = jQuery(this);
+  var tgt = jQuery('#' + trigger.data('target'));
+  trigger.on('click', function() {
+    if(tgt.hasClass('visible')) {
+      tgt.removeClass('visible').hide();
+      jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
+    } else {
+      jQuery('#tlc-ttsurvey .info-box').removeClass('visible').hide();
+      tgt.addClass('visible').show();
+      jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',14);
+    }
+  });
+}
+
+/******************************************************************************
+* general setup
+******************************************************************************/
+
 function setup_elements()
 {
   ce.container = jQuery('#survey');
@@ -242,18 +259,8 @@ function setup_elements()
 
   ce.pe_cancel = ce.profile_editor.find('.cancel');
   ce.pe_submit = ce.profile_editor.find('.submit');
-  ce.pe_editor = [];
-  ce.pe_entry = [];
-  ce.pe_error = [];
-  let keys = ['name','email','password'];
-  keys.forEach( function(key) {
-    var editor = ce.profile_editor.find(`.editor-body.${key}`);
-    ce.pe_editor[key] = editor;
-    var entry = editor.find('text-entry');
-    ce.pe_entry[key] = entry;
-    var error = editor.find('error');
-    ce.pe_error[key] = error;
-  });
+  ce.pe_editor = ce.profile_editor.find('.editor-body');
+  ce.pe_entry = ce.profile_editor.find('.text-edit');
 
   ce.matchMedia = window.matchMedia("(max-width:480px)");
   ce.matchMedia.addEventListener('change',watch_media);
@@ -261,41 +268,28 @@ function setup_elements()
 
   jQuery(window).on('scroll',update_layout);
   jQuery(window).on('resize',update_layout);
-}
 
+  // menubar
 
-function info_setup()
-{
+  ce.user_menu.find('.edit-user-name').on('click', function(e) { start_editor(e,'name','edit'); } );
+  ce.user_menu.find('.edit-user-email').on('click', function(e) { start_editor(e,'email','edit'); } );
+  ce.user_menu.find('.add-user-email').on('click', function(e) { start_editor(e,'email','add'); } );
+  ce.user_menu.find('.change-password').on('click', function(e) { start_editor(e,'password','change'); } );
+
+  // profile editor
+
+  ce.pe_cancel.on('click', handle_pe_cancel);
+  ce.pe_entry.on('input', handle_pe_input);
+
+  ce.pe_submit.prop('disabled',true);
+  ce.pe_submit.on('click'.update_profile_entry);
+
+  // info
+
   jQuery('#tlc-ttsurvey .info-box').hide();
-  jQuery('#tlc-ttsurvey .info-trigger').each(
-    function() {
-      var trigger = jQuery(this)
-      var tgt_id = trigger.data('target');
-      var tgt = jQuery('#'+tgt_id);
-      trigger.on( 'click', function() { 
-        if(tgt.hasClass('visible')) {
-          tgt.removeClass('visible').hide();
-          jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
-        } else {
-          jQuery('#tlc-ttsurvey .info-box').removeClass('visible').hide();
-          tgt.addClass('visible').show();
-          jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',14);
-        }
-      });
-
-      tgt.on( 'click', function() { 
-        tgt.removeClass('visible').hide();
-        jQuery('#tlc-ttsurvey .modal .dialog').css('z-index',15);
-      });
-    }
-  );
+  jQuery('#tlc-ttsurvey .info-trigger').each(setup_info_trigger);
 }
 
 jQuery(document).ready(
-  function($) {
-    setup_elements();
-    setup_user_menu();
-    setup_profile_editor();
-    info_setup();
-  }
+  function($) { setup_elements(); }
 );

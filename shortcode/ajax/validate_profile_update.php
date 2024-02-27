@@ -7,7 +7,6 @@ require_once plugin_path('include/logger.php');
 require_once plugin_path('include/validation.php');
 
 $key = $_POST['key'];
-if($key == 'name') { $key = 'fullname'; }
 
 $value = adjust_user_input($key,$_POST['value']);
 
