@@ -617,8 +617,14 @@
  * Other stuff
  **/
 
-#tlc-ttsurvey-admin form.new-survey span.new-name {
+#tlc-ttsurvey-admin form.new-survey table {
   margin-left:1.5rem;
+}
+
+#tlc-ttsurvey-admin form.new-survey td.label {
+  font-weight:bold;
+  padding-right:5px;
+  text-align:right;
 }
 
 #tlc-ttsurvey-admin form.new-survey input.new-name {

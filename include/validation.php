@@ -126,15 +126,17 @@ class SurveyDataValidation
 
     $survey_data_schema = [
       'surveys'=>[ 'type'=>'hashlist', 'required'=>true, 'schema'=>[
-          'name'=>    [ 'type'=>'string',  'required'=>true, 'rule'=>'survey_name'],
-          'post_id'=> [ 'type'=>'integer', 'required'=>true, 'rule'=>'positive' ],
-          'status'=>  [ 'type'=>'enum',    'required'=>true, 'values'=>['draft','active','closed'] ],
-          'responses'=>[ 'type'=>'integer', 'required'=>false,'rule'=>'natural' ],
+          'name'=>       [ 'type'=>'string',  'required'=>true, 'rule'=>'survey_name'],
+          'post_id'=>    [ 'type'=>'integer', 'required'=>true, 'rule'=>'positive' ],
+          'parent_id' => [ 'type'=>'integer', 'required'=>false, 'rule'=>'natural'],
+          'status'=>     [ 'type'=>'enum',    'required'=>true, 'values'=>['draft','active','closed'] ],
+          'responses'=>  [ 'type'=>'integer', 'required'=>false,'rule'=>'natural' ],
           'content'=> [ 'type'=>'hash',    'required'=>false, 'schema'=>[
               'survey'=>  [ 'type'=>'string', 'required'=>false, 'rule'=>'survey_form' ],
               'sendmail'=>[ 'type'=>'hash',   'required'=>false, 'schema'=>[
                   'welcome'=> [ 'type'=>'string', 'required'=>false, 'rule'=>'markdown' ],
-                  'recovery'=>[ 'type'=>'string', 'required'=>false, 'rule'=>'markdown' ]
+                  'recovery'=>[ 'type'=>'string', 'required'=>false, 'rule'=>'markdown' ],
+                  'profile'=>[ 'type'=>'string', 'required'=>false, 'rule'=>'markdown' ]
                 ]
               ]
             ]

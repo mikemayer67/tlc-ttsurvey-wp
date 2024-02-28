@@ -121,6 +121,7 @@ class Survey
   private $_post_id = null;
   private $_name = null;
   private $_status = null;
+  private $_parent_id = null;
   private $_last_modified = null;
   private $_content = null;
 
@@ -134,16 +135,25 @@ class Survey
     $this->_post_id = $post_id = $post->ID;
     $this->_name = $name = $post->post_title;
 
-    $status = get_post_meta($post->ID,'status') ?? null;
-    if(!$status) {
+    $result = get_post_meta($post->ID,'status') ?? null;
+    if(!$result) {
       log_error("Survey $name is missing status metadata");
       wp_die();
     }
-    if(count($status)>1) {
+    if(count($result)>1) {
       log_error("Survey $name has multiple status entries in the metadata");
       wp_die();
     }
-    $this->_status = $status[0];
+    $this->_status = $result[0];
+
+    $result = get_post_meta($post->ID,'parent_id') ?? null;
+    if($result) {
+      if(count($result)>1) {
+        log_error("Survey $name has multiple parent_id entries in the metadata");
+        wp_die();
+      }
+      $this->_parent_id = $result[0];
+    }
 
     $this->_last_modified = get_post_modified_time('U',true,$post);
   }
@@ -181,12 +191,20 @@ class Survey
     return new Survey($post);
   }
 
-  public static function create_new($name)
+  public static function create_new($name,$parent_id)
   {
+    $content = '';
+    if($parent_id) {
+      $parent = get_post($parent_id);
+      if($parent) {
+        $content = $parent->post_content;
+      }
+    }
+
     $post_id = wp_insert_post(
       array(
         'post_title' => $name,
-        'post_content' => '',
+        'post_content' => $content,
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
       ),
@@ -198,9 +216,14 @@ class Survey
     }
 
     update_post_meta($post_id,'status',SURVEY_IS_DRAFT);
+    update_post_meta($post_id,'parent_id',$parent_id);
     update_post_meta($post_id,'responses',0);
 
-    log_info("Created new $name survey");
+    if($parent_id) {
+      log_info("Created new $name survey as clone of $parent_name");
+    } else {
+      log_info("Created new $name survey");
+    }
 
     return Survey::from_post_id($post_id);
   }
@@ -210,6 +233,7 @@ class Survey
     $name = $data['name'];
     $content = wp_slash(json_encode($data['content']));
     $responses = intval($data['responses'] ?? 0);
+    $parent_id = intval($data['parent_id'] ?? 0);
     $status = $data['status'] ?? SURVEY_IS_CLOSED;
 
     $post_id = wp_insert_post(
@@ -224,6 +248,7 @@ class Survey
     if(!$post_id) { return null; }
 
     update_post_meta($post_id,'status',$status);
+    update_post_meta($post_id,'parent_id',$parent_id);
     update_post_meta($post_id,'responses',$responses);
 
     log_info("Loaded $name survey");
@@ -232,10 +257,10 @@ class Survey
   }
 
   // getters
-
   public function post_id()       { return $this->_post_id;       }
   public function name()          { return $this->_name;          }
   public function status()        { return $this->_status;        }
+  public function parent_id()     { return $this->_parent_id;     }
   public function last_modified() { return $this->_last_modified; }
 
   // the following assumes that there is only one survey that is either draft or active
@@ -266,6 +291,36 @@ class Survey
     $this->_status = $status;
     update_post_meta($this->_post_id,'status',$status);
   }
+
+  // update parent id
+  //   (e.g. after reload of data)
+
+  public function update_parent_id($id_map)
+  {
+    $old_pid = $this->_parent_id;
+
+
+    // if existing parent_id is 0, now remap necessary, new parent_id is also 0
+    if( !$old_pid ) {
+      return true; 
+    }
+
+    // if existing parent id is not in the id map, then we have a problem with the remapping
+    if( !array_key_exists( $old_pid, $id_map ) ) { 
+      return false;
+    }
+
+    // update the parent id and return true
+    $new_pid = $id_map[$old_pid] ?? 0;
+
+    $this->_parent_id = $new_pid;
+    update_post_meta($this->_post_id,'parent_id',$new_pid);
+
+    return true;
+  }
+
+
+
 
   // update status from admin tabs
 
@@ -317,11 +372,16 @@ class SurveyCatalog
   }
 
   // catalog instance
-  private $_index = array();
+  private $_index = null;
   private $_current = null;
 
-  private function __construct()
+  private function __construct() { $this->_load(); }
+
+  private function _load()
   {
+    $this->_index = array();
+    $this->_current = null;
+
     $posts = get_posts(
       array(
         'post_type' => SURVEY_POST_TYPE,
@@ -363,6 +423,22 @@ class SurveyCatalog
     return null;
   }
 
+  public function parent_survey($post_id=null)
+  {
+    if($post_id) {
+      $child = $this->lookup_by_post_id($post_id);
+    } else {
+      $child = $this->_current;
+    }
+    if($child) {
+      $parent_id = $child->parent_id();
+      if($parent_id) {
+        return $this->lookup_by_post_id($parent_id);
+      }
+    }
+    return null;
+  }
+
   public function reopen_survey($post_id) 
   {
     $survey = $this->_index[$post_id] ?? null;
@@ -387,20 +463,20 @@ class SurveyCatalog
     return true;
   }
 
-  public function create_new_survey($name)
+  public function create_new_survey($name,$parent_id)
   {
     if( $this->_current ) {
       $cur_name = $this->_current->name();
       log_error("Cannot create new survey with existing $cur_name survey open");
       wp_die();
     }
-    $survey = Survey::create_new($name);
+    $survey = Survey::create_new($name,$parent_id);
     if(!$survey) {
       log_warning("Failed to insert new $name survey into posts");
       wp_die();
     }
     $post_id = $survey->post_id();
-    $this->index[$post_id] = $survey;
+    $this->_index[$post_id] = $survey;
     return true;
   }
 
@@ -424,6 +500,15 @@ class SurveyCatalog
       $names[] = $survey->name();
     }
     return $names;
+  }
+
+  public function survey_name_index()
+  {
+    $rval = array();
+    foreach($this->_index as $survey) {
+      $rval[$survey->post_id()] = $survey->name();
+    }
+    return $rval;
   }
 
   public function post_ids()
@@ -458,8 +543,15 @@ function current_survey() { return SurveyCatalog::instance()->current_survey(); 
 function active_survey()  { return SurveyCatalog::instance()->active_survey();  }
 function closed_surveys() { return SurveyCatalog::instance()->closed_surveys(); }
 
-function reopen_survey($post_id) { return SurveyCatalog::instance()->reopen_survey($post_id); }
-function create_new_survey($name) { return SurveyCatalog::instance()->create_new_survey($name); }
+function parent_survey($post_id=null)  { return SurveyCatalog::instance()->parent_survey($post_id);  }
+
+function reopen_survey($post_id) { 
+  return SurveyCatalog::instance()->reopen_survey($post_id); 
+}
+
+function create_new_survey($name,$parent_id) { 
+  return SurveyCatalog::instance()->create_new_survey($name,$parent_id);
+}
 
 /**
  * Updates from admin tab
@@ -518,6 +610,7 @@ function dump_all_survey_data()
     $data[] = array(
       'name' => $post->post_title,
       'post_id' => $post->ID,
+      'parent_id' => get_post_meta($id,'parent_id')[0] ?? 0,
       'content' => $content,
       'responses' => get_post_meta($id,'responses')[0] ?? 0,
       'status' => get_post_meta($id,'status')[0] ?? '',
@@ -530,6 +623,7 @@ function load_all_survey_data($data,&$error=null)
 {
   $post_id_map = array();
 
+  $surveys = array();
   foreach($data as $survey_data) {
     $name = $survey_data['name'];
     $old_post_id = $survey_data['post_id'];
@@ -538,7 +632,16 @@ function load_all_survey_data($data,&$error=null)
       $error = "Failed to load $name survey";
       return null;
     }
+    $surveys[] = $survey;
     $post_id_map[$old_post_id] = $survey->post_id();
+  }
+
+  // correct parent_ids
+  foreach($surveys as $survey) { 
+    if(!$survey->update_parent_id($post_id_map)) {
+      $error = "Failed to remap parent ids";
+      return null;
+    }
   }
 
   return $post_id_map;
