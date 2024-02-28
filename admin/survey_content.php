@@ -147,15 +147,37 @@ function add_new_survey_content()
   }
   $existing_names = json_encode($existing_names);
 
+  $candidate_parents = SurveyCatalog::instance()->survey_name_index();
+  krsort($candidate_parents);
+
   echo "<div class=new>";
   echo "  <h2>Create a New Survey</h2>";
   echo "  <form class='new-survey'>";
   echo "    <input class='existing' type='hidden' value='$existing_names'>";
-  echo "    <span class='new-name'>";
-  echo "      <span class='label'>Survey Name</span>";
-  echo "      <input type='text' class='new-name' name='name' value='$suggested_name'>";
-  echo "      <span class='error'></span>";
-  echo "    </span>";
+  echo "    <table>";
+  echo "      <tr>";
+  echo "        <td class='label'>Survey Name:</td>";
+  echo "        <td class='value'>";
+  echo "          <input type='text' class='new-name' name='name' value='$suggested_name'>";
+  echo "          <span class='error'></span>";
+  echo "        </td>";
+  echo "      </tr>";
+  if($candidate_parents) {
+    echo "      <tr>";
+    echo "        <td class='label'>Clone from:</td>";
+    echo "        <td class='value'>";
+    echo "          <select class='select-parent' name='parent'>";
+    echo "            <option value='0'>None</option>";
+    foreach ($candidate_parents as $pid=>$name) {
+      echo "            <option value='$pid'>$name</option>";
+    }
+    echo "          </select>";
+    echo "        </td>";
+    echo "      </tr>";
+  } else {
+    echo "    <input class='select-parent' type='hidden' value='0'>";
+  }
+  echo "    </table>";
   echo "    <div class='button-box'>";
   $class = 'submit button button-primary button-large';
   echo "      <input type='submit' value='Create Survey' class='$class''>";

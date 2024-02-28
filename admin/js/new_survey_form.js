@@ -29,6 +29,7 @@ function handle_new_survey(event)
   event.preventDefault();
 
   const new_name = ce.new_name.val();
+  const parent_id = ce.parent_id.val();
 
   jQuery.post(
     form_vars['ajaxurl'],
@@ -37,6 +38,7 @@ function handle_new_survey(event)
       nonce:form_vars['nonce'],
       query:'admin/new_survey',
       name:new_name,
+      parent_id:parent_id,
     },
     function(response) {
       if(response.success) {
@@ -52,6 +54,7 @@ jQuery(document).ready(
   function($) {
     ce.form = $('form.new-survey');
     ce.new_name = ce.form.find('input.new-name'); 
+    ce.parent_id = ce.form.find('.select-parent');
     ce.error = ce.form.find('span.error');
     ce.submit = ce.form.find('input.submit');
 
