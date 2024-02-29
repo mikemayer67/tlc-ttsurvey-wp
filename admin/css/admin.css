@@ -255,7 +255,6 @@
   background:#999;
 }
 
-
 /**
  * Content Tab
  */
@@ -325,15 +324,6 @@
   margin: 20px 0 5px 0;
 }
 
-#tlc-ttsurvey-admin .content div.email-template {
-  margin: 10px 0 0 20px;
-}
-
-#tlc-ttsurvey-admin .content div.email-template h3 {
-  margin:1.5em 0 8px 0;
-  font-size: 1.2em;
-}
-
 #tlc-ttsurvey-admin .content div.content-editors textarea {
   width:calc(100% - 15px);
   margin-left:15px;
@@ -347,22 +337,17 @@
   height:10em;
 }
 
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.content,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.sendmail {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.pids,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.editors,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.templates
+{
   margin-bottom:15px;
 }
 
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.content a.nav-tab {
-  padding: 0 10px 0 10px;
-}
-
-#tlc-ttsurvey-admin .content div.menubar {
-  margin: 1em 2em 1em 2em;
-}
-
-#tlc-ttsurvey-admin .content div.menubar a.nav-tab {
+#tlc-ttsurvey-admin .content a.nav-tab.pid,
+#tlc-ttsurvey-admin .content a.nav-tab.editor,
+#tlc-ttsurvey-admin .content a.nav-tab.template 
+{
   padding: 0 10px 0 10px;
 }
 
@@ -376,11 +361,6 @@
 
 #tlc-ttsurvey-admin .content textarea.invalid {
   border-color:var(--bright-error-color);
-}
-
-#tlc-ttsurvey-admin div.content.sendmail h3 {
-  margin-top:2em;
-  margin-bottom:5px;
 }
 
 #tlc-ttsurvey-admin .sendmail.info {

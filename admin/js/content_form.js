@@ -6,8 +6,10 @@ var ajax_lock = false;
 var queue_timer = null;
 var queue = [];
 
-var pid = null;
-var ce = {};
+var ce = {
+  pid:null,
+  last_modified:0,
+}
 
 
 function populate_form()
@@ -20,11 +22,11 @@ function populate_form()
       action:'tlc_ttsurvey',
       nonce:form_vars['nonce'],
       query:'admin/populate_content_form',
-      pid:pid,
+      pid:ce.pid,
     },
     function(response) {
       if(response.success) {
-        ce.last_modified.val(response.data.last_modified);
+        ce.last_modified = response.data.last_modified;
 
         saved_content = {
           survey: response.data.survey,
@@ -35,25 +37,25 @@ function populate_form()
         var from_autosave = false;
         var current_content = saved_content;
 
-        if(autosave[pid]) {
+        if(autosave[ce.pid]) {
           // equality means that the autosave is for the current revision
           //   earlier means that autosave is no longer applicable
           //   later means what?  the post was somehow rolled back?
           //   either way, only want to use the autosave on equality
-          if(autosave[pid].last_modified == response.data.last_modified) {
+          if(autosave[ce.pid].last_modified == response.data.last_modified) {
             from_autosave = true;
-            current_content = autosave[pid];
+            current_content = autosave[ce.pid];
             ce.form_status.html('autosave').addClass('info').show();
           }
         } 
 
-        ce.survey.val(current_content.survey);
+        ce.survey_textarea.val(current_content.survey);
 
         for(const key in current_content.sendmail) {
-          ce.sendmail.filter('.'+key).val(current_content.sendmail[key]);
+          ce.sendmail_textarea.filter('.'+key).val(current_content.sendmail[key]);
         }
         for(const key in current_content.preview) {
-          ce.preview.filter('.'+key).html(current_content.preview[key]);
+          ce.sendmail_preview.filter('.'+key).html(current_content.preview[key]);
         }
 
         if(from_autosave) { 
@@ -68,47 +70,41 @@ function populate_form()
   );
 }
 
-function handle_pid_nav(event)
+function handle_pid_nav(e)
 {
-  event.preventDefault();
-  var href = this.href + '&ce=' + ce.active_block.val() + '&ces=' + ce.active_sendmail.val();
+  e.preventDefault();
+  var href = this.href + '&ce=' + ce.active_editor + '&cet=' + ce.active_template;
   window.location = href;
 }
 
-function handle_block_nav()
+function handle_editor_nav(e)
 {
   const target = this.dataset.target;
-  const nav_tabs = ce.form.find('a.block.nav-tab');
-  const active_nav_tab = nav_tabs.filter("[data-target='"+target+"']");
 
-  const blocks = ce.form.find('.content-block .block');
-  const active_block = blocks.filter('.'+target);
+  ce.editor_navtabs.removeClass('nav-tab-active');
+  jQuery(this).addClass('nav-tab-active');
 
-  nav_tabs.removeClass('nav-tab-active');
-  active_nav_tab.addClass('nav-tab-active');
+  ce.editors.hide();
+  ce.editors.filter('.'+target).show();
+  if(target == 'sendmail') {
+    ce.templates.hide();
+    ce.templates.filter('.'+ce.active_template).show();
+  }
 
-  blocks.hide();
-  active_block.show();
-
-  ce.active_block.val(target);
+  ce.active_editor = target;
 }
 
 function handle_sendmail_nav(e)
 {
   const target = this.dataset.target;
-  const nav_tabs = ce.form.find('a.sendmail.nav-tab');
-  const active_nav_tab = nav_tabs.filter(`[data-target='${target}']`);
 
-  const blocks = ce.form.find('.content-block .sendmail-block');
-  const active_block = blocks.filter(`.${target}`);
+  ce.sendmail_navtabs.removeClass('nav-tab-active');
+  jQuery(this).addClass('nav-tab-active');
 
-  nav_tabs.removeClass('nav-tab-active');
-  active_nav_tab.addClass('nav-tab-active');
+  ce.templates.hide();
+  ce.templates.filter('.'+target).show();
 
-  blocks.hide();
-  active_block.show();
-
-  ce.active_sendmail.val(target);
+  ce.active_template = target;
 }
 
 
@@ -176,7 +172,7 @@ function validate_survey_input()
       action:'tlc_ttsurvey',
       nonce:form_vars['nonce'],
       query:'admin/validate_content_form',
-      survey:ce.survey.eq(0).val(),
+      survey:ce.survey.val(),
     },
     function(response) {
       survey_error = response.success ? null : response.data;
@@ -186,10 +182,9 @@ function validate_survey_input()
   );
 }
 
-function refresh_sendmail_preview(subject)
+function refresh_sendmail_preview(template)
 {
-  const input = ce.sendmail.filter('.'+subject)
-  const content = input.val()
+  const content = ce.sendmail_textarea.filter('.'+template).val();
 
   jQuery.post(
     form_vars['ajaxurl'],
@@ -197,30 +192,28 @@ function refresh_sendmail_preview(subject)
       action:'tlc_ttsurvey',
       nonce:form_vars['nonce'],
       query:'admin/render_sendmail_preview',
-      pid:pid,
-      subject:subject,
+      pid:ce.pid,
+      subject:template,
       content:content,
     },
     function(response) {
       if(response.success) {
-        ce.preview.filter('.'+subject).html(response.data);
+        ce.sendmail_preview.filter('.'+template).html(response.data);
         ajax_lock = false;
-
       }
     },
     'json',
   );
 }
 
-
 function content_has_changed()
 {
   if(!saved_content) { return false; }
 
-  if(saved_content.survey != ce.survey.val()) { return true; }
+  if(saved_content.survey != ce.survey_textarea.val()) { return true; }
 
   var rval = false;
-  ce.sendmail.each(function() {
+  ce.sendmail_textarea.each(function() {
     const saved_sendmail = saved_content.sendmail[this.name];
     if( this.value != saved_sendmail ) { rval = true; }
   });
@@ -235,30 +228,30 @@ function update_state()
   ce.revert.prop('disabled', !has_change );
 
   if(survey_error) {
-    ce.survey.addClass('invalid');
-    ce.error.html(survey_error).show();
+    ce.survey.textarea.addClass('invalid');
+    ce.survey_error.html(survey_error).show();
   } else {
-    ce.survey.removeClass('invalid');
-    ce.error.hide();
+    ce.survey.textarea.removeClass('invalid');
+    ce.survey_error.hide();
   }
 }
 
-function handle_form_submit(event)
+function handle_form_submit(e)
 {
   ce.form_status.hide();
-  event.preventDefault();
+  e.preventDefault();
 
   let data = {
     action:'tlc_ttsurvey',
     nonce:form_vars['nonce'],
     query:'admin/submit_content_form',
-    pid:pid,
+    pid:ce.pid,
     content:{},
   };
 
-  data.content.survey = ce.survey.val();
+  data.content.survey = ce.survey.textarea.val();
   data.content.sendmail = {}
-  ce.sendmail.each(function() {
+  ce.sendmail_textarea.each(function() {
     data.content.sendmail[this.name] = this.value;
   });
 
@@ -268,15 +261,15 @@ function handle_form_submit(event)
     function(response) {
       if(response.success) {
         ce.form_status.html('saved').addClass('info').show();
-        ce.last_modified.val(response.data.last_modified);
-        saved_content.survey = ce.survey.val();
+        ce.last_modified = response.data.last_modified;
+        saved_content.survey = ce.survey_textarea.val();
         for(const key in saved_content.sendmail) {
-          saved_content.sendmail[key] = ce.sendmail.filter('.'+key).val();
+          saved_content.sendmail[key] = ce.sendmail_textarea.filter('.'+key).val();
         }
         for(const key in saved_content.preview) {
-          saved_content.preview[key] = ce.preview.filter('.'+key).html();
+          saved_content.preview[key] = ce.sendmail_preview.filter('.'+key).html();
         }
-        delete autosave[pid];
+        delete autosave[ce.pid];
         localStorage.autosave = JSON.stringify(autosave);
         reset_queue();
         update_state();
@@ -288,22 +281,22 @@ function handle_form_submit(event)
   );
 }
 
-function handle_form_revert(event)
+function handle_form_revert(e)
 {
   ce.form_status.hide();
-  event.preventDefault();
+  e.preventDefault();
 
-  ce.survey.val(saved_content.survey);
+  ce.survey_textarea.val(saved_content.survey);
   for(const key in saved_content.sendmail) {
-    ce.sendmail.filter('.'+key).val(saved_content.sendmail[key]);
+    ce.sendmail_textarea.filter('.'+key).val(saved_content.sendmail[key]);
   }
   for(const key in saved_content.preview) {
-    ce.preview.filter('.'+key).html(saved_content.preview[key]);
+    ce.sendmail_preview.filter('.'+key).html(saved_content.preview[key]);
   }
   // assume that the saved_content has been validated already
   survey_error = false
 
-  delete autosave[pid];
+  delete autosave[ce.pid];
   localStorage.autosave = JSON.stringify(autosave);
   reset_queue();
   update_state();
@@ -312,19 +305,19 @@ function handle_form_revert(event)
 function do_autosave()
 {
   if( content_has_changed() ) {
-    autosave[pid] = {
-      survey: ce.survey.val(),
+    autosave[ce.pid] = {
+      survey: ce.survey_textarea.val(),
       sendmail: {},
       preview: {},
-      last_modified: ce.last_modified.val(),
+      last_modified: ce.last_modified,
     };
-    ce.sendmail.each( function() {
+    ce.sendmail_textarea.each( function() {
       const name = this.name;
       const value = this.value;
-      autosave[pid].sendmail[name] = value;
+      autosave[ce.pid].sendmail[name] = value;
     });
   } else {
-    delete autosave[pid];
+    delete autosave[ce.pid];
   }
   localStorage.autosave = JSON.stringify(autosave);
 }
@@ -347,39 +340,52 @@ function hold_lock()
   );
 }
 
+jQuery(document).ready( function() {
+  ce.pid = form_vars['pid'];
+  ce.active_editor = form_vars['active_editor'];
+  ce.active_template = form_vars['active_template'];
 
-jQuery(document).ready( function($) {
-  ce.form = $('#tlc-ttsurvey-admin form.content');
-  ce.form_status = $('#tlc-ttsurvey-admin .tlc-status');
-  ce.lock_info = $('.content .info.lock').eq(0);
-  ce.last_modified = ce.form.find('input[name=last-modified]').eq(0);
-  ce.inputs = ce.form.find('textarea');
-  ce.survey = ce.form.find('textarea.survey').eq(0);
-  ce.error = ce.form.find('div.invalid.survey').eq(0);
-  ce.sendmail = ce.form.find('textarea.sendmail');
-  ce.preview = ce.form.find('.sendmail.preview');
-  ce.submit = ce.form.find('input.submit').eq(0);
-  ce.revert = ce.form.find('button.revert').eq(0);
+  ce.body = jQuery('#tlc-ttsurvey-admin div.content');
+  ce.form = ce.body.find('form.content');
+  ce.form_status = ce.body.find('.tlc-status');
+  ce.lock_info = ce.body.find('.info.lock');
 
-  ce.pid_navtabs = $('#tlc-ttsurvey-admin div.content a.pid.nav-tab');
-  ce.active_block = ce.form.find('input[name=active_block]');
-  ce.active_sendmail = ce.form.find('input[name=active_sendmail]');
+  ce.editors = ce.form.find('div.editor');
+  ce.inputs = ce.editors.find('textarea');
 
-  pid = ce.form.find('input[name=pid]').eq(0).val();
+  ce.survey = ce.editors.filter('.survey');
+  ce.survey_textarea = ce.survey.find('textarea');
+  ce.survey_error = ce.survey.find('div.invalid')
+
+  ce.sendmail = ce.editors.filter('.sendmail');
+  ce.sendmail_textarea = ce.sendmail.find('textarea');
+  ce.sendmail_preview = ce.sendmail.find('div.preview');
+
+  ce.submit = ce.form.find('input.submit');
+  ce.revert = ce.form.find('button.revert');
+
+  ce.pid_navtabs = ce.body.find('a.pid.nav-tab');
+  ce.pid_navtabs.removeClass('nav-tab-active');
+  ce.pid_navtabs.filter('.'+ce.pid).addClass('nav-tab-active');
+  ce.pid_navtabs.on('click',handle_pid_nav);
+
+  ce.editor_navtabs = ce.form.find('a.editor.nav-tab');
+  ce.editor_navtabs.removeClass('nav-tab-active');
+  ce.editor_navtabs.filter('.'+ce.active_editor).addClass('nav-tab-active');
+  ce.editor_navtabs.on('click',handle_editor_nav);
+
+  ce.sendmail_navtabs = ce.sendmail.find('a.template.nav-tab');
+  ce.sendmail_navtabs.removeClass('nav-tab-active');
+  ce.sendmail_navtabs.filter('.'+ce.active_template).addClass('nav-tab-active');
+  ce.sendmail_navtabs.on('click',handle_sendmail_nav);
+
+  ce.templates = ce.sendmail.find('div.template');
 
   ce.form_status.hide();
-
-  const active_block = ce.active_block.val();
-  ce.form.find('.content-block div.block').hide();
-  ce.form.find(`.content-block div.block.${active_block}`).show();
-  ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
-
-  const active_sendmail = ce.active_sendmail.val();
-  ce.form.find('.content-block div.sendmail-block').hide();
-  ce.form.find(`.content-block div.sendmail-block.${active_sendmail}`).show();
-  ce.form.find('a.nav-tab.sendmail').on('click',handle_sendmail_nav);
-
-  ce.pid_navtabs.on('click', handle_pid_nav);
+  ce.editors.hide();
+  ce.editors.filter('.'+ce.active_editor).show();
+  ce.templates.hide();
+  ce.templates.filter('.'+ce.active_template).show();
 
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
@@ -408,16 +414,8 @@ jQuery(document).ready( function($) {
 
   ce.inputs.prop('readonly',false);
 
-  //------------------------------------------------------------
-  // content validation setup
-  //------------------------------------------------------------
-
   ce.inputs.on('input', handle_input_event );
   ce.inputs.on('input', do_autosave );
-
-  //------------------------------------------------------------
-  // form submission
-  //------------------------------------------------------------
 
   ce.form.on('submit', handle_form_submit);
   ce.revert.on('click', handle_form_revert);

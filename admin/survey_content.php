@@ -80,7 +80,7 @@ function add_survey_navbar()
 {
   $active_pid = determine_active_survey_tab();
 
-  echo "<div class='nav-tab-wrapper survey'>";
+  echo "<div class='nav-tab-wrapper pids'>";
 
   $query_args = array();
   $uri_path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
@@ -109,10 +109,9 @@ function add_survey_navbar()
   foreach($tabs as $tab)
   {
     [$label,$pid] = $tab;
-    $active = ($pid == $active_pid) ? 'nav-tab-active' : '';
     $query_args['pid'] = $pid;
     $uri = implode('?', array($uri_path,http_build_query($query_args)));
-    echo "<a class='pid nav-tab $active' href='$uri'>$label</a>";
+    echo "<a class='nav-tab pid $pid' href='$uri'>$label</a>";
   }
 
   echo "</div>";
@@ -262,33 +261,22 @@ function add_current_survey_content()
 
 function add_content_form($survey,$editable=false)
 {
-  $pid = $survey->post_id();
-
   // add the form
   //   no action or method attributes specified as submision will be handled by javascript
-  $class = $editable ? 'contant edit' : 'content no-edit';
+  $class = $editable ? 'content edit' : 'content no-edit';
   echo "<form class='$class'>";
-  echo "<input type='hidden' name='pid' value='$pid'>";
-  // last modified will be filled in by javascript
-  echo "<input type='hidden' name='last-modified' value=0>";
 
   // Add the editor navbar
-  $active_editor = $_GET['ce'] ?? 'survey';
-  echo "<div class='nav-tab-wrapper editor'>";
-  echo "<input type='hidden' name='active_editor' value='$active_editor'>";
+  echo "<div class='nav-tab-wrapper editors'>";
   $editors = [['survey','Survey Form'],['sendmail','Email Customization']];
   foreach( $editors as [$key,$label] ) {
-    $class = 'editor nav-tab';
-    $active = $key==$active_editor ? 'nav-tab-active' : '';
-    echo "<a class='$class $active' data-target='$key'>$label</a>";
+    echo "<a class='nav-tab editor $key' data-target='$key'>$label</a>";
   }
   echo "</div>";
 
   // add the content editors
-  echo "<div class='content-editors'>";
   add_survey_editor($survey);
   add_sendmail_editor($survey);
-  echo "</div>";
 
   //   add submit button if editable
   if($editable) {
@@ -302,7 +290,7 @@ function add_content_form($survey,$editable=false)
   echo "</form>";
 
   // enqueue the javascript
-  enqueue_content_javascript($editable);
+  enqueue_content_javascript($editable, $survey->post_id());
 }
 
 
@@ -341,23 +329,19 @@ function add_sendmail_editor($survey)
   echo "</div>";
 
   $templates = array_keys(SENDMAIL_TEMPLATES);
-  $active_sendmail = $_GET['ces'] ?? $templates[0];
-  echo "<div class='nav-tab-wrapper sendmail'>";
-  echo "<input type='hidden' name='active_sendmail' value='$active_sendmail'>";
+  echo "<div class='nav-tab-wrapper templates'>";
   foreach( $templates as $key ) {
     $label = SENDMAIL_TEMPLATES[$key]['label'] ?? ucfirst($key);
-    $class = 'sendmail nav-tab';
-    $active = $key==$active_sendmail ? 'nav-tab-active' : '';
-    echo "<a class='$class $active' data-target='$key'>$label</a>";
+    echo "<a class='nav-tab template $key' data-target='$key'>$label</a>";
   }
   echo "</div>"; // nav-tab-wrapper.sendmail
 
   foreach($templates as $key) {
     $when = SENDMAIL_TEMPLATES[$key]['when'];
-    echo "<div class='sendmail-block $key'>";
-    echo "<div class='sendmail info'>Sent when $when</div>";
-    echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
-    echo "<div class='sendmail preview $key'></div>";
+    echo "<div class='template $key'>";
+    echo "<div class='info'>Sent when $when</div>";
+    echo "<textarea class='template $key' name='$key' readonly></textarea>";
+    echo "<div class='template-preview $key'>preview</div>";
     echo "</div>";
   }
 
@@ -365,7 +349,7 @@ function add_sendmail_editor($survey)
 }
 
 
-function enqueue_content_javascript($editable)
+function enqueue_content_javascript($editable, $pid)
 {
   wp_register_script(
     'tlc_ttsurvey_content_form',
@@ -381,6 +365,9 @@ function enqueue_content_javascript($editable)
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
+      'pid' => $pid,
+      'active_editor' => ($_GET['ce'] ?? 'survey'),
+      'active_template' => ($_GET['cet'] ?? array_key_first(SENDMAIL_TEMPLATES)),
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
