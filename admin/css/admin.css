@@ -347,11 +347,9 @@
   height:10em;
 }
 
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey {
-  margin-bottom:15px;
-}
-
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.block {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.survey,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.block,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.sendmail {
   margin-bottom:15px;
 }
 
@@ -386,7 +384,6 @@
 }
 
 #tlc-ttsurvey-admin .sendmail.info {
-  font-weight: 300;
   margin-bottom:1em;
 }
 

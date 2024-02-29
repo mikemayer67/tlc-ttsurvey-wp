@@ -71,7 +71,7 @@ function populate_form()
 function handle_pid_nav(event)
 {
   event.preventDefault();
-  var href = this.href + '&block=' + ce.active_block.val();
+  var href = this.href + '&block=' + ce.active_block.val() + '&sendmail=' + ce.active_sendmail.val();
   window.location = href;
 }
 
@@ -92,6 +92,25 @@ function handle_block_nav()
 
   ce.active_block.val(target);
 }
+
+function handle_sendmail_nav(e)
+{
+  const target = this.dataset.target;
+  const nav_tabs = ce.form.find('a.sendmail.nav-tab');
+  const active_nav_tab = nav_tabs.filter(`[data-target='${target}']`);
+
+  const blocks = ce.form.find('.content-block .sendmail-block');
+  const active_block = blocks.filter(`.${target}`);
+
+  nav_tabs.removeClass('nav-tab-active');
+  active_nav_tab.addClass('nav-tab-active');
+
+  blocks.hide();
+  active_block.show();
+
+  ce.active_sendmail.val(target);
+}
+
 
 function reset_queue()
 {
@@ -344,16 +363,21 @@ jQuery(document).ready( function($) {
 
   ce.pid_navtabs = $('#tlc-ttsurvey-admin div.content a.pid.nav-tab');
   ce.active_block = ce.form.find('input[name=active_block]');
+  ce.active_sendmail = ce.form.find('input[name=active_sendmail]');
 
   pid = ce.form.find('input[name=pid]').eq(0).val();
 
   ce.form_status.hide();
 
-  ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
+  const active_block = ce.active_block.val();
   ce.form.find('.content-block div.block').hide();
+  ce.form.find(`.content-block div.block.${active_block}`).show();
+  ce.form.find('a.nav-tab.block').on('click', handle_block_nav);
 
-  const active = ce.active_block.val();
-  ce.form.find(`.content-block div.block.${active}`).show();
+  const active_sendmail = ce.active_sendmail.val();
+  ce.form.find('.content-block div.sendmail-block').hide();
+  ce.form.find(`.content-block div.sendmail-block.${active_sendmail}`).show();
+  ce.form.find('a.nav-tab.sendmail').on('click',handle_sendmail_nav);
 
   ce.pid_navtabs.on('click', handle_pid_nav);
 

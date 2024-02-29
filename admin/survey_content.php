@@ -335,12 +335,27 @@ function add_survey_content($survey,$editable=false)
   echo "browser you are currently using.";
   echo "</div>";
 
+  $sendmail_blocks = array();
+  foreach(SENDMAIL_TEMPLATES as $key=>$template) {
+    $label = $template['label'] ?? ucfirst($key);
+    $sendmail_blocks[] = [$key,$label];
+  }
+  $active_sendmail = $_GET['sendmail'] ?? $sendmail_blocks[0][0];
+  echo "<div class='nav-tab-wrapper sendmail'>";
+  echo "<input type='hidden' name='active_sendmail' value='$active_sendmail'>";
+  foreach( $sendmail_blocks as [$key,$label] ) {
+    $class = 'sendmail nav-tab';
+    if($key == $active_sendmail) { $class = "$class nav-tab-active"; }
+    echo "<a class='$class' data-target='$key'>$label</a>";
+  }
+  echo "</div>"; // nav-tab-wrapper.sendmail
+
   foreach(SENDMAIL_TEMPLATES as $key=>$template) {
     $label = $template['label'] ?? ucfirst($key);
     $when = $template['when'];
     echo "<!-- $label -->";
-    echo "<div class='sendmail $key'>";
-    echo "<h3>$label</h3>";
+    echo "<div class='sendmail-block $key'>";
+//    echo "<h3>$label</h3>";
     echo "<div class='sendmail info'>Sent when $when</div>";
     echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
     echo "<div class='sendmail preview $key'></div>";
