@@ -71,7 +71,7 @@ function populate_form()
 function handle_pid_nav(event)
 {
   event.preventDefault();
-  var href = this.href + '&block=' + ce.active_block.val() + '&sendmail=' + ce.active_sendmail.val();
+  var href = this.href + '&ce=' + ce.active_block.val() + '&ces=' + ce.active_sendmail.val();
   window.location = href;
 }
 

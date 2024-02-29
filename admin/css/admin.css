@@ -301,27 +301,27 @@
   border-width:1px;
 }
 
-#tlc-ttsurvey-admin .content div.content-block {
+#tlc-ttsurvey-admin .content div.content-editors {
   margin-left:1.5em;
 }
 
-#tlc-ttsurvey-admin .content div.content-block table.info {
+#tlc-ttsurvey-admin .content div.content-editors table.info {
   margin-left: 3em;
 }
 
-#tlc-ttsurvey-admin .content div.content-block table.info td{
+#tlc-ttsurvey-admin .content div.content-editors table.info td{
   padding-left:3px;
   padding-top:0;
 }
 
-#tlc-ttsurvey-admin .content div.content-block table.info td:first-child {
+#tlc-ttsurvey-admin .content div.content-editors table.info td:first-child {
   font-family:monospace;
   padding:0 5px 0 5px;
   background-color:var(--pale-border-color);
   text-align:center;
 }
 
-#tlc-ttsurvey-admin .content div.content-block h2 {
+#tlc-ttsurvey-admin .content div.content-editors h2 {
   margin: 20px 0 5px 0;
 }
 
@@ -334,27 +334,27 @@
   font-size: 1.2em;
 }
 
-#tlc-ttsurvey-admin .content div.content-block textarea {
+#tlc-ttsurvey-admin .content div.content-editors textarea {
   width:calc(100% - 15px);
   margin-left:15px;
 }
 
-#tlc-ttsurvey-admin .content div.content-block textarea.survey {
+#tlc-ttsurvey-admin .content div.content-editors textarea.survey {
   height:30em;
 }
 
-#tlc-ttsurvey-admin .content div.content-block textarea {
+#tlc-ttsurvey-admin .content div.content-editors textarea {
   height:10em;
 }
 
 #tlc-ttsurvey-admin .content .nav-tab-wrapper.survey,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.block,
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.content,
 #tlc-ttsurvey-admin .content .nav-tab-wrapper.sendmail {
   margin-bottom:15px;
 }
 
 #tlc-ttsurvey-admin .content .nav-tab-wrapper.survey a.nav-tab,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.block a.nav-tab {
+#tlc-ttsurvey-admin .content .nav-tab-wrapper.content a.nav-tab {
   padding: 0 10px 0 10px;
 }
 
@@ -378,7 +378,7 @@
   border-color:var(--bright-error-color);
 }
 
-#tlc-ttsurvey-admin div.block.sendmail h3 {
+#tlc-ttsurvey-admin div.content.sendmail h3 {
   margin-top:2em;
   margin-bottom:5px;
 }

@@ -34,9 +34,7 @@ function add_script_body()
   $lock = obtain_content_lock();
   if($lock['has_lock']) {
     // we have the lock
-    $active_pid = determine_content_tab();
-    add_survey_navbar($active_pid);
-    add_survey_tab_content($active_pid);
+    add_survey_navbar();
   } else {
     // someone else has lock
     add_content_lock($lock);
@@ -45,7 +43,7 @@ function add_script_body()
 }
 
 
-function determine_content_tab()
+function determine_active_survey_tab()
 {
   // returns the post_id of the selected content tab
   $current = current_survey();
@@ -78,8 +76,10 @@ function determine_content_tab()
 }
 
 
-function add_survey_navbar($active_pid)
+function add_survey_navbar()
 {
+  $active_pid = determine_active_survey_tab();
+
   echo "<div class='nav-tab-wrapper survey'>";
 
   $query_args = array();
@@ -92,9 +92,10 @@ function add_survey_navbar($active_pid)
   //   first tab is current survey if there is a current survey
   //     otherwise, it's the new survey tab
   $current = current_survey();
+  $current_pid = $current ? $current->post_id() : '';
 
   if($current) {
-    $tabs[] = array($current->name(),$current->post_id());
+    $tabs[] = array($current->name(),$current_pid);
   } else {
     $tabs[] = array(' + ',FIRST_TAB);
   }
@@ -115,14 +116,8 @@ function add_survey_navbar($active_pid)
   }
 
   echo "</div>";
-}
 
-
-function add_survey_tab_content($active_pid)
-{
-  $current = current_survey();
-
-  $current_pid = $current ? $current->post_id() : '';
+  // add the survey content
 
   if($active_pid == FIRST_TAB) {
     add_new_survey_content();
@@ -132,6 +127,7 @@ function add_survey_tab_content($active_pid)
     add_past_survey_content($active_pid);
   }
 }
+
 
 function add_new_survey_content()
 {
@@ -217,7 +213,7 @@ function add_past_survey_content($pid)
   echo "No changes can be made to its content.";
   echo "</div></div>";
 
-  add_survey_content($survey);
+  add_content_form($survey);
 
   echo "</div>";
 }
@@ -258,63 +254,72 @@ function add_current_survey_content()
   echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
   echo "</div>";
 
-  add_survey_content($survey,$editable);
+  add_content_form($survey,$editable);
 
   echo "</div>";
 }
 
 
-function add_survey_content($survey,$editable=false)
+function add_content_form($survey,$editable=false)
 {
-  $name = $survey->name();
   $pid = $survey->post_id();
-  $last_modified = $survey->last_modified();
 
-  // wrap the content in a form
-  //   no action/method as submision will be handled by javascript
-  if($editable)
-  {
-    echo "<form class='content edit'>";
-  } else {
-    echo "<form class='content no-edit'>";
-  }
+  // add the form
+  //   no action or method attributes specified as submision will be handled by javascript
+  $class = $editable ? 'contant edit' : 'content no-edit';
+  echo "<form class='$class'>";
   echo "<input type='hidden' name='pid' value='$pid'>";
   // last modified will be filled in by javascript
   echo "<input type='hidden' name='last-modified' value=0>";
 
-  //
-  // Add the block navbar
-  //
-
-  $active_block = $_GET['block'] ?? 'survey';
-  echo "<div class='nav-tab-wrapper block'>";
-  echo "<input type='hidden' name='active_block' value='$active_block'>";
-  $blocks = [['survey','Survey Form'],['sendmail','Email Customization']];
-  foreach( $blocks as [$key,$label] ) {
-    $class = 'block nav-tab';
-    if($key == $active_block) { $class = "$class nav-tab-active"; }
-    echo "<a class='$class' data-target='$key'>$label</a>";
+  // Add the editor navbar
+  $active_editor = $_GET['ce'] ?? 'survey';
+  echo "<div class='nav-tab-wrapper editor'>";
+  echo "<input type='hidden' name='active_editor' value='$active_editor'>";
+  $editors = [['survey','Survey Form'],['sendmail','Email Customization']];
+  foreach( $editors as [$key,$label] ) {
+    $class = 'editor nav-tab';
+    $active = $key==$active_editor ? 'nav-tab-active' : '';
+    echo "<a class='$class $active' data-target='$key'>$label</a>";
   }
-  echo "</div>"; // nav-tab-wrapper.blocks
+  echo "</div>";
 
-  // 
-  // Add actual form content
-  //
-  echo "<div class=content-block>";
+  // add the content editors
+  echo "<div class='content-editors'>";
+  add_survey_editor($survey);
+  add_sendmail_editor($survey);
+  echo "</div>";
 
-  // Survey 
+  //   add submit button if editable
+  if($editable) {
+    echo "<div class='button-box'>";
+    echo "<input type='submit' class='submit button button-primary button-large' value='Save' disabled>";
+    echo "<button class='revert button button-secondary button-large' name='revert' disabled>revert all updates</button>";
+    echo "</div>";
+  }
 
-  echo "<div class='block survey'>";
+  // close out the form
+  echo "</form>";
+
+  // enqueue the javascript
+  enqueue_content_javascript($editable);
+}
+
+
+function add_survey_editor($survey)
+{
+  echo "<div class='editor survey'>";
   echo "<div class='info'>";
   echo "Instructions go here.";
   echo "</div>";
   echo "<textarea class='survey' name='survey' readonly></textarea>";
   echo "<div class='invalid survey'></div>";
   echo "</div>";
+}
 
-  // Email Customization
-
-  echo "<div class='block sendmail'>";
+function add_sendmail_editor($survey)
+{
+  echo "<div class='editor sendmail'>";
 
   echo "<div class='info'>";
   echo "Email customization defines the (optional) custom content to include ";
@@ -335,52 +340,28 @@ function add_survey_content($survey,$editable=false)
   echo "browser you are currently using.";
   echo "</div>";
 
-  $sendmail_blocks = array();
-  foreach(SENDMAIL_TEMPLATES as $key=>$template) {
-    $label = $template['label'] ?? ucfirst($key);
-    $sendmail_blocks[] = [$key,$label];
-  }
-  $active_sendmail = $_GET['sendmail'] ?? $sendmail_blocks[0][0];
+  $templates = array_keys(SENDMAIL_TEMPLATES);
+  $active_sendmail = $_GET['ces'] ?? $templates[0];
   echo "<div class='nav-tab-wrapper sendmail'>";
   echo "<input type='hidden' name='active_sendmail' value='$active_sendmail'>";
-  foreach( $sendmail_blocks as [$key,$label] ) {
+  foreach( $templates as $key ) {
+    $label = SENDMAIL_TEMPLATES[$key]['label'] ?? ucfirst($key);
     $class = 'sendmail nav-tab';
-    if($key == $active_sendmail) { $class = "$class nav-tab-active"; }
-    echo "<a class='$class' data-target='$key'>$label</a>";
+    $active = $key==$active_sendmail ? 'nav-tab-active' : '';
+    echo "<a class='$class $active' data-target='$key'>$label</a>";
   }
   echo "</div>"; // nav-tab-wrapper.sendmail
 
-  foreach(SENDMAIL_TEMPLATES as $key=>$template) {
-    $label = $template['label'] ?? ucfirst($key);
-    $when = $template['when'];
-    echo "<!-- $label -->";
+  foreach($templates as $key) {
+    $when = SENDMAIL_TEMPLATES[$key]['when'];
     echo "<div class='sendmail-block $key'>";
-//    echo "<h3>$label</h3>";
     echo "<div class='sendmail info'>Sent when $when</div>";
     echo "<textarea class='sendmail $key' name='$key' readonly></textarea>";
     echo "<div class='sendmail preview $key'></div>";
     echo "</div>";
   }
 
-  echo "</div>"; // block sendmail
-
-  //
-  // close out the form
-  //   add submit button if editable
-  //
-  if($editable) {
-    echo "<div class='button-box'>";
-    echo "<input type='submit' class='submit button button-primary button-large' value='Save' disabled>";
-    echo "<button class='revert button button-secondary button-large' name='revert' disabled>revert all updates</button>";
-    echo "</div>";
-  }
-
-  echo "</form>";
-
-  //
-  // enqueue the javascript
-  //
-  enqueue_content_javascript($editable);
+  echo "</div>"; // sendmail editor
 }
 
 
