@@ -128,6 +128,7 @@ class SurveyDataValidation
       'surveys'=>[ 'type'=>'hashlist', 'required'=>true, 'schema'=>[
           'name'=>       [ 'type'=>'string',  'required'=>true, 'rule'=>'survey_name'],
           'post_id'=>    [ 'type'=>'integer', 'required'=>true, 'rule'=>'positive' ],
+          'created'=>    [ 'type'=>'string',  'required'=>true, 'rule'=>'date' ],
           'parent_id' => [ 'type'=>'integer', 'required'=>false, 'rule'=>'natural'],
           'status'=>     [ 'type'=>'enum',    'required'=>true, 'values'=>['draft','active','closed'] ],
           'responses'=>  [ 'type'=>'integer', 'required'=>false,'rule'=>'natural' ],
@@ -146,6 +147,7 @@ class SurveyDataValidation
       'userids'=>[ 'type'=>'hashlist', 'required'=>true, 'schema'=> [
           'userid'=> [ 'type'=>'string',  'required'=>true, 'rule'=>'userid' ],
           'post_id'=>[ 'type'=>'integer', 'required'=>true, 'rule'=>'positive' ],
+          'created'=>[ 'type'=>'string',  'required'=>true, 'rule'=>'date' ],
           'anonid'=> [ 'type'=>'integer', 'required'=>false, 'rule'=>'positive' ],
           'content'=>[ 'type'=>'hash',    'required'=>true, 'schema'=> [
               'pw_hash'=>     [ 'type'=>'string', 'required'=>true,  'rule'=>'pw_hash'  ],
@@ -265,6 +267,12 @@ class SurveyDataValidation
         $error = "";
         if(!validate_user_input($rule,$value,$error)) {
           $this->errors[] = "$scope: $error";
+        }
+        break;
+
+      case 'date':
+        if(!wp_resolve_post_date($value)) {
+          $this->errors[] = "$scope: invalid date string";
         }
         break;
 

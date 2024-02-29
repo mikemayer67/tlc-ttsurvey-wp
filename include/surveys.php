@@ -231,6 +231,7 @@ class Survey
   public static function create_from_upload($data)
   {
     $name = $data['name'];
+    $created = $data['created'];
     $content = wp_slash(json_encode($data['content']));
     $responses = intval($data['responses'] ?? 0);
     $parent_id = intval($data['parent_id'] ?? 0);
@@ -242,6 +243,7 @@ class Survey
         'post_content' => $content,
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
+        'post_date_gmt' => $created,
       ),
       true,
     );
@@ -482,6 +484,9 @@ class SurveyCatalog
 
   public function closed_surveys($newest_to_oldest=true)
   {
+    // @@@ TODO: consider using post_date rather than post_id for sorting.
+    //   for now, the data dump/load will ensure that the post_id order is preserved
+    //   while this *should* be sufficient for ordering, post_date would be safer
     $post_ids = array_keys($this->_index);
     if($newest_to_oldest) { rsort($post_ids); }
     else                  {  sort($post_ids); }
@@ -599,6 +604,8 @@ function dump_all_survey_data()
     array(
       'post_type' => SURVEY_POST_TYPE,
       'numberposts' => -1,
+      'orderby' => 'ID',
+      'order' => 'ASC',
     )
   );
 
@@ -610,6 +617,7 @@ function dump_all_survey_data()
     $data[] = array(
       'name' => $post->post_title,
       'post_id' => $post->ID,
+      'created' => $post->post_date_gmt,
       'parent_id' => get_post_meta($id,'parent_id')[0] ?? 0,
       'content' => $content,
       'responses' => get_post_meta($id,'responses')[0] ?? 0,

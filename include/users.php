@@ -254,6 +254,7 @@ class User {
   {
     $userid = $user_data['userid'];
     $content = $user_data['content'];
+    $created = $user_data['created'];
 
     $post_id = wp_insert_post(
       array(
@@ -261,6 +262,7 @@ class User {
         'post_title' => $userid,
         'post_content' => json_encode($content),
         'post_status' => 'publish',
+        'post_date_gmt' => $created,
       ),
       true
     );
@@ -481,6 +483,8 @@ class User {
       array(
         'post_type' => USERID_POST_TYPE,
         'numberposts' => -1,
+        'orderby' => 'ID',
+        'order' => 'ASC',
       )
     );
 
@@ -493,6 +497,7 @@ class User {
         $data[] = array(
           'userid' => $userid,
           'post_id' => $id,
+          'created' => $post->post_date_gmt,
           'content' => json_decode($post->post_content,true),
           'anonid' => get_post_meta($id,'anonid')[0] ?? '',
         );
