@@ -118,11 +118,12 @@ function register_userid_post_type()
         'not_found_in_trash' => 'No Participants found in Trash',
       ),
       'has_archive' => false,
-      'supports' => array('title','editor'),
+      'supports' => array('title','editor','author'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
       'show_in_menu' => $show_in_menu,
+      'taxonomies' => array('category'),
     ),
   );
 }
@@ -137,6 +138,25 @@ function users_activate()
   log_info("Users Activate");
   register_userid_post_type();
   flush_rewrite_rules();
+
+  $cat_id = category_exists(POST_CATEGORY_NAME);
+  if($cat_id) {
+    $post_ids = get_posts(
+      array(
+        'post_type' => USERID_POST_TYPE,
+        'numberposts' => -1,
+        'fields' => 'ids',
+      )
+    );
+    foreach($post_ids as $pid) {
+      wp_update_post(
+        array(
+          'ID'=>$pid,
+          'post_category'=>array($cat_id),
+        )
+      );
+    }
+  }
 }
 
 function users_deactivate()
@@ -238,6 +258,7 @@ class User {
         'post_title' => $userid,
         'post_content' => json_encode($content),
         'post_status' => 'publish',
+        'post_category' => array(category_exists(POST_CATEGORY_NAME)),
       ),
       true
     );
@@ -261,6 +282,7 @@ class User {
         'post_title' => $userid,
         'post_content' => json_encode($content),
         'post_status' => 'publish',
+        'post_category' => array(category_exists(POST_CATEGORY_NAME)),
       ),
       true
     );
@@ -462,6 +484,7 @@ class User {
         'post_title' => ANON_USERID,
         'post_content' => '{}',
         'post_status' => 'publish',
+        'post_category' => array(category_exists(POST_CATEGORY_NAME)),
       ),
       true
     );
