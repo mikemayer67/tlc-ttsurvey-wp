@@ -73,8 +73,7 @@ function populate_form()
 function handle_pid_nav(e)
 {
   e.preventDefault();
-  var href = this.href + '&ce=' + ce.active_editor + '&cet=' + ce.active_template;
-  window.location = href;
+  window.location = this.href;
 }
 
 function handle_editor_nav(e)
@@ -88,10 +87,10 @@ function handle_editor_nav(e)
   ce.editors.filter('.'+target).show();
   if(target == 'sendmail') {
     ce.templates.hide();
-    ce.templates.filter('.'+ce.active_template).show();
+    ce.templates.filter('.'+sessionStorage.active_template).show();
   }
 
-  ce.active_editor = target;
+  sessionStorage.active_editor = target;
 }
 
 function handle_sendmail_nav(e)
@@ -104,7 +103,7 @@ function handle_sendmail_nav(e)
   ce.templates.hide();
   ce.templates.filter('.'+target).show();
 
-  ce.active_template = target;
+  sessionStorage.active_template = target;
 }
 
 
@@ -270,7 +269,7 @@ function handle_form_submit(e)
           saved_content.preview[key] = ce.sendmail_preview.filter('.'+key).html();
         }
         delete autosave[ce.pid];
-        localStorage.autosave = JSON.stringify(autosave);
+        sessionStorage.autosave = JSON.stringify(autosave);
         reset_queue();
         update_state();
       } else {
@@ -297,7 +296,7 @@ function handle_form_revert(e)
   survey_error = false
 
   delete autosave[ce.pid];
-  localStorage.autosave = JSON.stringify(autosave);
+  sessionStorage.autosave = JSON.stringify(autosave);
   reset_queue();
   update_state();
 }
@@ -319,7 +318,7 @@ function do_autosave()
   } else {
     delete autosave[ce.pid];
   }
-  localStorage.autosave = JSON.stringify(autosave);
+  sessionStorage.autosave = JSON.stringify(autosave);
 }
 
 function hold_lock()
@@ -342,8 +341,9 @@ function hold_lock()
 
 jQuery(document).ready( function() {
   ce.pid = form_vars['pid'];
-  ce.active_editor = form_vars['active_editor'];
-  ce.active_template = form_vars['active_template'];
+
+  if(!sessionStorage.active_editor)   { sessionStorage.active_editor='survey'; }
+  if(!sessionStorage.active_template) { sessionStorage.active_template='welcome'; }
 
   ce.body = jQuery('#tlc-ttsurvey-admin div.content');
   ce.form = ce.body.find('form.content');
@@ -371,21 +371,21 @@ jQuery(document).ready( function() {
 
   ce.editor_navtabs = ce.form.find('a.editor.nav-tab');
   ce.editor_navtabs.removeClass('nav-tab-active');
-  ce.editor_navtabs.filter('.'+ce.active_editor).addClass('nav-tab-active');
+  ce.editor_navtabs.filter('.'+sessionStorage.active_editor).addClass('nav-tab-active');
   ce.editor_navtabs.on('click',handle_editor_nav);
 
   ce.sendmail_navtabs = ce.sendmail.find('a.template.nav-tab');
   ce.sendmail_navtabs.removeClass('nav-tab-active');
-  ce.sendmail_navtabs.filter('.'+ce.active_template).addClass('nav-tab-active');
+  ce.sendmail_navtabs.filter('.'+sessionStorage.active_template).addClass('nav-tab-active');
   ce.sendmail_navtabs.on('click',handle_sendmail_nav);
 
   ce.templates = ce.sendmail.find('div.template');
 
   ce.form_status.hide();
   ce.editors.hide();
-  ce.editors.filter('.'+ce.active_editor).show();
+  ce.editors.filter('.'+sessionStorage.active_editor).show();
   ce.templates.hide();
-  ce.templates.filter('.'+ce.active_template).show();
+  ce.templates.filter('.'+sessionStorage.active_template).show();
 
   //------------------------------------------------------------
   // We're updating the form content here rather than in php to avoid
@@ -404,8 +404,8 @@ jQuery(document).ready( function() {
     return;
   }
 
-  if(localStorage.autosave) {
-    autosave = JSON.parse(localStorage.autosave)
+  if(sessionStorage.autosave) {
+    autosave = JSON.parse(sessionStorage.autosave)
   }
 
   //------------------------------------------------------------

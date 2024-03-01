@@ -368,8 +368,6 @@ function enqueue_content_javascript($editable, $pid)
       'nonce' => array('content_form',wp_create_nonce('content_form')),
       'editable' => $editable,
       'pid' => $pid,
-      'active_editor' => ($_GET['ce'] ?? 'survey'),
-      'active_template' => ($_GET['cet'] ?? array_key_first(SENDMAIL_TEMPLATES)),
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
