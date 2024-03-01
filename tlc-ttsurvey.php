@@ -89,10 +89,23 @@ register_uninstall_hook(    __FILE__, ns('handle_uninstall') );
 
 function handle_activate()
 {
+  require_once plugin_path('include/const.php');
   require_once plugin_path('include/logger.php');
   require_once plugin_path('include/surveys.php');
   require_once plugin_path('include/users.php');
   log_info('activate: '.__NAMESPACE__);
+
+  $cat_id = category_exists(POST_CATEGORY_NAME);
+  if(!$cat_id) {
+    $cat_id = wp_insert_category(
+      array(
+        'cat_name' => POST_CATEGORY_NAME,
+        'category_nicename' => POST_CATEGORY_SLUG,
+        'category_description' => 'Post entries created and used by the Time & Talent plugin',
+      )
+    );
+  }
+
   users_activate();
   surveys_activate();
 
@@ -102,12 +115,16 @@ function handle_activate()
 
 function handle_deactivate()
 {
+  require_once plugin_path('include/const.php');
   require_once plugin_path('include/logger.php');
   require_once plugin_path('include/surveys.php');
   require_once plugin_path('include/users.php');
   log_info('deactivate: '.__NAMESPACE__);
   users_deactivate();
   surveys_deactivate();
+
+  $cat_id = category_exists(POST_CATEGORY_NAME);
+  if($cat_id) { wp_delete_category($cat_id); }
 
   $admin = get_role('administrator');
   $admin->remove_cap('tlc-ttsurvey-view');

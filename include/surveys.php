@@ -59,11 +59,12 @@ function register_survey_post_type()
         'not_found_in_trash' => 'No Surveys found in Trash',
       ),
       'has_archive' => false,
-      'supports' => array('title','editor','revisions'),
+      'supports' => array('title','editor','author','revisions'),
       'public' => false,
       'show_ui' => true,
       'show_in_rest' => false,
       'show_in_menu' => $show_in_menu,
+      'taxonomies' => array('category'),
     ),
   );
 }
@@ -78,6 +79,25 @@ function surveys_activate()
   log_info("Surveys Activate");
   register_survey_post_type();
   flush_rewrite_rules();
+
+  $cat_id = category_exists(POST_CATEGORY_NAME);
+  if($cat_id) {
+    $post_ids = get_posts(
+      array(
+        'post_type' => SURVEY_POST_TYPE,
+        'numberposts' => -1,
+        'fields' => 'ids',
+      )
+    );
+    foreach($post_ids as $pid) {
+      wp_update_post(
+        array(
+          'ID'=>$pid,
+          'post_category'=>array($cat_id),
+        )
+      );
+    }
+  }
 }
 
 function surveys_deactivate()
@@ -207,6 +227,7 @@ class Survey
         'post_content' => wp_slash($content),
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
+        'post_category' => array(category_exists(POST_CATEGORY_NAME)),
       ),
       true,
     );
@@ -244,6 +265,7 @@ class Survey
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
         'post_date_gmt' => $created,
+        'post_category' => array(category_exists(POST_CATEGORY_NAME)),
       ),
       true,
     );
