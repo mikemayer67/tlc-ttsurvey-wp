@@ -165,7 +165,7 @@ function logout_active_user()
 function start_survey_as($user)
 {
   $userid = $user->userid();
-  $token = $user->token();
+  $token = $user->access_token();
   return CookieJar::instance()->set_active_userid($userid,$token);
 }
 

@@ -3,6 +3,9 @@ namespace TLC\TTSurvey;
 
 if( ! defined('WPINC') ) { die; }
 
+const POST_CATEGORY_NAME = 'Time & Talent Survey';
+const POST_CATEGORY_SLUG = 'tlc-ttsurvey';
+
 const OPTIONS_NONCE      = 'tlc-ttsurvey-settings';
 const DATA_NONCE         = 'tlc-ttsurve-data';
 const SETTINGS_PAGE_SLUG = 'tlc-ttsurvey-settings';
