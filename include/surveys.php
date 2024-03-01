@@ -204,7 +204,7 @@ class Survey
     $post_id = wp_insert_post(
       array(
         'post_title' => $name,
-        'post_content' => $content,
+        'post_content' => wp_slash($content),
         'post_type' => SURVEY_POST_TYPE,
         'post_status' => 'publish',
       ),
