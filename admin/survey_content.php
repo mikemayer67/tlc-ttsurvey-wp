@@ -275,8 +275,10 @@ function add_content_form($survey,$editable=false)
   echo "</div>";
 
   // add the content editors
+  echo "<div class='content-editors'>";
   add_survey_editor($survey);
   add_sendmail_editor($survey);
+  echo "</div>";
 
   //   add submit button if editable
   if($editable) {
@@ -341,7 +343,7 @@ function add_sendmail_editor($survey)
     echo "<div class='template $key'>";
     echo "<div class='info'>Sent when $when</div>";
     echo "<textarea class='template $key' name='$key' readonly></textarea>";
-    echo "<div class='template-preview $key'>preview</div>";
+    echo "<div class='preview $key'>preview</div>";
     echo "</div>";
   }
 

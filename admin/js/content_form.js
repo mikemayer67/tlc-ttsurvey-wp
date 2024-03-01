@@ -359,7 +359,7 @@ jQuery(document).ready( function() {
 
   ce.sendmail = ce.editors.filter('.sendmail');
   ce.sendmail_textarea = ce.sendmail.find('textarea');
-  ce.sendmail_preview = ce.sendmail.find('div.preview');
+  ce.sendmail_preview = ce.sendmail.find('.preview');
 
   ce.submit = ce.form.find('input.submit');
   ce.revert = ce.form.find('button.revert');

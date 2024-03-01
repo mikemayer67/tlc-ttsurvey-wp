@@ -363,11 +363,11 @@
   border-color:var(--bright-error-color);
 }
 
-#tlc-ttsurvey-admin .sendmail.info {
+#tlc-ttsurvey-admin .content .sendmail.editor .info {
   margin-bottom:1em;
 }
 
-#tlc-ttsurvey-admin .sendmail.preview {
+#tlc-ttsurvey-admin .content .sendmail.editor .preview {
   margin:8px 0 0 15px;
   padding:15px;
   border-style:double;
@@ -377,14 +377,14 @@
   background:#f8f8f8;
 }
 
-#tlc-ttsurvey-admin .sendmail.preview p {
+#tlc-ttsurvey-admin .template-preview p {
   margin:5px 0;
 }
 
-#tlc-ttsurvey-admin div.sendmail.preview h1,
-#tlc-ttsurvey-admin div.sendmail.preview h2,
-#tlc-ttsurvey-admin div.sendmail.preview h3,
-#tlc-ttsurvey-admin div.sendmail.preview h4
+#tlc-ttsurvey-admin div.template-preview h1,
+#tlc-ttsurvey-admin div.template-preview h2,
+#tlc-ttsurvey-admin div.template-preview h3,
+#tlc-ttsurvey-admin div.template-preview h4
 {
   margin:5px 0;
 }
