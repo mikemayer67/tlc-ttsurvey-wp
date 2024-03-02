@@ -227,10 +227,10 @@ function update_state()
   ce.revert.prop('disabled', !has_change );
 
   if(survey_error) {
-    ce.survey.textarea.addClass('invalid');
+    ce.survey_textarea.addClass('invalid');
     ce.survey_error.html(survey_error).show();
   } else {
-    ce.survey.textarea.removeClass('invalid');
+    ce.survey_textarea.removeClass('invalid');
     ce.survey_error.hide();
   }
 }
@@ -248,7 +248,7 @@ function handle_form_submit(e)
     content:{},
   };
 
-  data.content.survey = ce.survey.textarea.val();
+  data.content.survey = ce.survey_textarea.val();
   data.content.sendmail = {}
   ce.sendmail_textarea.each(function() {
     data.content.sendmail[this.name] = this.value;
