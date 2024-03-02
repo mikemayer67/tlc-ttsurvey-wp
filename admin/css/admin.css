@@ -337,18 +337,20 @@
   height:10em;
 }
 
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.pids,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.editors,
-#tlc-ttsurvey-admin .content .nav-tab-wrapper.templates
+#tlc-ttsurvey-admin .content .nav-tab-wrapper
 {
   margin-bottom:15px;
 }
 
-#tlc-ttsurvey-admin .content a.nav-tab.pid,
-#tlc-ttsurvey-admin .content a.nav-tab.editor,
-#tlc-ttsurvey-admin .content a.nav-tab.template 
+#tlc-ttsurvey-admin .content .nav-tab
 {
   padding: 0 10px 0 10px;
+  margin: 0 0 0 7px;
+}
+
+#tlc-ttsurvey-admin .content .nav-tab.nav-tab-active
+{
+  margin-bottom: -1px;
 }
 
 #tlc-ttsurvey-admin .content div.invalid {

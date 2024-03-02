@@ -267,12 +267,12 @@ function add_content_form($survey,$editable=false)
   echo "<form class='$class'>";
 
   // Add the editor navbar
-  echo "<div class='nav-tab-wrapper editors'>";
+  echo "<ul class='nav-tab-wrapper editors'>";
   $editors = [['survey','Survey Form'],['sendmail','Email Customization']];
   foreach( $editors as [$key,$label] ) {
-    echo "<a class='nav-tab editor $key' data-target='$key'>$label</a>";
+    echo "<li class='nav-tab editor $key' data-target='$key'>$label</li>";
   }
-  echo "</div>";
+  echo "</ul>";
 
   // add the content editors
   echo "<div class='content-editors'>";
@@ -331,12 +331,12 @@ function add_sendmail_editor($survey)
   echo "</div>";
 
   $templates = array_keys(SENDMAIL_TEMPLATES);
-  echo "<div class='nav-tab-wrapper templates'>";
+  echo "<ul class='nav-tab-wrapper templates'>";
   foreach( $templates as $key ) {
     $label = SENDMAIL_TEMPLATES[$key]['label'] ?? ucfirst($key);
-    echo "<a class='nav-tab template $key' data-target='$key'>$label</a>";
+    echo "<li class='nav-tab template $key' data-target='$key'>$label</li>";
   }
-  echo "</div>"; // nav-tab-wrapper.sendmail
+  echo "</ul>"; // nav-tab-wrapper.sendmail
 
   foreach($templates as $key) {
     $when = SENDMAIL_TEMPLATES[$key]['when'];
