@@ -364,17 +364,17 @@ jQuery(document).ready( function() {
   ce.submit = ce.form.find('input.submit');
   ce.revert = ce.form.find('button.revert');
 
-  ce.pid_navtabs = ce.body.find('a.pid.nav-tab');
+  ce.pid_navtabs = ce.body.find('.pid.nav-tab');
   ce.pid_navtabs.removeClass('nav-tab-active');
   ce.pid_navtabs.filter('.'+ce.pid).addClass('nav-tab-active');
   ce.pid_navtabs.on('click',handle_pid_nav);
 
-  ce.editor_navtabs = ce.form.find('a.editor.nav-tab');
+  ce.editor_navtabs = ce.form.find('.editor.nav-tab');
   ce.editor_navtabs.removeClass('nav-tab-active');
   ce.editor_navtabs.filter('.'+sessionStorage.active_editor).addClass('nav-tab-active');
   ce.editor_navtabs.on('click',handle_editor_nav);
 
-  ce.sendmail_navtabs = ce.sendmail.find('a.template.nav-tab');
+  ce.sendmail_navtabs = ce.sendmail.find('.template.nav-tab');
   ce.sendmail_navtabs.removeClass('nav-tab-active');
   ce.sendmail_navtabs.filter('.'+sessionStorage.active_template).addClass('nav-tab-active');
   ce.sendmail_navtabs.on('click',handle_sendmail_nav);
