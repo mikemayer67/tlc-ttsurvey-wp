@@ -298,12 +298,33 @@ function add_content_form($survey,$editable=false)
 
 function add_survey_editor($survey)
 {
+  require_once plugin_path('admin/survey_blocks.php');
+
   echo "<div class='editor survey'>";
+
   echo "<div class='info'>";
-  echo "Instructions go here.";
+  echo "<div>Each survey form is constructed from a number of building blocks";
+  echo "which are grouped into survey sections.</div>";
+  echo "<div>There are a number of types of building blocks allowing for the inclusion of";
+  echo " text, graphics, and (<i>of course</i>) questions.</div>";
+  echo "<div>For more information about the types of building blocks, see the &quot;help&quot; tab below</div>";
   echo "</div>";
-  echo "<textarea class='survey' name='survey' readonly></textarea>";
-  echo "<div class='invalid survey'></div>";
+
+  $sections = gen_survey_sections($survey);
+  echo "<ul class='nav-tab-wrapper sections'>";
+  if($survey->is_draft()) {
+    echo "<li class='nav-tab section _add' data-target='_add'>+</li>";
+  }
+  foreach($sections as $section) {
+    echo $section['tab'];
+  }
+  echo "<li class='nav-tab section _help' data-target='_help'>Help</li>";
+  echo "</ul>";
+  /* @@@ TODO: Flesh out the help tab */
+
+  foreach($sections as $section) {
+    echo $section['body'];
+  }
   echo "</div>";
 }
 
