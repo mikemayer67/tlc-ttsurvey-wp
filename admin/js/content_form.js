@@ -49,7 +49,8 @@ function populate_form()
           }
         } 
 
-        ce.survey_textarea.val(current_content.survey);
+
+        console.log("@@@ Add logic to populate survey content");
 
         for(const key in current_content.sendmail) {
           ce.sendmail_textarea.filter('.'+key).val(current_content.sendmail[key]);
@@ -85,12 +86,31 @@ function handle_editor_nav(e)
 
   ce.editors.hide();
   ce.editors.filter('.'+target).show();
+  if(target == 'survey') {
+    ce.sections.hide();
+    ce.sections.filter('.'+sessionStorage.active_section).show();
+  }
   if(target == 'sendmail') {
     ce.templates.hide();
     ce.templates.filter('.'+sessionStorage.active_template).show();
   }
 
   sessionStorage.active_editor = target;
+}
+
+function handle_section_nav(e)
+{
+  const target = this.dataset.target;
+
+  ce.section_navtabs.removeClass('nav-tab-active');
+  jQuery(this).addClass('nav-tab-active');
+
+  ce.sections.hide();
+  ce.sections.filter('.'+target).show();
+
+  if( ce.submit.length > 0 ) {
+    sessionStorage.active_section = target;
+  }
 }
 
 function handle_sendmail_nav(e)
@@ -209,7 +229,7 @@ function content_has_changed()
 {
   if(!saved_content) { return false; }
 
-  if(saved_content.survey != ce.survey_textarea.val()) { return true; }
+  console.log("@@@ Add logic to see if survey content has changed");
 
   var rval = false;
   ce.sendmail_textarea.each(function() {
@@ -226,12 +246,11 @@ function update_state()
   ce.submit.prop('disabled', !has_change || survey_error );
   ce.revert.prop('disabled', !has_change );
 
+  console.log("@@@ Update logic for displaying error state");
   if(survey_error) {
-    ce.survey_textarea.addClass('invalid');
-    ce.survey_error.html(survey_error).show();
+    console.log("@@@ ... has error: " + survey_error);
   } else {
-    ce.survey_textarea.removeClass('invalid');
-    ce.survey_error.hide();
+    console.log("@@@ ... no error at this point");
   }
 }
 
@@ -248,7 +267,8 @@ function handle_form_submit(e)
     content:{},
   };
 
-  data.content.survey = ce.survey_textarea.val();
+  console.log("@@@ Add logic to add survey content to data structure");
+
   data.content.sendmail = {}
   ce.sendmail_textarea.each(function() {
     data.content.sendmail[this.name] = this.value;
@@ -261,7 +281,7 @@ function handle_form_submit(e)
       if(response.success) {
         ce.form_status.html('saved').addClass('info').show();
         ce.last_modified = response.data.last_modified;
-        saved_content.survey = ce.survey_textarea.val();
+        console.log("@@@ Add logic to copy survey content to saved_content");
         for(const key in saved_content.sendmail) {
           saved_content.sendmail[key] = ce.sendmail_textarea.filter('.'+key).val();
         }
@@ -285,7 +305,7 @@ function handle_form_revert(e)
   ce.form_status.hide();
   e.preventDefault();
 
-  ce.survey_textarea.val(saved_content.survey);
+  console.log("@@@ Add logic to revert survey content to saved content");
   for(const key in saved_content.sendmail) {
     ce.sendmail_textarea.filter('.'+key).val(saved_content.sendmail[key]);
   }
@@ -305,11 +325,12 @@ function do_autosave()
 {
   if( content_has_changed() ) {
     autosave[ce.pid] = {
-      survey: ce.survey_textarea.val(),
+      survey: {},
       sendmail: {},
       preview: {},
       last_modified: ce.last_modified,
     };
+    console.log("@@@ Add logic to add survey content to autosave");
     ce.sendmail_textarea.each( function() {
       const name = this.name;
       const value = this.value;
@@ -344,6 +365,7 @@ jQuery(document).ready( function() {
 
   if(!sessionStorage.active_editor)   { sessionStorage.active_editor='survey'; }
   if(!sessionStorage.active_template) { sessionStorage.active_template='welcome'; }
+  if(!sessionStorage.active_section)  { sessionStorage.active_section='_blank_'; }
 
   ce.body = jQuery('#tlc-ttsurvey-admin div.content');
   ce.form = ce.body.find('form.content');
@@ -354,8 +376,6 @@ jQuery(document).ready( function() {
   ce.inputs = ce.editors.find('textarea');
 
   ce.survey = ce.editors.filter('.survey');
-  ce.survey_textarea = ce.survey.find('textarea');
-  ce.survey_error = ce.survey.find('div.invalid')
 
   ce.sendmail = ce.editors.filter('.sendmail');
   ce.sendmail_textarea = ce.sendmail.find('textarea');
@@ -374,16 +394,28 @@ jQuery(document).ready( function() {
   ce.editor_navtabs.filter('.'+sessionStorage.active_editor).addClass('nav-tab-active');
   ce.editor_navtabs.on('click',handle_editor_nav);
 
+  ce.section_navtabs = ce.survey.find('.section.nav-tab');
+  ce.section_navtabs.removeClass('nav-tab-active');
+  var active_section_tab = ce.section_navtabs.filter('.'+sessionStorage.active_section);
+  if( active_section_tab.length == 0 ) {
+    active_section_tab = ce.section_navtabs.first();
+  }
+  active_section_tab.addClass('nav-tab-active');
+  ce.section_navtabs.on('click',handle_section_nav);
+
   ce.sendmail_navtabs = ce.sendmail.find('.template.nav-tab');
   ce.sendmail_navtabs.removeClass('nav-tab-active');
   ce.sendmail_navtabs.filter('.'+sessionStorage.active_template).addClass('nav-tab-active');
   ce.sendmail_navtabs.on('click',handle_sendmail_nav);
 
+  ce.sections = ce.survey.find('div.section');
   ce.templates = ce.sendmail.find('div.template');
 
   ce.form_status.hide();
   ce.editors.hide();
   ce.editors.filter('.'+sessionStorage.active_editor).show();
+  ce.sections.hide();
+  ce.sections.filter('.'+sessionStorage.active_section).show();
   ce.templates.hide();
   ce.templates.filter('.'+sessionStorage.active_template).show();
 

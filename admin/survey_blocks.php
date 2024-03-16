@@ -27,7 +27,7 @@ function gen_survey_section($section)
   $name = $section['name'];
   $tgt = str_replace(' ','-',strtolower($name));
 
-  $tab = "<li class='nav-tab section $name' data-target='$tgt'>$name</li>";
+  $tab = "<li class='nav-tab section $tgt' data-target='$tgt'>$name</li>";
 
   $body = "<div class='section $tgt'>";
   $body .= "$name stuff goes here";
