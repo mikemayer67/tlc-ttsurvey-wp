@@ -87,8 +87,8 @@ function handle_editor_nav(e)
   ce.editors.hide();
   ce.editors.filter('.'+target).show();
   if(target == 'survey') {
-    ce.sections.hide();
-    ce.sections.filter('.'+sessionStorage.active_section).show();
+    ce.focuses.hide();
+    ce.focuses.filter('.'+sessionStorage.active_focus).show();
   }
   if(target == 'sendmail') {
     ce.templates.hide();
@@ -98,18 +98,18 @@ function handle_editor_nav(e)
   sessionStorage.active_editor = target;
 }
 
-function handle_section_nav(e)
+function handle_focus_nav(e)
 {
   const target = this.dataset.target;
 
-  ce.section_navtabs.removeClass('nav-tab-active');
+  ce.focus_navtabs.removeClass('nav-tab-active');
   jQuery(this).addClass('nav-tab-active');
 
-  ce.sections.hide();
-  ce.sections.filter('.'+target).show();
+  ce.focuses.hide();
+  ce.focuses.filter('.'+target).show();
 
   if( ce.submit.length > 0 ) {
-    sessionStorage.active_section = target;
+    sessionStorage.active_focus = target;
   }
 }
 
@@ -365,7 +365,7 @@ jQuery(document).ready( function() {
 
   if(!sessionStorage.active_editor)   { sessionStorage.active_editor='survey'; }
   if(!sessionStorage.active_template) { sessionStorage.active_template='welcome'; }
-  if(!sessionStorage.active_section)  { sessionStorage.active_section='_blank_'; }
+  if(!sessionStorage.active_focus)  { sessionStorage.active_focus='_blank_'; }
 
   ce.body = jQuery('#tlc-ttsurvey-admin div.content');
   ce.form = ce.body.find('form.content');
@@ -394,28 +394,28 @@ jQuery(document).ready( function() {
   ce.editor_navtabs.filter('.'+sessionStorage.active_editor).addClass('nav-tab-active');
   ce.editor_navtabs.on('click',handle_editor_nav);
 
-  ce.section_navtabs = ce.survey.find('.section.nav-tab');
-  ce.section_navtabs.removeClass('nav-tab-active');
-  var active_section_tab = ce.section_navtabs.filter('.'+sessionStorage.active_section);
-  if( active_section_tab.length == 0 ) {
-    active_section_tab = ce.section_navtabs.first();
+  ce.focus_navtabs = ce.survey.find('.focus.nav-tab');
+  ce.focus_navtabs.removeClass('nav-tab-active');
+  var active_focus_tab = ce.focus_navtabs.filter('.'+sessionStorage.active_focus);
+  if( active_focus_tab.length == 0 ) {
+    active_focus_tab = ce.focus_navtabs.first();
   }
-  active_section_tab.addClass('nav-tab-active');
-  ce.section_navtabs.on('click',handle_section_nav);
+  active_focus_tab.addClass('nav-tab-active');
+  ce.focus_navtabs.on('click',handle_focus_nav);
 
   ce.sendmail_navtabs = ce.sendmail.find('.template.nav-tab');
   ce.sendmail_navtabs.removeClass('nav-tab-active');
   ce.sendmail_navtabs.filter('.'+sessionStorage.active_template).addClass('nav-tab-active');
   ce.sendmail_navtabs.on('click',handle_sendmail_nav);
 
-  ce.sections = ce.survey.find('div.section');
+  ce.focuses = ce.survey.find('div.focus');
   ce.templates = ce.sendmail.find('div.template');
 
   ce.form_status.hide();
   ce.editors.hide();
   ce.editors.filter('.'+sessionStorage.active_editor).show();
-  ce.sections.hide();
-  ce.sections.filter('.'+sessionStorage.active_section).show();
+  ce.focuses.hide();
+  ce.focuses.filter('.'+sessionStorage.active_focus).show();
   ce.templates.hide();
   ce.templates.filter('.'+sessionStorage.active_template).show();
 

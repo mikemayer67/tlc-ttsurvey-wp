@@ -11,25 +11,25 @@ if( !plugin_admin_can('content') ) {
 
 require_once plugin_path('include/logger.php');
 
-function gen_survey_sections($survey)
+function gen_survey_focuses($survey)
 {
   $content = $survey->content();
   $content = $content['survey'] ?? [];
-  $sections = [];
-  foreach( $content as $section ) {
-    $sections[] = gen_survey_section($section);
+  $focuses = [];
+  foreach( $content as $focus ) {
+    $focuses[] = gen_survey_focus($focus);
   }
-  return $sections;
+  return $focuses;
 }
 
-function gen_survey_section($section)
+function gen_survey_focus($focus)
 {
-  $name = $section['name'];
+  $name = $focus['name'];
   $tgt = str_replace(' ','-',strtolower($name));
 
-  $tab = "<li class='nav-tab section $tgt' data-target='$tgt'>$name</li>";
+  $tab = "<li class='nav-tab focus $tgt' data-target='$tgt'>$name</li>";
 
-  $body = "<div class='section $tgt'>";
+  $body = "<div class='focus $tgt'>";
   $body .= "$name stuff goes here";
   $body .= "</div>";
 

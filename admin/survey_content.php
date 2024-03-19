@@ -304,26 +304,26 @@ function add_survey_editor($survey)
 
   echo "<div class='info'>";
   echo "<div>Each survey form is constructed from a number of building blocks";
-  echo "which are grouped into survey sections.</div>";
+  echo "which are grouped into survey focuses.</div>";
   echo "<div>There are a number of types of building blocks allowing for the inclusion of";
   echo " text, graphics, and (<i>of course</i>) questions.</div>";
   echo "<div>For more information about the types of building blocks, see the &quot;help&quot; tab below</div>";
   echo "</div>";
 
-  $sections = gen_survey_sections($survey);
-  echo "<ul class='nav-tab-wrapper sections'>";
+  $focuses = gen_survey_focuses($survey);
+  echo "<ul class='nav-tab-wrapper focuses'>";
   if($survey->is_draft()) {
-    echo "<li class='nav-tab section _add' data-target='_add'>+</li>";
+    echo "<li class='nav-tab focus _add' data-target='_add'>+</li>";
   }
-  foreach($sections as $section) {
-    echo $section['tab'];
+  foreach($focuses as $focus) {
+    echo $focus['tab'];
   }
-  echo "<li class='nav-tab section _help' data-target='_help'>Help</li>";
+  echo "<li class='nav-tab focus _help' data-target='_help'>Help</li>";
   echo "</ul>";
   /* @@@ TODO: Flesh out the help tab */
 
-  foreach($sections as $section) {
-    echo $section['body'];
+  foreach($focuses as $focus) {
+    echo $focus['body'];
   }
   echo "</div>";
 }
