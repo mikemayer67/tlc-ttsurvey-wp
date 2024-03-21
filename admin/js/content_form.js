@@ -108,8 +108,18 @@ function handle_focus_nav(e)
   ce.focuses.hide();
   ce.focuses.filter('.'+target).show();
 
-  if( ce.submit.length > 0 ) {
-    sessionStorage.active_focus = target;
+  // adjust the active focus tab if either:
+  // - the current pid tab is for the current (active or draft) survey
+  // - all surveys are closed
+  // but only if it's a real focus tab
+  if(!target.startsWith('_')) {
+    if( form_vars.current ) {
+      if( form_vars.current == form_vars.pid ) {
+        sessionStorage.active_focus = target;
+      }
+    } else {
+      sessionStorage.active_focus = target;
+    }
   }
 }
 
@@ -365,7 +375,7 @@ jQuery(document).ready( function() {
 
   if(!sessionStorage.active_editor)   { sessionStorage.active_editor='survey'; }
   if(!sessionStorage.active_template) { sessionStorage.active_template='welcome'; }
-  if(!sessionStorage.active_focus)  { sessionStorage.active_focus='_blank_'; }
+  if(!sessionStorage.active_focus)    { sessionStorage.active_focus='_blank_'; }
 
   ce.body = jQuery('#tlc-ttsurvey-admin div.content');
   ce.form = ce.body.find('form.content');
@@ -399,6 +409,10 @@ jQuery(document).ready( function() {
   var active_focus_tab = ce.focus_navtabs.filter('.'+sessionStorage.active_focus);
   if( active_focus_tab.length == 0 ) {
     active_focus_tab = ce.focus_navtabs.first();
+    var target = active_focus_tab.data('target');
+    if(!target.startsWith('_')) {
+      sessionStorage.active_focus = target;
+    }
   }
   active_focus_tab.addClass('nav-tab-active');
   ce.focus_navtabs.on('click',handle_focus_nav);

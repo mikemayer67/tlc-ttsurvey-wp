@@ -121,9 +121,9 @@ function add_survey_navbar()
   if($active_pid == FIRST_TAB) {
     add_new_survey_content();
   } elseif( $active_pid == $current_pid ) {
-    add_current_survey_content();
+    add_current_survey_content($current);
   } else {
-    add_past_survey_content($active_pid);
+    add_past_survey_content($active_pid,$current_pid);
   }
 }
 
@@ -183,7 +183,7 @@ function add_new_survey_content()
   enqueue_new_survey_javascript();
 }
 
-function add_past_survey_content($pid)
+function add_past_survey_content($pid,$current_pid)
 {
   $survey = survey_catalog()->lookup_by_post_id($pid);
 
@@ -212,15 +212,13 @@ function add_past_survey_content($pid)
   echo "No changes can be made to its content.";
   echo "</div></div>";
 
-  add_content_form($survey);
+  add_content_form($survey,$current_pid);
 
   echo "</div>";
 }
 
-function add_current_survey_content()
+function add_current_survey_content($survey)
 {
-  $survey = current_survey();
-
   echo "<div class='current'>";
 
   $name = $survey->name();;
@@ -253,13 +251,13 @@ function add_current_survey_content()
   echo "Revision tracking is handled via the survey <a href='$url'>post editor</a>";
   echo "</div>";
 
-  add_content_form($survey,$editable);
+  add_content_form($survey,$survey->post_id(),$editable);
 
   echo "</div>";
 }
 
 
-function add_content_form($survey,$editable=false)
+function add_content_form($survey,$current_pid,$editable=false)
 {
   // add the form
   //   no action or method attributes specified as submision will be handled by javascript
@@ -292,7 +290,7 @@ function add_content_form($survey,$editable=false)
   echo "</form>";
 
   // enqueue the javascript
-  enqueue_content_javascript($editable, $survey->post_id());
+  enqueue_content_javascript($survey->post_id(), $current_pid, $editable);
 }
 
 
@@ -372,7 +370,7 @@ function add_sendmail_editor($survey)
 }
 
 
-function enqueue_content_javascript($editable, $pid)
+function enqueue_content_javascript($pid, $current_pid, $editable)
 {
   wp_register_script(
     'tlc_ttsurvey_content_form',
@@ -387,8 +385,9 @@ function enqueue_content_javascript($editable, $pid)
     array(
       'ajaxurl' => admin_url( 'admin-ajax.php' ),
       'nonce' => array('content_form',wp_create_nonce('content_form')),
-      'editable' => $editable,
       'pid' => $pid,
+      'current' => $current_pid,
+      'editable' => $editable,
     ),
   );
   wp_enqueue_script('tlc_ttsurvey_content_form');
