@@ -274,7 +274,7 @@ function add_content_form($survey,$current_pid,$editable=false)
 
   // add the content editors
   echo "<div class='content-editors'>";
-  add_survey_editor($survey);
+  add_survey_editor($survey,$editable);
   add_sendmail_editor($survey);
   echo "</div>";
 
@@ -294,7 +294,7 @@ function add_content_form($survey,$current_pid,$editable=false)
 }
 
 
-function add_survey_editor($survey)
+function add_survey_editor($survey,$editable=false)
 {
   require_once plugin_path('admin/survey_blocks.php');
 
@@ -305,10 +305,10 @@ function add_survey_editor($survey)
   echo "which are grouped into survey focuses.</div>";
   echo "<div>There are a number of types of building blocks allowing for the inclusion of";
   echo " text, graphics, and (<i>of course</i>) questions.</div>";
-  echo "<div>For more information about the types of building blocks, see the &quot;help&quot; tab below</div>";
+  echo "<div>For more information about the types of building blocks or how to edit focus info, see the &quot;Help&quot; tab below</div>";
   echo "</div>";
 
-  $focuses = gen_survey_focuses($survey);
+  $focuses = gen_survey_focuses($survey,$editable);
   echo "<ul class='nav-tab-wrapper focuses'>";
   if($survey->is_draft()) {
     echo "<li class='nav-tab focus _add' data-target='_add'>+</li>";
